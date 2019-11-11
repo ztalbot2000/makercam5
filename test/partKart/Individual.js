@@ -18,13 +18,13 @@ describe('Testing Individual.js', function ()
    it('individual.fitness should be: NaN', function ()
    {
       let expectedResult = NaN;
-      assert.equal(isNaN(individual.fitness), true, "individual.fitness: expected " + expectedResult + " received = " + individual.fitness);
+      assert.isNaN(individual.fitness, "individual.fitness: expected " + expectedResult + " received = " + individual.fitness);
    });
 
    it('individual.secondaryfitness should be: NaN', function ()
    {
       let expectedResult = NaN;
-      assert.equal(isNaN(individual.secondaryfitness), true, "individual.secondaryfitness: expected " + expectedResult + " received = " + individual.secondaryfitness);
+      assert.isNaN(individual.secondaryfitness, "individual.secondaryfitness: expected " + expectedResult + " received = " + individual.secondaryfitness);
    });
 
    it('individual.genes should be an Array', function ()
@@ -60,6 +60,26 @@ describe('Testing Individual.js', function ()
    {
       let expectedResult = 'function';
       assert.isFunction(individual.clone, "individual.clone: expected " + expectedResult + " received = " + typeof individual.clone);
+   });
+
+   it('individual.clone should increase genes', function ()
+   {
+      let expectedResult = 1;
+      let child = "Child";
+
+      // Add something to individula.genes array
+      individual.genes.push(child);
+
+      assert.lengthOf(individual.genes, expectedResult, "individual.genes.length expected: " + expectedResult + " received = " + individual.genes.length);
+
+      let clone = individual.clone();
+
+      assert.instanceOf(clone, Individual, "individual.clone(): expected: instance of Individual, received = " + clone);
+
+      let result = individual.genes.length;
+      assert.equal(result, expectedResult, "individual.clone: expected " + expectedResult + " received = " + result);
+
+      assert.equal(individual.genes[0], clone.genes[0], "individual.genes not cloned: expected " + individual.genes[0] + " received = " + clone.genes[0]);
    });
 
    it('individual.mate should be a function', function ()
