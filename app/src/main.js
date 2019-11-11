@@ -5,6 +5,7 @@ import mathAPI from '../math/operations.js';
 // var gc = new GlobalClass.GlobalClass("blast");
 //                 + "\n\n Global.zoom=" + gc.zoom
 import Global  from '../partKart/Global.js';
+import Individual  from '../partKart/Individual.js';
 
 $(document).ready(function() {
   $(".myButton").click(function () {

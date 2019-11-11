@@ -9,7 +9,7 @@ describe('Testing Global.js', function ()
 {
    it('Global should not be null', function ()
    {
-      assert.isNotNull(Global, 'Global resulted in null');
+      assert.isNotNull(Global, 'Global resulted is null');
    });
 
    describe('Testing Global variables', function (){});
