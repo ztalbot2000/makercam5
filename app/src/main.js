@@ -6,6 +6,7 @@ import mathAPI from '../math/operations.js';
 //                 + "\n\n Global.zoom=" + gc.zoom
 import Global  from '../partKart/Global.js';
 import Individual  from '../partKart/Individual.js';
+import Grid  from '../partKart/Grid.js';
 
 $(document).ready(function() {
   $(".myButton").click(function () {
