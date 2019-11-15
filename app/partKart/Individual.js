@@ -2,28 +2,25 @@
 export default class Individual
 {
 
-   constructor()
-   {
+   //public var fitness:Number = NaN;
+   fitness = NaN;
 
-      //public var fitness:Number = NaN;
-      this.fitness = NaN;
+   // secondary fitness is used as a "tiebreaker" in the event that fitness is equal
+   // this is important as we use rank based selection
+   //public var secondaryfitness:Number = NaN;
+   secondaryfitness = NaN;
 
-      // secondary fitness is used as a "tiebreaker" in the event that fitness is equal
-      // this is important as we use rank based selection
-      //public var secondaryfitness:Number = NaN;
-      this.secondaryfitness = NaN;
+   // the gene of the individual is an array of integers, each representing the index value of the nesting order
+   //public var genes:Array;
+   genes = [];
 
-      // the gene of the individual is an array of integers, each representing the index value of the nesting order
-      //public var genes:Array;
-      this.genes = [];
+   // whereas the genes array stores the insertion order, the data array stores the exact placements of each bitmap
+   //public var data:Array;
+   data = [];
 
-      // whereas the genes array stores the insertion order, the data array stores the exact placements of each bitmap
-      //public var data:Array;
-      this.data = [];
 
-   }
    //public function Individual():void
-   Individual()
+   constructor()
    {
 
    }
