@@ -1,17 +1,17 @@
-﻿//public class Individual
+﻿//O public class Individual
 export default class Individual
 {
 
-   //public var fitness:Number = NaN;
+   //O public var fitness:Number = NaN;
    fitness = NaN;
 
    // secondary fitness is used as a "tiebreaker" in the event that fitness is equal
    // this is important as we use rank based selection
-   //public var secondaryfitness:Number = NaN;
+   //O public var secondaryfitness:Number = NaN;
    secondaryfitness = NaN;
 
    // the gene of the individual is an array of integers, each representing the index value of the nesting order
-   //public var genes:Array;
+   //O public var genes:Array;
    genes = [];
 
    // whereas the genes array stores the insertion order, the data array stores the exact placements of each bitmap
@@ -19,7 +19,7 @@ export default class Individual
    data = [];
 
 
-   //public function Individual():void
+   //O public function Individual():void
    constructor()
    {
 
@@ -27,32 +27,32 @@ export default class Individual
 
    // mutates each chromasome of the gene according to the given probability p (percent)
    // returns the number of mutations
-   //public function mutate(p:Number):int
+   //O public function mutate(p:Number):int
    mutate(p)
    {
       if (!genes) {
          return 0;
       }
 
-      //var mutations:int = 0;
+      //O var mutations:int = 0;
       var mutations = 0;
 
-      //for(var i:int=0; i<genes.length; i++)
+      //O for(var i:int=0; i<genes.length; i++)
       for(var i=0; i<genes.length; i++)
       {
-         //var rand:Number = Math.random()*100;
+         //O var rand:Number = Math.random()*100;
          var rand = Math.random()*100;
          if ( rand < p )
          {
             mutations++;
             // swap current chromasome with another
-            //var j:int = i;
+            //O var j:int = i;
             var j = i;
             while( j==i )
             {
                j = Math.round(Math.random()*(genes.length-1));
             }
-            //var temp:int = genes[i];
+            //O var temp:int = genes[i];
             var temp = genes[i];
             genes[i] = genes[j];
             genes[j] = temp;
@@ -63,10 +63,10 @@ export default class Individual
    }
 
    // returns a clone of this individual
-   //public function clone():Individual
+   //O public function clone():Individual
    clone()
    {
-      //var clone:Individual = new Individual();
+      //O var clone:Individual = new Individual();
       var clone = new Individual();
       clone.fitness = this.fitness;
       clone.genes = this.genes.slice();
@@ -137,18 +137,18 @@ export default class Individual
    }*/
 
    // single point crossover
-   //public function mate(mate:Individual):Array
+   //O public function mate(mate:Individual):Array
    mate(mate)
    {
-      //var cutpoint:int = Math.round(Math.random()*((genes.length-1)*0.90));
+      //O var cutpoint:int = Math.round(Math.random()*((genes.length-1)*0.90));
       var cutpoint = Math.round(Math.random()*((genes.length-1)*0.90));
 
-      //var gene1:Array = genes.slice(0,cutpoint);
+      //O var gene1:Array = genes.slice(0,cutpoint);
       var gene1 = genes.slice(0,cutpoint);
-      //var gene2:Array = mate.genes.slice(0,cutpoint);
+      //O var gene2:Array = mate.genes.slice(0,cutpoint);
       var gene2 = mate.genes.slice(0,cutpoint);
 
-      //var i:int = 0;
+      //O var i:int = 0;
       var i = 0;
 
       while( i < genes.length )
@@ -170,11 +170,11 @@ export default class Individual
          i++;
       }
 
-      //var child1:Individual = new Individual();
+      //O var child1:Individual = new Individual();
       var child1 = new Individual();
       child1.genes = gene1;
 
-      //var child2:Individual = new Individual();
+      //O var child2:Individual = new Individual();
       var child2 = new Individual();
       child2.genes = gene2;
 
