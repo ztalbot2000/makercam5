@@ -163,35 +163,35 @@ export default class Grid extends PIXI.Graphics
 
       // draw horizontal lines
       //O for (i = 0; i <= gridynum; i++)
-      for ( var i = 0; i <= this.#gridynum; i++ )
+      for ( this.#i = 0; this.#i <= this.#gridynum; this.#i++ )
       {
          //O ypos = i * Global.zoom + yoffset;
-         ypos = i * Global.zoom + this.#yoffset;
+         ypos = this.#i * Global.zoom + this.#yoffset;
          if ( ypos != 0 )
          {
             //O gridlines[i] = new Shape();
-            this.#gridlines[i] = new PIXI.Graphics();
+            this.#gridlines[this.#i] = new PIXI.Graphics();
             //O drawHorizLine(gridlines[i]);
-            this.#drawHorizLine(this.#gridlines[i]);
+            this.#drawHorizLine(this.#gridlines[this.#i]);
             //O gridlines[i].y = ypos;
-            this.#gridlines[i].y = ypos;
+            this.#gridlines[this.#i].y = ypos;
          }
       }
 
       // draw vertical lines
       //O for (i = 0; i <= gridxnum; i++)
-      for ( var i = 0; i <= this.#gridxnum; i++ )
+      for ( this.#i = 0; this.#i <= this.#gridxnum; this.#i++ )
       {
          //O xpos = i*Global.zoom + xoffset;
-         xpos = i * Global.zoom + this.#xoffset;
+         xpos = this.#i * Global.zoom + this.#xoffset;
          if ( xpos != 0 )
          {
             //O gridlines[i] = new Shape();
-            this.#gridlines[i] = new PIXI.Graphics();
+            this.#gridlines[this.#i] = new PIXI.Graphics();
             //O drawVertLine(gridlines[i]);
-            this.#drawVertLine(this.#gridlines[i]);
+            this.#drawVertLine(this.#gridlines[this.#i]);
             //O gridlines[i].x = xpos;
-            this.#gridlines[i].x = xpos;
+            this.#gridlines[this.#i].x = xpos;
          }
       }
    }
@@ -224,22 +224,22 @@ export default class Grid extends PIXI.Graphics
 
       // reposition existing horizontal lines
       //O for (i = 0; i < horizlines.numChildren; i++)
-      for ( var i = 0; i < this.#horizlines.numChildren; i++ )
+      for ( this.#i = 0; this.#i < this.#horizlines.numChildren; this.#i++ )
       {
          //O ypos = i*Global.zoom + yoffset;
-         ypos = i * Global.zoom + this.#yoffset;
+         ypos = this.#i * Global.zoom + this.#yoffset;
          //O horizlines.getChildAt(i).y = ypos;
-         this.#horizlines.getChildAt(i).y = ypos;
+         this.#horizlines.getChildAt(this.#i).y = ypos;
       }
 
       // reposition existing vertical lines
       //O for (i = 0; i < vertlines.numChildren; i++)
-      for ( var i = 0; i < this.#vertlines.numChildren; i++ )
+      for ( this.#i = 0; this.#i < this.#vertlines.numChildren; this.#i++ )
       {
          //O xpos = i*Global.zoom + xoffset;
-         xpos = i*Global.zoom + this.#xoffset;
+         xpos = this.#i * Global.zoom + this.#xoffset;
          //O vertlines.getChildAt(i).x = xpos;
-         this.#vertlines.getChildAt(i).x = xpos;
+         this.#vertlines.getChildAt(this.#i).x = xpos;
       }
 
       // add more horizontal lines as needed
@@ -247,18 +247,18 @@ export default class Grid extends PIXI.Graphics
       if ( this.#gridynum > this.#horizlines.numChildren )
       {
          //O for ( i=horizlines.numChildren; i <= gridynum; i++ )
-         for ( var i=this.#horizlines.numChildren; i <= this.#gridynum; i++ )
+         for ( this.#i=this.#horizlines.numChildren; this.#i <= this.#gridynum; this.#i++ )
          {
             //O ypos = i*Global.zoom + yoffset;
-            ypos = i * Global.zoom + this.#yoffset;
+            ypos = this.#i * Global.zoom + this.#yoffset;
             if ( ypos != 0 )
             {
                //O gridlines[i] = new Shape();
-               this.#gridlines[i] = new PIXI.Graphics();
+               this.#gridlines[this.#i] = new PIXI.Graphics();
                //O drawHorizLine(gridlines[i]);
-               this.#drawHorizLine(this.#gridlines[i]);
+               this.#drawHorizLine(this.#gridlines[this.#i]);
                //O gridlines[i].y = ypos;
-               this.#gridlines[i].y = ypos;
+               this.#gridlines[this.#i].y = ypos;
             }
          }
       }
@@ -279,18 +279,18 @@ export default class Grid extends PIXI.Graphics
       if ( this.#gridxnum > this.#vertlines.numChildren )
       {
          //O for ( i=vertlines.numChildren; i <= gridxnum; i++ )
-         for ( var i = this.#vertlines.numChildren; i <=  this.#gridxnum; i++ )
+         for ( this.#i = this.#vertlines.numChildren; this.#i <=  this.#gridxnum; this.#i++ )
          {
             //O xpos = i*Global.zoom + xoffset;
-            xpos = i * Global.zoom + this.#xoffset;
+            xpos = this.#i * Global.zoom + this.#xoffset;
             if ( xpos != 0 )
             {
                //O gridlines[i] = new Shape();
-               this.#gridlines[i] = new PIXI.Graphics();
+               this.#gridlines[this.#i] = new PIXI.Graphics();
                //O drawVertLine(gridlines[i]);
-               this.#drawVertLine(this.#gridlines[i]);
+               this.#drawVertLine(this.#gridlines[this.#i]);
                //O gridlines[i].x = xpos;
-               this.#gridlines[i].x = xpos;
+               this.#gridlines[this.#i].x = xpos;
             }
          }
       }
@@ -346,22 +346,22 @@ export default class Grid extends PIXI.Graphics
 
       // reposition existing horizontal lines
       //O for (i = 0; i < horizlines.numChildren; i++)
-      for ( var i = 0; i < this.#horizlines.numChildren; i++ )
+      for ( this.#i = 0; this.#i < this.#horizlines.numChildren; this.#i++ )
       {
          //O ypos = i*Global.zoom*offset + yoffset;
-         ypos = i * Global.zoom*offset + this.#yoffset;
+         ypos = this.#i * Global.zoom*offset + this.#yoffset;
          //O horizlines.getChildAt(i).y = ypos;
-         this.#horizlines.getChildAt(i).y = ypos;
+         this.#horizlines.getChildAt(this.#i).y = ypos;
       }
 
       // reposition existing vertical lines
       //O for (i = 0; i < vertlines.numChildren; i++)
-      for ( var i = 0; i < this.#vertlines.numChildren; i++ )
+      for ( this.#i = 0; this.#i < this.#vertlines.numChildren; this.#i++ )
       {
          //O xpos = i*Global.zoom*offset + xoffset;
-         xpos = i*Global.zoom*offset + this.#xoffset;
+         xpos = this.#i * Global.zoom*offset + this.#xoffset;
          //O vertlines.getChildAt(i).x = xpos;
-         this.#vertlines.getChildAt(i).x = xpos;
+         this.#vertlines.getChildAt(this.#i).x = xpos;
       }
 
       // add more horizontal lines as needed
@@ -369,18 +369,18 @@ export default class Grid extends PIXI.Graphics
       if ( this.#gridynum > this.#horizlines.numChildren )
       {
          //O for ( i=horizlines.numChildren; i <= gridynum; i++ )
-         for ( var i= this.#horizlines.numChildren; i <=  this.#gridynum; i++ )
+         for ( this.#i= this.#horizlines.numChildren; this.#i <=  this.#gridynum; this.#i++ )
          {
             //O ypos = i*Global.zoom*offset + yoffset;
-            ypos = i*Global.zoom*offset + this.#yoffset;
+            ypos = this.#i * Global.zoom*offset + this.#yoffset;
             if ( ypos != 0 )
             {
                //O gridlines[i] = new Shape();
-               this.#gridlines[i] = new PIXI.Graphics();
+               this.#gridlines[this.#i] = new PIXI.Graphics();
                //O drawHorizLine(gridlines[i]);
-               this.#drawHorizLine(this.#gridlines[i]);
+               this.#drawHorizLine(this.#gridlines[this.#i]);
                //O gridlines[i].y = ypos;
-               this.#gridlines[i].y = ypos;
+               this.#gridlines[this.#i].y = ypos;
             }
          }
       }
@@ -401,18 +401,18 @@ export default class Grid extends PIXI.Graphics
       if ( this.#gridxnum > this.#vertlines.numChildren )
       {
          //O for ( i=vertlines.numChildren; i <= gridxnum; i++ )
-         for ( var i=this.#vertlines.numChildren; i <= this.#gridxnum; i++ )
+         for ( this.#i=this.#vertlines.numChildren; this.#i <= this.#gridxnum; this.#i++ )
          {
             //O xpos = i*Global.zoom*offset + xoffset;
-            xpos = i * Global.zoom*offset + this.#xoffset;
+            xpos = this.#i * Global.zoom*offset + this.#xoffset;
             if ( xpos != 0 )
             {
                //O gridlines[i] = new Shape();
-               this.#gridlines[i] = new PIXI.Graphics();
+               this.#gridlines[this.#i] = new PIXI.Graphics();
                //O drawVertLine(gridlines[i]);
-               this.#drawVertLine(this.#gridlines[i]);
+               this.#drawVertLine(this.#gridlines[this.#i]);
                //O gridlines[i].x = xpos;
-               this.#gridlines[i].x = xpos;
+               this.#gridlines[this.#i].x = xpos;
             }
          }
       }
@@ -434,6 +434,7 @@ export default class Grid extends PIXI.Graphics
    #drawHorizLine(line)
    {
       // dotted line
+      //O for(var j=0; j<Global.docwidth; j+=4)
       for ( var j=0; j<Global.docwidth; j+=4 )
       {
          //O line.graphics.beginFill(0x999999);
@@ -481,7 +482,7 @@ export default class Grid extends PIXI.Graphics
    //O public function clear():void
    clear()
    {
-      while ( numChildren > 0 )
+      while ( this.numChildren > 0 )
       {
          removeChildAt(0);
       }

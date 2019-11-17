@@ -18,10 +18,12 @@ describe('Testing Grid.js', function ()
 
    describe('Testing Grid variables', function (){});
 
-   it('grid.xaxis should be private and not defined: NaN', function ()
+   it('grid.xaxis should be private and not defined', function ()
    {
-      let expectedResult = NaN;
-      assert.isNaN(grid.xaxis, "grid.xaxis: expected " + expectedResult + " received = " + grid.xaxis);
+      console.log("grid.xasis is " + grid.xaxis);
+      //console.log("grid.#asis is " + grid.#xaxis);
+      let expectedResult = undefined;
+      assert.isUndefined(grid.xaxis, "grid.xaxis: expected " + expectedResult + " received = " + grid.xaxis);
    });
 /*
    it('grid.secondaryfitness should be: NaN', function ()
