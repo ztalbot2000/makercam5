@@ -6,6 +6,23 @@ module.exports = {
       filename: 'makercam5.js',
       path: path.resolve(__dirname, './dist')
    },
+   devServer: {
+      contentBase: path.join(__dirname, 'dist'),
+      index: 'index.html',
+      compress: false,
+      port: 9000,
+      watchContentBase: true,
+      watchOptions: {
+         poll: 5000
+      },
+      liveReload: true,
+      onListening: function(server) {
+         const port = server.listeningApp.address().port;
+         console.log('Listening on port:', port);
+      },
+      open: true,
+      openPage: 'index.html'
+   },
    target: 'node',
    externals: {
    },
