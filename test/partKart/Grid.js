@@ -16,14 +16,14 @@ describe('Testing Grid.js', function ()
       assert.isNotNull(grid, 'grid is null');
    });
 
-   describe('Testing Grid variables', function (){});
-
-   it('grid.xaxis should be private and not defined', function ()
-   {
-      console.log("grid.xasis is " + grid.xaxis);
-      let expectedResult = undefined;
-      assert.isUndefined(grid.xaxis, "grid.xaxis: expected " + expectedResult + " received = " + grid.xaxis);
-   });
+// describe('Testing Grid variables', function (){});
+//
+// it('grid.xaxis should be private and not defined', function ()
+// {
+//    console.log("grid.xasis is " + grid.xaxis);
+//    let expectedResult = undefined;
+//    assert.isUndefined(grid.xaxis, "grid.xaxis: expected " + expectedResult + " received = " + grid.xaxis);
+// });
 
    // All the other variables are private, so no use testing them
 

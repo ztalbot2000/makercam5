@@ -6,13 +6,13 @@ module.exports = function(env)
 
     // ...
    // Hmm required for mocha but not for build ...
-   if ( env && env.test != 'true' ) {
+ if ( env && env.exclude != 'false' ) {
       // Don't bundle pixi.js, assume it'll be included in the HTML via a script
-      Externals= {"pixi.js": "PIXI"};
-      console.log("Not bundling pixi.js");
-   } else {
-      console.log("pixi.js will be bundled for testing");
-   }
+    Externals= {"pixi.js": "PIXI"};
+    console.log("Not bundling pixi.js");
+ } else {
+    console.log("pixi.js will be bundled for testing");
+ }
    return {
       entry: './app/src/main.js',
       output: {
@@ -72,9 +72,6 @@ module.exports = function(env)
       },
       target: 'node',
       externals: Externals,
-      //externals: [
-           //{"pixi.js": "PIXI"}
-      //],
       node: {
          fs: 'empty',
          net: 'empty',
@@ -98,25 +95,37 @@ module.exports = function(env)
          ]
       },
       module: {
-         rules: [{
-            test: /\.js$/,
-            include: [path.resolve(__dirname, "./app/")],
-            exclude: [
-               /node_modules/
-            ],
-             use: {
-                loader: 'babel-loader',
-                options: {
-                   presets: [
-                      "@babel/preset-env"
-                   ],
-                   plugins: [
-                      "@babel/plugin-proposal-class-properties",
-                      "@babel/plugin-proposal-private-methods"
-                   ]
-                }
-             }
-         }]
+         rules: [
+            {
+               test: /\.js$/,
+                  include: [path.resolve(__dirname, "./app/")],
+                  exclude: [
+                     /node_modules/
+                  ],
+               use: {
+                  loader: 'babel-loader',
+                  options: {
+                     presets: [
+                        "@babel/preset-env"
+                     ],
+                     plugins: [
+                        "@babel/plugin-proposal-class-properties",
+                        "@babel/plugin-proposal-private-methods"
+                     ]
+                  }
+               }
+            },
+            {
+               test: /\.ts$/,
+               include: [path.resolve(__dirname, "./app/")],
+               exclude: [
+                  /node_modules/
+               ],
+               use: {
+                  loader: "ts-loader"
+               }
+            }
+         ]
       },
       plugins: [
       ]

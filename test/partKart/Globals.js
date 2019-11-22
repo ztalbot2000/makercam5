@@ -2,7 +2,8 @@
 
 var assert = require('chai').assert;
 
-import Global  from '../../app/partKart/Global.js';
+//Jimport Global  from '../../app/partKart/Global.js';
+import { Global }  from '../../app/partKart/Global.js';
 import { Point } from '@pixi/math';
 
 describe('Testing Global.js', function ()
@@ -186,11 +187,11 @@ describe('Testing Global.js', function ()
    });
 
 
-   it('Global.lineIntersect should be a function', function ()
-   {
-      let expectedResult = 'function';
-      assert.isFunction(Global.lineIntersect, "Global.lineIntersect: expected " + expectedResult + " received = " + typeof Global.lineIntersect);
-   });
+//   it('Global.lineIntersect should be a function', function ()
+//   {
+//      let expectedResult = 'function';
+//      assert.isFunction(Global.lineIntersect, "Global.lineIntersect: expected " + expectedResult + " received = " + typeof Global.lineIntersect);
+//   });
 
 
 
