@@ -5,8 +5,6 @@
 //O import flash.geom.Point;
 
 import * as PIXI from 'pixi.js';
-//N Unused
-// import { Point }  from "pixi.js";
 import { Global }  from "./Global";
 
 
@@ -29,11 +27,9 @@ export default class Tab extends PIXI.Graphics
    active:Boolean = false;
 
    //O public var p1:Point;
-   //H Unused?
-   //p1:Point;
+   p1:PIXI.Point;
    //O public var p2:Point;
-   //H Unused?
-   //p2:Point;
+   p2:PIXI.Point;
 
    //O public function Tab(inputlocation:Number, inputwidth:Number, inputheight:Number, inputdiameter:Number):void
    constructor (inputlocation: number, inputwidth: number, inputheight: number, inputdiameter: number)
