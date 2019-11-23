@@ -50,13 +50,13 @@ describe('Testing Individual.js', function ()
    });
 
 
-   it('individual.mutate should be a function', function ()
+   it('individual.mutate should be a Class method', function ()
    {
       let expectedResult = 'function';
       assert.isFunction(individual.mutate, "individual.mutate: expected " + expectedResult + " received = " + typeof individual.mutate);
    });
 
-   it('individual.clone should be a function', function ()
+   it('individual.clone should be a Class method', function ()
    {
       let expectedResult = 'function';
       assert.isFunction(individual.clone, "individual.clone: expected " + expectedResult + " received = " + typeof individual.clone);
@@ -83,7 +83,7 @@ describe('Testing Individual.js', function ()
       assert.equal(individual.genes[0], clone.genes[0], "individual.genes not cloned: expected " + individual.genes[0] + " received = " + clone.genes[0]);
    });
 
-   it('individual.mate should be a function', function ()
+   it('individual.mate should be a Class method', function ()
    {
       let expectedResult = 'function';
       assert.isFunction(individual.mate, "individual.mate: expected " + expectedResult + " received = " + typeof individual.mate);

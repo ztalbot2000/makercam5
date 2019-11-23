@@ -1,8 +1,7 @@
-//'use strict';
+'use strict';
 
 var assert = require('chai').assert;
 
-//Jimport Global  from '../../app/partKart/Global.js';
 import { Global }  from '../../app/partKart/Global';
 import { Point } from 'pixi.js';
 
@@ -13,7 +12,7 @@ describe('Testing Global.js', function ()
       assert.isNotNull(Global, 'Global resulted is null');
    });
 
-   describe('Testing Global variables', function (){});
+   describe('Testing Class Global variables', function (){});
 
    it('Global.zoom should be 80', function ()
    {
@@ -140,31 +139,31 @@ describe('Testing Global.js', function ()
       assert.equal(Global.undo.length, expectedResult, "Global.undo.length: expected " + expectedResult + " received = " + Global.undo.length);
    });
 
-   it('Global.undoPush should be a function', function ()
+   it('Global.undoPush should be a Class method', function ()
    {
       let expectedResult = 'function';
       assert.isFunction(Global.undoPush, "Global.undoPush: expected " + expectedResult + " received = " + typeof Global.undoPush);
    });
 
-   it('Global.undoAction should be a function', function ()
+   it('Global.undoAction should be a Class method', function ()
    {
       let expectedResult = 'function';
       assert.isFunction(Global.undoAction, "Global.undoAction: expected " + expectedResult + " received = " + typeof Global.undoAction);
    });
 
-   it('Global.withinTolerance should be a function', function ()
+   it('Global.withinTolerance should be a Class method', function ()
    {
       let expectedResult = 'function';
       assert.isFunction(Global.withinTolerance, "Global.withinTolerance: expected " + expectedResult + " received = " + typeof Global.withinTolerance);
    });
 
-   it('Global.toFixed should be a function', function ()
+   it('Global.toFixed should be a Class method', function ()
    {
       let expectedResult = 'function';
       assert.isFunction(Global.toFixed, "Global.toFixed: expected " + expectedResult + " received = " + typeof Global.toFixed);
    });
 
-   it('Global.getAngle should be a function', function ()
+   it('Global.getAngle should be a Class method', function ()
    {
       let expectedResult = 'function';
       assert.isFunction(Global.getAngle, "Global.getAngle: expected " + expectedResult + " received = " + typeof Global.getAngle);
@@ -187,11 +186,11 @@ describe('Testing Global.js', function ()
    });
 
 
-//   it('Global.lineIntersect should be a function', function ()
-//   {
-//      let expectedResult = 'function';
-//      assert.isFunction(Global.lineIntersect, "Global.lineIntersect: expected " + expectedResult + " received = " + typeof Global.lineIntersect);
-//   });
+     it('Global.lineIntersect should be a Class method', function ()
+     {
+        let expectedResult = 'function';
+        assert.isFunction(Global.lineIntersect, "Global.lineIntersect: expected " + expectedResult + " received = " + typeof Global.lineIntersect);
+     });
 
 
 

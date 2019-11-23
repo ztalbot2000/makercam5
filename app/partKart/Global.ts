@@ -283,7 +283,7 @@ export class Global
    //---------------------------------------------------------------
    //O public static function lineIntersect(A:Point,B:Point,E:Point,F:Point,as_seg:Boolean=false):Point 
    //J lineIntersect(A,B,E,F,as_seg=false)
-   lineIntersect(A: Point, B: Point, E: Point, F: Point, as_seg: boolean=false): Point
+   static lineIntersect(A: Point, B: Point, E: Point, F: Point, as_seg: boolean=false): Point
    {
       //O var ip:Point;
       //J var ip;
