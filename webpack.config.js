@@ -100,7 +100,8 @@ module.exports = function(env)
                test: /\.js$/,
                   include: [path.resolve(__dirname, "./app/")],
                   exclude: [
-                     /node_modules/
+                     /node_modules/,
+                     /test/
                   ],
                use: {
                   loader: 'babel-loader',
@@ -119,7 +120,8 @@ module.exports = function(env)
                test: /\.ts$/,
                include: [path.resolve(__dirname, "./app/")],
                exclude: [
-                  /node_modules/
+                  /node_modules/,
+                  /test/
                ],
                use: {
                   loader: "ts-loader"
