@@ -5,7 +5,7 @@ export class Undo
 {
 
    //O public var scene:SceneGraph;
-   // Hmmm - fixme later
+   // Hmmm - fixme later. number should be SceneGraph
    public scene: number;
 
    //O public function Undo(s:SceneGraph):void

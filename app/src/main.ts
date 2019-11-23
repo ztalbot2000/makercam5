@@ -1,8 +1,7 @@
 import * as $ from 'jquery';
-import mathAPI from '../math/operations';
-import { Global }  from '../partKart/Global';
-//import Individual  from '../partKart/Individual';
-import Grid  from '../partKart/Grid';
+import * as PIXI from 'pixi.js';
+
+import Grid from '../partKart/Grid';
 
 $(document).ready(function()
 {
@@ -11,13 +10,4 @@ $(document).ready(function()
 
   var grid = new Grid();
   app.stage.addChild(grid);
-  $(".myButton").click(function () {
-   var message : string  = "5 + 3 = " 
-                 + mathAPI.add(5,3) 
-                 + ", 5 * 3 = "
-                 + mathAPI.multiply(5,3) 
-                 + "\n\n Global.zoom=" + Global.zoom
-    
-    alert(message);
-  });
 });
