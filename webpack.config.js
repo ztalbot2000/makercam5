@@ -14,7 +14,7 @@ module.exports = function(env)
     console.log("pixi.js will be bundled for testing");
  }
    return {
-      entry: './app/src/main.js',
+      entry: './app/src/main.ts',
       output: {
          filename: 'makercam5.js',
          path: path.resolve(__dirname, './dist')

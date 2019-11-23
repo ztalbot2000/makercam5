@@ -5,7 +5,7 @@
 var assert = require('chai').assert;
 
 
-import Grid  from '../../app/partKart/Grid.js';
+import Grid  from '../../app/partKart/Grid';
 
 var grid = new Grid();
 

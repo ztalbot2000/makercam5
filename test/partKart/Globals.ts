@@ -3,8 +3,8 @@
 var assert = require('chai').assert;
 
 //Jimport Global  from '../../app/partKart/Global.js';
-import { Global }  from '../../app/partKart/Global.js';
-import { Point } from '@pixi/math';
+import { Global }  from '../../app/partKart/Global';
+import { Point } from 'pixi.js';
 
 describe('Testing Global.js', function ()
 {

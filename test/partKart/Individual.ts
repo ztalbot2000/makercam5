@@ -2,7 +2,7 @@
 
 var assert = require('chai').assert;
 
-import Individual  from '../../app/partKart/Individual.js';
+import Individual  from '../../app/partKart/Individual';
 
 var individual = new Individual();
 
@@ -65,10 +65,11 @@ describe('Testing Individual.js', function ()
    it('individual.clone should increase genes', function ()
    {
       let expectedResult = 1;
-      let child = "Child";
+      //J let x: number = 42;
+      let x = 42;
 
       // Add something to individula.genes array
-      individual.genes.push(child);
+      individual.genes.push(x);
 
       assert.lengthOf(individual.genes, expectedResult, "individual.genes.length expected: " + expectedResult + " received = " + individual.genes.length);
 

@@ -6,7 +6,7 @@
 import * as PIXI from 'pixi.js';
 import { Graphics } from 'pixi.js';
 import { Sprite } from 'pixi.js';
-import { Global }  from "./Global.js";
+import { Global }  from "./Global";
 
 //O public class Grid extends Sprite
 //C export default class Grid extends Sprite

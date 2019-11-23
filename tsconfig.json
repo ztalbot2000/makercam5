@@ -1,35 +1,37 @@
 {
    "compilerOptions": {
       // Target latest version of ECMAScript.
-//      "target": "esnext",
-      // Search under node_modules for non-relative imports.
-//      "moduleResolution": "node",
-      // Process & infer types from .js files.
-//      "allowJs": true,
-      // Don't emit; allow Babel to transform files.
-//      "noEmit": true,
-      // Enable all strict tests. (Do not do this, let each file decide)
-//      "strict": false,
-      // Disallow features that require cross-file information for emit.
-//      "isolatedModules": true,
-      // Import non-ES modules as default imports.
-//      "esModuleInterop": true
-
         "target": "es5",
+      // Process & infer types from .js files.
         "allowJs": true,
+      // Generates corresponding .map file.
         "sourceMap": true,
+      // Remove all comments except copy-right header comments beginning with /*!
         "removeComments": false,
+      // Enable all strict tests.
         "strict": true,
+      // Raise error on expressions and declarations with an implied any type.
         "noImplicitAny": true,
+      // Report errors on unused locals.
         "noUnusedLocals": true,
+      // Report errors on unused parameters.
         "noUnusedParameters": true,
+      // Report an error when not all code paths in function return a value.
         "noImplicitReturns": true,
-        "strictNullChecks": false
+      // In strict null checking mode, the null and undefined values are not in the domain of every type and are only assignable to themselves and any (the one exception being that undefined is also assignable to void).
+        "strictNullChecks": false,
+        "rootDirs": ["app", "test"],
+        "outDir": "js"
    },
    "include": [
-      "app"
+      "app",
+      "test"
    ],
    "exclude": [
-      "node_modules"
+      "node_modules",
+      "app/dist",
+      "js",
+      "test/dist",
+      "test/pixi-setup.js"
    ]
 }
