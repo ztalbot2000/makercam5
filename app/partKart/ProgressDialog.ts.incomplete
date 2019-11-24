@@ -1,0 +1,219 @@
+﻿//O package com.partkart
+//O {
+
+//O import fl.controls.ProgressBar;
+//O import fl.controls.ProgressBarMode;
+//O import fl.controls.ProgressBarDirection;
+//O import fl.controls.*;
+
+//O import flash.display.*;
+//O import flash.events.*;
+//O import flash.geom.Matrix;
+//O import flash.text.*;
+//O import flash.filters.DropShadowFilter;
+//O import fl.controls.Button;
+import * as PIXI from 'pixi.js';
+import { Graphics } from 'pixi.js';
+import { Sprite } from 'pixi.js';
+
+//O public class ProgressDialog extends Sprite
+export default class ProgressDialog extends Sprite
+{
+
+   //O private var dwidth:int; // width of the dialog
+   private dwidth: number; // width of the dialog
+   //O private var dheight:int; // height of the dialog
+   private dheight: number; // height of the dialog
+
+   //O private var stoplabel:String;
+   private stoplabel:string;
+
+   //O private var back:Shape; // background box
+   private back:Graphics; // background box
+
+   //O private var progressbar:pBar;
+   private progressbar:PIXI.ProgressBar;
+
+   //O private var oncancel:Function = null; // callback function for when the user cancels
+   private oncancel:Function = null; // callback function for when the user cancels
+
+   //O public var total:Number = 1; // number of operations to process
+   public total:number = 1; // number of operations to process
+
+   //O var titlelabel:TextField;
+   public titlelabel:TextField;
+
+   //O public function ProgressDialog(dialogwidth:int, dialogheight:int, dialogmessage:String = "processing", dialoglabel:String = "Cancel", callback:Function = null):void
+   constructor (dialogwidth: number, dialogheight: number, dialogmessage:string = "processing", dialoglabel:string = "Cancel", callback:Function = null)
+   {
+      // New
+      super();
+
+      //O dwidth = dialogwidth;
+      this.dwidth = dialogwidth;
+      //O dheight = dialogheight;
+      this.dheight = dialogheight;
+      //O name = dialogmessage;
+      this.name = dialogmessage;
+      //O stoplabel = dialoglabel;
+      this.stoplabel = dialoglabel;
+      //O oncancel = callback;
+      this.oncancel = callback;
+   }
+
+   //O public function init(progresstotal:Number):void
+   public init(progresstotal:number):void
+   {
+      //O total = progresstotal;
+      this.total = progresstotal;
+
+      //O back = new Shape();
+      this.back = new Graphics();
+
+      //O var m:Matrix = new Matrix(dwidth/1000, 0, 0, dheight/1000,dwidth/2, dheight/2);
+      var m:Matrix = new Matrix(this.dwidth/1000, 0, 0, this.dheight/1000,this.dwidth/2, this.dheight/2);
+      //O back.graphics.beginGradientFill(GradientType.RADIAL, [0x444444, 0x222222],[1,1],[50,255], m);
+      this.back.beginGradientFill(GradientType.RADIAL, [0x444444, 0x222222],[1,1],[50,255], m);
+      //O back.graphics.drawRoundRect(0,0,dwidth,dheight,20,20);
+      this.back.drawRoundedRect(0,0,this.dwidth,this.dheight,20,20);
+      //O back.graphics.endFill();
+      this.back.endFill();
+
+      //O addChild(back);
+      this.addChild(this.back);
+
+      //O addEventListener(MouseEvent.MOUSE_DOWN, dialogDown);
+      addEventListener('mousedown', this.dialogDown);
+      //O addEventListener(MouseEvent.MOUSE_UP, dialogUp);
+      addEventListener('mouseup', this.dialogUp);
+
+      //O draw title
+      //O var shadowfilter:DropShadowFilter = new DropShadowFilter(2,45,0,0.65,3,3);
+      let shadowfilter:DropShadowFilter = new DropShadowFilter(2,45,0,0.65,3,3);
+
+      //O var format:TextFormat = new TextFormat("Arial", 11);
+      let format:TextFormat = new TextFormat("Arial", 11);
+
+      //O titlelabel = new TextField();
+      this.titlelabel = new TextField();
+
+      //O titlelabel.defaultTextFormat = format;
+      this.titlelabel.defaultTextFormat = format;
+      //O titlelabel.type = TextFieldType.DYNAMIC;
+      this.titlelabel.type = TextFieldType.DYNAMIC;
+      //O titlelabel.multiline = false;
+      this.titlelabel.multiline = false;
+      //O titlelabel.height = 20;
+      this.titlelabel.height = 20;
+      //O titlelabel.width = this.width - 10;
+      this.titlelabel.width = this.width - 10;
+      //O titlelabel.x = 8;
+      this.titlelabel.x = 8;
+      //O titlelabel.y = 10;
+      this.titlelabel.y = 10;
+      //O titlelabel.filters = [shadowfilter];
+      this.titlelabel.filters = [shadowfilter];
+      //O titlelabel.textColor = 0xffffff;
+      this.titlelabel.textColor = 0xffffff;
+      //O titlelabel.text = name + " (0%)";
+      this.titlelabel.text = name + " (0%)";
+
+      //O addChild(titlelabel);
+      this.addChild(this.titlelabel);
+
+      //O draw progress bar
+      //O progressbar = new pBar();
+      this.progressbar = new pBar();
+      //O progressbar.width = dwidth-20;
+      this.progressbar.width = this.dwidth-20;
+
+      //O progressbar.x = 10;
+      this.progressbar.x = 10;
+      //O progressbar.y = 30;
+      this.progressbar.y = 30;
+
+      //O addChild(progressbar);
+      this.addChild(this.progressbar);
+
+      //O if (oncancel != null)
+      if (this.oncancel != null)
+      {
+         //O draw stop button
+         //O var stop:Button = new Button();
+         let stop:Button = new Button();
+         //O stop.label = stoplabel;
+         stop.label = this.stoplabel;
+         //O stop.width = 50;
+         stop.width = 50;
+         //O stop.x = dwidth/2 - 25;
+         stop.x = this.dwidth/2 - 25;
+         //O stop.y = 40;
+         stop.y = 40;
+         //O addChild(stop);
+         this.addChild(stop);
+
+         //O stop.addEventListener(MouseEvent.CLICK, endDialog);
+         stop.addEventListener('click', this.endDialog);
+      }
+   }
+
+   //O private function dialogDown(e:MouseEvent):void
+   private dialogDown(e:MouseEvent):void
+   {
+      //O if (e.target == this || (e.target is TextField && e.target.selectable == false))
+      //Help fixme is?  
+      if (e.target == this || (e.target == this.titlelabel && e.target.selectable == false))
+      {
+         //O startDrag();
+         startDrag();
+      }
+   }
+
+   //O private function dialogUp(e:MouseEvent):void
+   private dialogUp(e:MouseEvent):void
+   {
+      //O stopDrag();
+      stopDrag();
+   }
+
+   //O private function endDialog(e:MouseEvent):void
+   private endDialog(e:MouseEvent):void
+   {
+      //O stopDialog();
+      this.stopDialog();
+
+      //O if (oncancel !== null)
+      if (this.oncancel !== null)
+      {
+         //O oncancel();
+         this.oncancel();
+      }
+   }
+
+   //O public function stopDialog():void
+   public stopDialog():void
+   {
+      //O if (this.parent)
+      if (this.parent)
+      {
+         //O var main:* = this.parent;
+         var main:* = this.parent;
+         //O main.endDialog();
+         main.endDialog();
+         //O main.setCursor();
+         main.setCursor();
+         //O this.parent.removeChild(this);
+         this.parent.removeChild(this);
+      }
+   }
+
+   //O public function setProgress(p:Number):void
+   public setProgress(p:number):void
+   {
+      //O progressbar.width = (dwidth-20)*(p/total);
+      this.progressbar.width = (this.dwidth-20)*(p/this.total);
+      //O titlelabel.text = name + " ("+Math.round(100*(p/total))+"%)";
+      this.titlelabel.text = name + " ("+Math.round(100*(p/this.total))+"%)";
+   }
+}
+//O }

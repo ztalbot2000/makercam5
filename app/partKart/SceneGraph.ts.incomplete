@@ -24,6 +24,7 @@ import { Sprite } from 'pixi.js';
 import { Global }  from "./Global";
 import { Tab }  from "./Tab";
 import { Individual }  from "./Individual";
+import { Segment }  from "./Segment";
 
    //O the scene graph is a root node containing all rendered objects
    //O public class SceneGraph extends Sprite

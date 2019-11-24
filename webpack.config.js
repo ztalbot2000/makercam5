@@ -98,10 +98,14 @@ module.exports = function(env)
          rules: [
             {
                test: /\.js$/,
-                  include: [path.resolve(__dirname, "./app/")],
+                  include: [path.resolve(__dirname, "app")],
                   exclude: [
+                     // This would be a regular expression
                      /node_modules/,
-                     /test/
+                     // This would be a path
+                     // Omit stuff to be worked on
+                     '/app/uitry',
+                     '/test/uitry/'
                   ],
                use: {
                   loader: 'babel-loader',
@@ -118,10 +122,14 @@ module.exports = function(env)
             },
             {
                test: /\.ts$/,
-               include: [path.resolve(__dirname, "./app/")],
+               include: [path.resolve(__dirname, "app")],
                exclude: [
+                  // This would be a regular expression
                   /node_modules/,
-                  /test/
+                  // This would be a path
+                  // Omit stuff to be worked on
+                  '/app/uitry/',
+                  '/test/uitry'
                ],
                use: {
                   loader: "ts-loader"

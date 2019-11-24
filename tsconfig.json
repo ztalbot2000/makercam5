@@ -24,14 +24,11 @@
         "outDir": "js"
    },
    "include": [
-      "app",
-      "test"
+      "app"
+      // - Adding "test" here compiled uitry,
+      //   no matter what I tried to exclude
    ],
    "exclude": [
-      "node_modules",
-      "app/dist",
-      "js",
-      "test/dist",
-      "test/pixi-setup.js"
+      "/app/uitry/"
    ]
 }
