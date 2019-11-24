@@ -22,6 +22,8 @@ import * as PIXI from 'pixi.js';
 import { Graphics } from 'pixi.js';
 import { Sprite } from 'pixi.js';
 import { Global }  from "./Global";
+import { Tab }  from "./Tab";
+import { Individual }  from "./Individual";
 
    //O the scene graph is a root node containing all rendered objects
    //O public class SceneGraph extends Sprite
@@ -114,7 +116,7 @@ export default class SceneGraph extends Sprite
          removeChild(p);
       }
       //O var index:int = pathlist.indexOf(p);
-      var index:int = pathlist.indexOf(p);
+      var index:number = pathlist.indexOf(p);
       //O if (index == -1)
       if (index == -1)
       {
@@ -131,7 +133,7 @@ export default class SceneGraph extends Sprite
    public function addPaths(list:Array):void
    {
       //O for(var i:int=0; i<list.length; i++)
-      for(var i:int=0; i<list.length; i++)
+      for(let i=0; i<list.length; i++)
       {
          //O addChild(list[i]);
          addChild(list[i]);
@@ -154,16 +156,16 @@ export default class SceneGraph extends Sprite
    public function setInactive():void
    {
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i=0; i<pathlist.length; i++)
       {
          //O pathlist[i].setInactive();
          pathlist[i].setInactive();
       }
 
       //O for(i=0; i<cutlist.length; i++)
-      for(i=0; i<cutlist.length; i++){
+      for(i=0; i<this.cutlist.length; i++){
          //O cutlist[i].setInactive();
-         cutlist[i].setInactive();
+         this.cutlist[i].setInactive();
       }
    }
 
@@ -172,11 +174,11 @@ export default class SceneGraph extends Sprite
       //O var active:Array = new Array();
       var active:Array = new Array();
       //O for(var i:int=0; i<cutlist.length; i++)
-      for(var i:int=0; i<cutlist.length; i++){
+      for(let i=0; i<this.cutlist.length; i++){
          //O if (cutlist[i].active == true)
-         if (cutlist[i].active == true){
+         if (this.cutlist[i].active == true){
             //O active.push(cutlist[i]);
-            active.push(cutlist[i]);
+            active.push(this.cutlist[i]);
          }
       }
       //O return active;
@@ -188,7 +190,7 @@ export default class SceneGraph extends Sprite
    //O public function clearDots(p:Path = null):void
    public function clearDots(p:Path = null):void{
       //O for(var i:int = 0; i<pathlist.length; i++)
-      for(var i:int = 0; i<pathlist.length; i++){
+      for(let i = 0; i<pathlist.length; i++){
          //O if (p == null || (p != null && pathlist[i] != p))
          if (p == null || (p != null && pathlist[i] != p)){
             //O pathlist[i].setSegmentsInactive();
@@ -222,7 +224,8 @@ export default class SceneGraph extends Sprite
    //O public function addDots():void
    public function addDots():void{
       //O for each(var path:Path in pathlist)
-      for each(var path:Path in pathlist){
+      for each(var path:Path in pathlist)
+      {
          //O path.redrawDots();
          path.redrawDots();
       }
@@ -253,7 +256,8 @@ export default class SceneGraph extends Sprite
          //O // stack cutobjects at the bottom
          // stack cutobjects at the bottom
          //O for each(var cut:CutObject in cutlist)
-         for each(var cut:CutObject in cutlist){
+         for each(var cut:CutObject in this.cutlist)
+         {
             //O addChild(cut);
             addChild(cut);
          }
@@ -261,7 +265,8 @@ export default class SceneGraph extends Sprite
          //O // paths on top
          // paths on top
          //O for each(var path in pathlist)
-         for each(var path in pathlist){
+         for each(var path in pathlist)
+         {
             //O addChild(path);
             addChild(path);
 
@@ -282,7 +287,8 @@ export default class SceneGraph extends Sprite
    //O public function redrawCuts():void
    public function redrawCuts():void{
       //O for each(var cutobject:CutObject in cutlist)
-      for each(var cutobject:CutObject in cutlist){
+      for each(var cutobject:CutObject in this.cutlist)
+      {
          //O cutobject.x = cutobject.docx*Global.zoom;
          cutobject.x = cutobject.docx*Global.zoom;
          //O cutobject.y = cutobject.docy*Global.zoom;
@@ -292,11 +298,13 @@ export default class SceneGraph extends Sprite
          cutobject.redraw();
       }
       //O for each(cutobject in cutlist)
-      for each(cutobject in cutlist){
+      for each(cutobject in this.cutlist)
+      {
          //O if (cutobject.processed == false)
          if (cutobject.processed == false){
             //O for each(var path:Path in cutobject.pathlist)
-            for each(var path:Path in cutobject.pathlist){
+            for each(var path:Path in cutobject.pathlist)
+            {
                //O path.dirty = false;
                path.dirty = false;
             }
@@ -307,23 +315,23 @@ export default class SceneGraph extends Sprite
    //O public function cmToInch():void
    public function cmToInch():void{
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++){
+      for(let i=0; i<pathlist.length; i++){
          //O pathlist[i].cmToInch();
          pathlist[i].cmToInch();
          //O pathlist[i].dirty = true;
          pathlist[i].dirty = true;
       }
       //O for(i=0; i<cutlist.length; i++)
-      for(i=0; i<cutlist.length; i++)
+      for(i=0; i<this.cutlist.length; i++)
       {
          //O if (cutlist[i].processed == true)
-         if (cutlist[i].processed == true)
+         if (this.cutlist[i].processed == true)
          {
             //O cutlist[i].cmToInch();
-            cutlist[i].cmToInch();
+            this.cutlist[i].cmToInch();
          } else {
             //O cutlist[i].paramsCmToInch();
-            cutlist[i].paramsCmToInch();
+            this.cutlist[i].paramsCmToInch();
          }
       }
 
@@ -335,7 +343,7 @@ export default class SceneGraph extends Sprite
    public function inchToCm():void
    {
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i=0; i<pathlist.length; i++)
       {
          //O pathlist[i].inchToCm();
          pathlist[i].inchToCm();
@@ -343,16 +351,16 @@ export default class SceneGraph extends Sprite
          pathlist[i].dirty = true;
       }
       //O for(i=0; i<cutlist.length; i++)
-      for(i=0; i<cutlist.length; i++)
+      for(i=0; i<this.cutlist.length; i++)
       {
          //O if (cutlist[i].processed == true)
-         if (cutlist[i].processed == true)
+         if (this.cutlist[i].processed == true)
          {
             //O cutlist[i].inchToCm();
-            cutlist[i].inchToCm();
+            this.cutlist[i].inchToCm();
          } else {
             //O cutlist[i].paramsInchToCm();
-            cutlist[i].paramsInchToCm();
+            this.cutlist[i].paramsInchToCm();
          }
       }
 
@@ -438,7 +446,7 @@ export default class SceneGraph extends Sprite
             }
 
             //O for(var i:int = 0; i<pathlist.length; i++)
-            for(var i:int = 0; i<pathlist.length; i++)
+            for(let i = 0; i<pathlist.length; i++)
             {
                //O if (pathlist[i].active && pathlist[i] != path)
                if (pathlist[i].active && pathlist[i] != path)
@@ -454,14 +462,14 @@ export default class SceneGraph extends Sprite
             }
 
             //O for(i=0; i<cutlist.length; i++)
-            for(i=0; i<cutlist.length; i++) 
+            for(i=0; i<this.cutlist.length; i++)
             {
                //O var parents:Array = cutlist[i].pathlist;
-               var parents:Array = cutlist[i].pathlist;
+               var parents:Array = this.cutlist[i].pathlist;
                //O var movecut:Boolean = true;
                var movecut:boolean = true;
                //O for each(var p:Path in parents)
-               for each(var p:Path in parents) 
+               for each(var p:Path in parents)
                {
                   //O if (p.active == false)
                   if (p.active == false)
@@ -474,12 +482,12 @@ export default class SceneGraph extends Sprite
                if (movecut == true)
                {
                   //O path.addChild(cutlist[i]);
-                  path.addChild(cutlist[i]);
+                  path.addChild(this.cutlist[i]);
 
                   //O cutlist[i].x -= path.x;
-                  cutlist[i].x -= path.x;
+                  this.cutlist[i].x -= path.x;
                   //O cutlist[i].y -= path.y;
-                  cutlist[i].y -= path.y;
+                  this.cutlist[i].y -= path.y;
                }
             }
 
@@ -631,10 +639,10 @@ export default class SceneGraph extends Sprite
 //O               }
                */
                //O for each(var c:CutObject in cutlist)
-               for each(var c:CutObject in cutlist)
+               for each(var c:CutObject in this.cutlist)
                {
                   //O var moved:int = 0;
-                  var moved:int = 0;
+                  let moved: number = 0;
                   //O for each(path in c.pathlist)
                   for each(path in c.pathlist)
                   {
@@ -686,7 +694,7 @@ export default class SceneGraph extends Sprite
    public function mouseLeave():void
    {
       //O for(var i:int = 0; i<pathlist.length; i++)
-      for(var i:int = 0; i<pathlist.length; i++)
+      for(let i = 0; i<pathlist.length; i++)
       {
          //O if (pathlist[i].dragging == true)
          if (pathlist[i].dragging == true)
@@ -718,7 +726,7 @@ export default class SceneGraph extends Sprite
       selectbox.alpha = 1;
 
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i=0; i<pathlist.length; i++)
       {
          //O if (HitTest.complexHitTestObject(selectbox, pathlist[i]))
          if (HitTest.complexHitTestObject(selectbox, pathlist[i]))
@@ -738,20 +746,20 @@ export default class SceneGraph extends Sprite
       }
 
       //O for(i=0; i<cutlist.length; i++)
-      for(i=0; i<cutlist.length; i++)
+      for(i=0; i<this.cutlist.length; i++)
       {
          //O if (HitTest.complexHitTestObject(selectbox, cutlist[i]))
-         if (HitTest.complexHitTestObject(selectbox, cutlist[i]))
+         if (HitTest.complexHitTestObject(selectbox, this.cutlist[i]))
          {
             //O if (cutlist[i].active)
-            if (cutlist[i].active)
+            if (this.cutlist[i].active)
             {
                //O cutlist[i].setInactive();
-               cutlist[i].setInactive();
+               this.cutlist[i].setInactive();
             } else
             {
                //O cutlist[i].setActive();
-               cutlist[i].setActive();
+               this.cutlist[i].setActive();
             }
          }
       }
@@ -772,27 +780,28 @@ export default class SceneGraph extends Sprite
       var cutparent:Array = new Array();
 
       //O var i:int;
-      var i:int;
+      var i: number;
 
-      //O // remove selected paths from cutlist
-      // remove selected paths from cutlist
+      //O remove selected paths from cutlist
       //O for(i=0; i<cutlist.length; i++)
-      for(i=0; i<cutlist.length; i++){
+      for(i=0; i<this.cutlist.length; i++)
+      {
          //O for(var j:int=0; j<pathlist.length; j++)
-         for(var j:int=0; j<pathlist.length; j++){
+         for(let j=0; j<pathlist.length; j++){
             //O var dirty:Boolean = false;
             var dirty:boolean = false;
 
             //O if (pathlist[j].active == true)
-            if (pathlist[j].active == true){
+            if (pathlist[j].active == true)
+            {
                //O cutparent.push({cut:cutlist[i], path:pathlist[j]});
-               cutparent.push({cut:cutlist[i], path:pathlist[j]});
+               cutparent.push({cut:this.cutlist[i], path:pathlist[j]});
                //O var index:int = cutlist[i].pathlist.indexOf(pathlist[j]);
-               var index:int = cutlist[i].pathlist.indexOf(pathlist[j]);
+               var index: number = this.cutlist[i].pathlist.indexOf(pathlist[j]);
                //O if (index != -1)
                if (index != -1){
                   //O cutlist[i].pathlist.splice(index,1);
-                  cutlist[i].pathlist.splice(index,1);
+                  this.cutlist[i].pathlist.splice(index,1);
                   //O dirty = true;
                   dirty = true;
                }
@@ -800,9 +809,9 @@ export default class SceneGraph extends Sprite
             //O // delete the cutobject if it has no paths left
             // delete the cutobject if it has no paths left
             //O if (cutlist[i].pathlist.length == 0)
-            if (cutlist[i].pathlist.length == 0){
+            if (this.cutlist[i].pathlist.length == 0){
                //O var cut:CutObject = cutlist[i];
-               var cut:CutObject = cutlist[i];
+               var cut:CutObject = this.cutlist[i];
                //O if (removeCut(cut))
                if (removeCut(cut)){
                   //O removedcuts.push(cut);
@@ -817,9 +826,9 @@ export default class SceneGraph extends Sprite
             else if (dirty)
             {
                //O cutlist[i].pathlist[0].dirty = true;
-               cutlist[i].pathlist[0].dirty = true;
+               this.cutlist[i].pathlist[0].dirty = true;
                //O cutlist[i].pathlist[0].camdirty = true;
-               cutlist[i].pathlist[0].camdirty = true;
+               this.cutlist[i].pathlist[0].camdirty = true;
             }
          }
       }
@@ -866,12 +875,12 @@ export default class SceneGraph extends Sprite
       }
 
       //O for(i=0; i<cutlist.length; i++)
-      for(i=0; i<cutlist.length; i++)
+      for(i=0; i<this.cutlist.length; i++)
       {
          //O cut = cutlist[i];
-         cut = cutlist[i];
+         cut = this.cutlist[i];
          //O if (cutlist[i].active == true)
-         if (cutlist[i].active == true)
+         if (this.cutlist[i].active == true)
          {
             //O if (removeCut(cut))
             if (removeCut(cut))
@@ -893,7 +902,7 @@ export default class SceneGraph extends Sprite
          //O undo.pathlist = removedpaths;
          undo.pathlist = removedpaths;
          //O undo.cutlist = removedcuts;
-         undo.cutlist = removedcuts;
+         undo.this.cutlist = removedcuts;
          //O undo.cutparent = cutparent;
          undo.cutparent = cutparent;
 
@@ -903,10 +912,10 @@ export default class SceneGraph extends Sprite
 
       //O remove tabs
       //O for(i=0; i<cutlist.length; i++)
-      for(i=0; i<cutlist.length; i++)
+      for(i=0; i<this.cutlist.length; i++)
       {
          //O cutlist[i].removeActiveTabs();
-         cutlist[i].removeActiveTabs();
+         this.cutlist[i].removeActiveTabs();
       }
 
       //O clearDots();
@@ -914,12 +923,12 @@ export default class SceneGraph extends Sprite
    }
 
    //O public function getPathNumActive():int
-   public function getPathNumActive():int
+   public function getPathNumActive(): number
    {
       //O var n:int = 0;
-      var n:int = 0;
+      var n: number = 0;
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i: number=0; i<pathlist.length; i++)
       {
          //O if (pathlist[i].active == true)
          if (pathlist[i].active == true)
@@ -940,7 +949,7 @@ export default class SceneGraph extends Sprite
       copylist = new Array();
 
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i=0; i<pathlist.length; i++)
       {
          //O if (pathlist[i].active == true)
          if (pathlist[i].active == true)
@@ -971,7 +980,7 @@ export default class SceneGraph extends Sprite
          //O var min:Point = copylist[0].getMin().clone();
          var min:Point = copylist[0].getMin().clone();
          //O for(var j:int=0; j<copylist.length; j++)
-         for(var j:int=0; j<copylist.length; j++)
+         for(let j=0; j<copylist.length; j++)
          {
             //O var m:Point = copylist[j].getMin();
             var m:Point = copylist[j].getMin();
@@ -1015,7 +1024,7 @@ export default class SceneGraph extends Sprite
       //O var newlist:Array = new Array();
       var newlist:Array = new Array();
       //O for(var i:int=0; i<copylist.length; i++)
-      for(var i:int=0; i<copylist.length; i++)
+      for(let i=0; i<copylist.length; i++)
       {
          //O newlist.push(copylist[i].clone());
          newlist.push(copylist[i].clone());
@@ -1036,10 +1045,10 @@ export default class SceneGraph extends Sprite
       //O var average:Point = new Point(0,0);
       var average:Point = new Point(0,0);
       //O var len:int = 0;
-      var len:int = 0;
+      var len: number = 0;
 
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i=0; i<pathlist.length; i++)
       {
          //O if (pathlist[i].active == true)
          if (pathlist[i].active == true)
@@ -1110,7 +1119,7 @@ export default class SceneGraph extends Sprite
       //O var snappoint:Point;
       var snappoint:Point;
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i=0; i<pathlist.length; i++)
       {
          //O snappoint = pathlist[i].snapPoint(dot);
          snappoint = pathlist[i].snapPoint(dot);
@@ -1180,7 +1189,7 @@ export default class SceneGraph extends Sprite
       //O var selectedpaths:Array = new Array();
       var selectedpaths:Array = new Array();
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++) 
+      for(let i=0; i<pathlist.length; i++) 
       {
          //O if (pathlist[i].active == true)
          if (pathlist[i].active == true) 
@@ -1260,7 +1269,7 @@ export default class SceneGraph extends Sprite
       //O var plungerate:Number = Math.abs(Number(flist[8].input.text));
       var plungerate:number = Math.abs(Number(flist[8].input.text));
       //O var dir:int = flist[9].input.selectedItem.data;
-      var dir:int = flist[9].input.selectedItem.data;
+      var dir: number = flist[9].input.selectedItem.data;
 
       //O if (Global.unit == "cm")
       if (Global.unit == "cm")
@@ -1348,7 +1357,7 @@ export default class SceneGraph extends Sprite
       //O var plungerate:Number = Math.abs(Number(flist[9].input.text));
       var plungerate:number = Math.abs(Number(flist[9].input.text));
       //O var dir:int = flist[10].input.selectedItem.data;
-      var dir:int = flist[10].input.selectedItem.data;
+      var dir: number = flist[10].input.selectedItem.data;
 
       //O if (Global.unit == "cm")
       if (Global.unit == "cm")
@@ -1370,7 +1379,7 @@ export default class SceneGraph extends Sprite
       //O var selectedpaths:Array = new Array();
       var selectedpaths:Array = new Array();
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i=0; i<pathlist.length; i++)
       {
          //O if (pathlist[i].active == true)
          if (pathlist[i].active == true)
@@ -1453,7 +1462,7 @@ export default class SceneGraph extends Sprite
       //O var plungerate:Number = Math.abs(Number(flist[9].input.text));
       var plungerate:number = Math.abs(Number(flist[9].input.text));
       //O var dir:int = flist[10].input.selectedItem.data;
-      var dir:int = flist[10].input.selectedItem.data;
+      var dir: number = flist[10].input.selectedItem.data;
 
       //O if (Global.unit == "cm")
       if (Global.unit == "cm")
@@ -1558,7 +1567,7 @@ export default class SceneGraph extends Sprite
       //O var selectedpaths:Array = new Array();
       var selectedpaths:Array = new Array();
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i=0; i<pathlist.length; i++)
       {
          //O if (pathlist[i].active == true)
          if (pathlist[i].active == true)
@@ -1708,7 +1717,7 @@ export default class SceneGraph extends Sprite
       //O var selectedpaths:Array = new Array();
       var selectedpaths:Array = new Array();
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++) 
+      for(let i=0; i<pathlist.length; i++) 
       {
          //O if (pathlist[i].active == true)
          if (pathlist[i].active == true) 
@@ -1867,7 +1876,7 @@ export default class SceneGraph extends Sprite
       //O var plungerate:Number = Math.abs(Number(flist[9].input.text));
       var plungerate:number = Math.abs(Number(flist[9].input.text));
       //O var dir:int = flist[10].input.selectedItem.data;
-      var dir:int = flist[10].input.selectedItem.data;
+      var dir: number = flist[10].input.selectedItem.data;
       //O var center:Boolean = flist[11].input.selectedItem.data;
       var center:boolean = flist[11].input.selectedItem.data;
       //O var spacing:Number = Number(flist[12].input.text);
@@ -1893,13 +1902,13 @@ export default class SceneGraph extends Sprite
       //O var selectedcuts:Array = new Array();
       var selectedcuts:Array = new Array();
       //O for(var i:int=0; i<cutlist.length; i++)
-      for(var i:int=0; i<cutlist.length; i++)
+      for(let i=0; i<this.cutlist.length; i++)
       {
          //O if (cutlist[i].active == true)
-         if (cutlist[i].active == true)
+         if (this.cutlist[i].active == true)
          {
             //O selectedcuts.push(cutlist[i]);
-            selectedcuts.push(cutlist[i]);
+            selectedcuts.push(this.cutlist[i]);
          }
       }
 
@@ -1950,7 +1959,7 @@ export default class SceneGraph extends Sprite
    public function zeroSelected():void
    {
       //O for(var i:int=0; i<pathlist.length; i++)
-      for(var i:int=0; i<pathlist.length; i++)
+      for(let i=0; i<pathlist.length; i++)
       {
          //O if (pathlist[i].active == true)
          if (pathlist[i].active == true)
@@ -1967,13 +1976,13 @@ export default class SceneGraph extends Sprite
       //O var processed:Array = new Array();
       var processed:Array = new Array();
       //O for(var i:int=0; i<cutlist.length; i++)
-      for(var i:int=0; i<cutlist.length; i++)
+      for(let i=0; i<this.cutlist.length; i++)
       {
          //O if (cutlist[i].processed == true)
-         if (cutlist[i].processed == true) 
+         if (this.cutlist[i].processed == true) 
          {
             //O processed.push(cutlist[i]);
-            processed.push(cutlist[i]);
+            processed.push(this.cutlist[i]);
          }
       }
 
@@ -1998,7 +2007,7 @@ export default class SceneGraph extends Sprite
       for each(cut in cutgroup)
       {
          //O cutlist.push(cut);
-         cutlist.push(cut);
+         this.cutlist.push(cut);
          //O addChild(cut);
          addChild(cut);
 
@@ -2017,7 +2026,7 @@ export default class SceneGraph extends Sprite
          //O main.tools.dToolpaths.addItem({label: cut.name, data: cut});
          main.tools.dToolpaths.addItem({label: cut.name, data: cut});
          //O main.tools.dToolpaths.height = Math.max(cutlist.length*20,20);
-         main.tools.dToolpaths.height = Math.max(cutlist.length*20,20);
+         main.tools.dToolpaths.height = Math.max(this.cutlist.length*20,20);
          //O cut.setActive();
          cut.setActive();
       }
@@ -2039,18 +2048,18 @@ export default class SceneGraph extends Sprite
          removeChild(cut);
       }
       //O var index:int = cutlist.indexOf(cut);
-      var index:int = cutlist.indexOf(cut);
+      var index: number = this.cutlist.indexOf(cut);
       //O if (index != -1)
       if (index != -1)
       {
          //O cutlist.splice(index,1);
-         cutlist.splice(index,1);
+         this.cutlist.splice(index,1);
          //O var main:* = this.parent;
          var main:* = this.parent;
          //O main.tools.dToolpaths.removeItemAt(index);
          main.tools.dToolpaths.removeItemAt(index);
          //O main.tools.dToolpaths.height = Math.max(cutlist.length*20,20);
-         main.tools.dToolpaths.height = Math.max(cutlist.length*20,20);
+         main.tools.dToolpaths.height = Math.max(this.cutlist.length*20,20);
          //O return true;
          return true;
       } else
@@ -2076,7 +2085,7 @@ export default class SceneGraph extends Sprite
       } else
       {
          //O for each(var cut:CutObject in cutlist)
-         for each(var cut:CutObject in cutlist)
+         for each(var cut:CutObject in this.cutlist)
          {
             //O if (activeonly && cut.active == false)
             if (activeonly && cut.active == false)
@@ -2505,10 +2514,10 @@ export default class SceneGraph extends Sprite
    {
 
       //O var len:int = pathlist.length;
-      var len:int = pathlist.length;
+      var len: number = pathlist.length;
 
       //O for(var i:int=0; i<len; i++)
-      for(var i:int=0; i<len; i++)
+      for(let i=0; i<len; i++)
       {
          //O if (pathlist[i].active == true)
          if (pathlist[i].active == true)
@@ -2518,18 +2527,17 @@ export default class SceneGraph extends Sprite
             //O if (paths.length > 0)
             if (paths.length > 0)
             {
-               //O // check cutlist (we must replace the path in the cutobject)
-               // check cutlist (we must replace the path in the cutobject)
+               //O check cutlist (we must replace the path in the cutobject)
                //O for(var j:int=0; j<cutlist.length; j++)
-               for(var j:int=0; j<cutlist.length; j++)
+               for(let j=0; j<this.cutlist.length; j++)
                {
                   //O var index:int = cutlist.pathlist.indexOf(pathlist[i]);
-                  var index:int = cutlist.pathlist.indexOf(pathlist[i]);
+                  var index: number = this.cutlist.pathlist.indexOf(pathlist[i]);
                   //O if (index != -1)
                   if (index != -1)
                   {
                      //O cutlist.pathlist.splice(index,1,paths);
-                     cutlist.pathlist.splice(index,1,paths);
+                     this.cutlist.pathlist.splice(index,1,paths);
                   }
                }
                //O for each(var p:Path in paths)
@@ -2622,7 +2630,7 @@ export default class SceneGraph extends Sprite
       }
 
       //O if (cutlist.length < 2)
-      if (cutlist.length < 2)
+      if (this.cutlist.length < 2)
       {
          //O return false;
          return false;
@@ -2636,15 +2644,15 @@ export default class SceneGraph extends Sprite
       }
 
       //O nest = new Nest(nestpath, cutlist.slice(), directions, gap, group, groupprofile);
-      nest = new Nest(nestpath, cutlist.slice(), directions, gap, group, groupprofile);
+      nest = new Nest(nestpath, this.cutlist.slice(), directions, gap, group, groupprofile);
       //O addChild(nest);
       addChild(nest);
 
       //O for(var i:int=0; i<cutlist.length; i++)
-      for(var i:int=0; i<cutlist.length; i++)
+      for(let i=0; i<this.cutlist.length; i++)
       {
          //O addChild(cutlist[i]);
-         addChild(cutlist[i]);
+         addChild(this.cutlist[i]);
       }
 
       //O nest.addEventListener(ProgressEvent.PROGRESS, nestProgress);
@@ -2704,13 +2712,13 @@ export default class SceneGraph extends Sprite
          var processed:Array = new Array();
 
          //O for(var i:int=0; i<data.length; i++)
-         for(var i:int=0; i<data.length; i++)
+         for(let i=0; i<data.length; i++)
          {
             //O if (!data[i].failed)
             if (!data[i].failed)
             {
                //O var cutobject:* = nest.cutlist[data[i].index];
-               var cutobject:* = nest.cutlist[data[i].index];
+               var cutobject:* = nest.this.cutlist[data[i].index];
 
                //O // the clumped nest object (cutobject) is represented as a tree using the displayobject dom
                // the clumped nest object (cutobject) is represented as a tree using the displayobject dom
@@ -2719,7 +2727,7 @@ export default class SceneGraph extends Sprite
                //O var cutarray:Array = new Array(cutobject);
                var cutarray:Array = new Array(cutobject);
                //O var index:int = 0;
-               var index:int = 0;
+               var index: number = 0;
                //O while(index < cutarray.length)
                while(index < cutarray.length)
                {
@@ -2747,10 +2755,10 @@ export default class SceneGraph extends Sprite
                var nestarray:Array = new Array();
 
                //O for(var j:int=0; j<cutarray.length; j++)
-               for(var j:int=0; j<cutarray.length; j++)
+               for(let j=0; j<cutarray.length; j++)
                {
                   //O for(var k:int=0; k<cutarray[j].pathlist.length; k++)
-                  for(var k:int=0; k<cutarray[j].pathlist.length; k++)
+                  for(let k=0; k<cutarray[j].pathlist.length; k++)
                   {
                      //O if (nestarray.indexOf(cutarray[j].pathlist[k]) == -1 && processed.indexOf(cutarray[j].pathlist[k]) == -1)
                      if (nestarray.indexOf(cutarray[j].pathlist[k]) == -1 && processed.indexOf(cutarray[j].pathlist[k]) == -1)
@@ -2795,36 +2803,34 @@ export default class SceneGraph extends Sprite
       removeChild(nest);
 
       //O for(i=0; i<cutlist.length; i++)
-      for(i=0; i<cutlist.length; i++)
+      for(i=0; i<this.cutlist.length; i++)
       {
          //O while(cutlist[i].numChildren > 0)
-         while(cutlist[i].numChildren > 0)
+         while(this.cutlist[i].numChildren > 0)
          {
             //O cutlist[i].removeChildAt(0);
-            cutlist[i].removeChildAt(0);
+            this.cutlist[i].removeChildAt(0);
          }
          //O addChild(cutlist[i]);
-         addChild(cutlist[i]);
+         addChild(this.cutlist[i]);
 
-         //O /*cutlist[i].docx = 0;
-         /*cutlist[i].docx = 0;
-         //O cutlist[i].docy = 0;
-         cutlist[i].docy = 0;
-         //O cutlist[i].x = 0;
-         cutlist[i].x = 0;
-         //O cutlist[i].y = 0;*/
-         cutlist[i].y = 0;*/
+         /*
+//o      cutlist[i].docx = 0;
+//o      cutlist[i].docy = 0;
+//o      cutlist[i].x = 0;
+//o      cutlist[i].y = 0;
+         */
 
          //O cutlist[i].processed = false;
-         cutlist[i].processed = false;
+         this.cutlist[i].processed = false;
          //O cutlist[i].rotation = 0;
-         cutlist[i].rotation = 0;
+         this.cutlist[i].rotation = 0;
          //O cutlist[i].pathlist[0].dirty = true;
-         cutlist[i].pathlist[0].dirty = true;
+         this.cutlist[i].pathlist[0].dirty = true;
          //O cutlist[i].pathlist[0].camdirty = true;
-         cutlist[i].pathlist[0].camdirty = true;
+         this.cutlist[i].pathlist[0].camdirty = true;
          //O cutlist[i].graphics.clear();
-         cutlist[i].graphics.clear();
+         this.cutlist[i].graphics.clear();
       }
 
       //O redraw();
@@ -2836,13 +2842,13 @@ export default class SceneGraph extends Sprite
    public function addTabsSelected(spacing:number, tabwidth:number, tabheight:number):void
    {
       //O for(var i:int=0; i<cutlist.length; i++)
-      for(var i:int=0; i<cutlist.length; i++)
+      for(let i=0; i<this.cutlist.length; i++)
       {
          //O if (cutlist[i].active == true && cutlist[i] is ProfileCutObject && cutlist[i].processed == true)
-         if (cutlist[i].active == true && cutlist[i] is ProfileCutObject && cutlist[i].processed == true)
+         if (this.cutlist[i].active == true && this.cutlist[i] is ProfileCutObject && this.cutlist[i].processed == true)
          {
             //O cutlist[i].addTabs(spacing, tabwidth, tabheight);
-            cutlist[i].addTabs(spacing, tabwidth, tabheight);
+            this.cutlist[i].addTabs(spacing, tabwidth, tabheight);
          }
       }
    }
@@ -2857,25 +2863,25 @@ export default class SceneGraph extends Sprite
       var active:Array = new Array();
 
       //O for(var i:int = 0; i<cutlist.length; i++)
-      for(var i:int = 0; i<cutlist.length; i++)
+      for(let i = 0; i<this.cutlist.length; i++)
       {
          //O if (cutlist[i].active == true)
-         if (cutlist[i].active == true)
+         if (this.cutlist[i].active == true)
          {
             //O active.push(cutlist[i]);
-            active.push(cutlist[i]);
+            active.push(this.cutlist[i]);
          } else
          {
             //O inactive.push(cutlist[i]);
-            inactive.push(cutlist[i]);
+            inactive.push(this.cutlist[i]);
          }
          //O some problems with accounting for docx/y, for now just reset all to zero
          //O cutlist[i].zeroOrigin();
-         cutlist[i].zeroOrigin();
+         this.cutlist[i].zeroOrigin();
          //O cutlist[i].pathlist[0].dirty = true;
-         cutlist[i].pathlist[0].dirty = true;
+         this.cutlist[i].pathlist[0].dirty = true;
          //O cutlist[i].pathlist[0].camdirty = true;
-         cutlist[i].pathlist[0].camdirty = true;
+         this.cutlist[i].pathlist[0].camdirty = true;
       }
 
       //O var irect:Rectangle = getExactBounds(inactive);
@@ -2923,7 +2929,7 @@ export default class SceneGraph extends Sprite
       for(i=0; i<active.length; i++)
       {
          //O for(var j:int=0; j<active[i].pathlist.length; j++)
-         for(var j:int=0; j<active[i].pathlist.length; j++)
+         for(let j=0; j<active[i].pathlist.length; j++)
          {
             //O var path:Path = active[i].pathlist[j];
             var path:Path = active[i].pathlist[j];
@@ -2961,7 +2967,7 @@ export default class SceneGraph extends Sprite
 
       //O find bounding box of deselected cutpaths
       //O for(var i:int=0; i<list.length; i++)
-      for(var i:int=0; i<list.length; i++)
+      for(let i=0; i<list.length; i++)
       {
          //O var lminx:Number = NaN;
          var lminx:number = NaN;
@@ -2975,7 +2981,7 @@ export default class SceneGraph extends Sprite
          //O var children:Array = list[i].rootpath.getChildren();
          var children:Array = list[i].rootpath.getChildren();
          //O for(var j:int=0; j<children.length; j++)
-         for(var j:int=0; j<children.length; j++)
+         for(let j=0; j<children.length; j++)
          {
             //O var rect:Rectangle = children[j].getExactBounds();
             var rect:Rectangle = children[j].getExactBounds();
