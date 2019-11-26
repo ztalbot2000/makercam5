@@ -27,7 +27,6 @@ describe('Testing Grid.js', function ()
 
    it('grid.xaxis should be private and hackingly an object', function ()
    {
-      console.log("grid['xaxis'] is " + grid['xaxis']);
       let expectedResult = 'object';
       assert.isObject(grid['xaxis'], "grid.xaxis: expected " + expectedResult + " received = " + typeof grid['xaxis'] );
    });

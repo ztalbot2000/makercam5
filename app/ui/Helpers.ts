@@ -55,9 +55,8 @@
       let shorthandRegex: RegExp  = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
       var hexS = this.componentToHex( hex );
       hexS = hexS.replace( shorthandRegex,
-                function (m, r, g, b) : string
+                function (_m, r, g, b) : string
                 {
-                   var v=m;m=v;  // for unused var
                    return (r + r + g + g + b + b);
                 });
 

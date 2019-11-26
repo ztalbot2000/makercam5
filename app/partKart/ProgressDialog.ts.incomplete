@@ -15,6 +15,10 @@
 import * as PIXI from 'pixi.js';
 import { Graphics } from 'pixi.js';
 import { Sprite } from 'pixi.js';
+import Button from '../ui/Button';
+import Text from '../ui/Text.js';
+import TextInput from '../ui/TextInput.js';
+import { ProgressBar } from '../ui/ProgressBar.js';
 
 //O public class ProgressDialog extends Sprite
 export default class ProgressDialog extends Sprite
@@ -41,7 +45,7 @@ export default class ProgressDialog extends Sprite
    public total:number = 1; // number of operations to process
 
    //O var titlelabel:TextField;
-   public titlelabel:TextField;
+   public titlelabel:Text;
 
    //O public function ProgressDialog(dialogwidth:int, dialogheight:int, dialogmessage:String = "processing", dialoglabel:String = "Cancel", callback:Function = null):void
    constructor (dialogwidth: number, dialogheight: number, dialogmessage:string = "processing", dialoglabel:string = "Cancel", callback:Function = null)
@@ -95,12 +99,12 @@ export default class ProgressDialog extends Sprite
       let format:TextFormat = new TextFormat("Arial", 11);
 
       //O titlelabel = new TextField();
-      this.titlelabel = new TextField();
+      this.titlelabel = new TextInput();
 
       //O titlelabel.defaultTextFormat = format;
       this.titlelabel.defaultTextFormat = format;
       //O titlelabel.type = TextFieldType.DYNAMIC;
-      this.titlelabel.type = TextFieldType.DYNAMIC;
+      // this.titlelabel.type = TextFieldType.DYNAMIC;
       //O titlelabel.multiline = false;
       this.titlelabel.multiline = false;
       //O titlelabel.height = 20;
@@ -158,7 +162,7 @@ export default class ProgressDialog extends Sprite
    }
 
    //O private function dialogDown(e:MouseEvent):void
-   private dialogDown(e:MouseEvent):void
+   private dialogDown(e:PIXI.interaction.InteractionEvent):void
    {
       //O if (e.target == this || (e.target is TextField && e.target.selectable == false))
       //Help fixme is?  
@@ -170,14 +174,14 @@ export default class ProgressDialog extends Sprite
    }
 
    //O private function dialogUp(e:MouseEvent):void
-   private dialogUp(e:MouseEvent):void
+   private dialogUp(_e:PIXI.interaction.InteractionEvent):void
    {
       //O stopDrag();
       stopDrag();
    }
 
    //O private function endDialog(e:MouseEvent):void
-   private endDialog(e:MouseEvent):void
+   private endDialog(_e:PIXI.interaction.InteractionEvent):void
    {
       //O stopDialog();
       this.stopDialog();
