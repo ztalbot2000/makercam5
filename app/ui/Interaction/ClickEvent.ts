@@ -1,8 +1,5 @@
 import * as PIXI from 'pixi.js';
-import
-{
-   UIBase
-} from '../UIBase';
+import { UIBase } from '../UIBase';
 
 //O var ClickEvent = function (obj, includeHover, rightMouseButton, doubleClick)
 class ClickEvent
