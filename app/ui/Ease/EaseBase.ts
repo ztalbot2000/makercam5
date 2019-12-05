@@ -5,7 +5,7 @@ export default class EaseBase
     {
     }
 
-    getPosition (p: number): number
+    public getPosition = (p: number): number =>
     {
         return p;
     };

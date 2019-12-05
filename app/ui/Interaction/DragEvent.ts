@@ -51,7 +51,7 @@ class DragEvent
    }
 
    //O var _onDragStart = function( e )
-   private _onDragStart ( e: PIXI.interaction.InteractionEvent )
+   private _onDragStart = ( e: PIXI.interaction.InteractionEvent ): void =>
    {
       //O id = e.data.identifier;
       this.id = e.data.identifier;
@@ -85,7 +85,7 @@ class DragEvent
    };
 
    //O var _onDragMove = function( event )
-   private _onDragMove( event: PIXI.interaction.InteractionEvent )
+   private _onDragMove = ( event: PIXI.interaction.InteractionEvent ): void =>
    {
       //O if ( event.data.identifier !== id )
       if ( event.data.identifier !== this.id )
@@ -147,7 +147,7 @@ class DragEvent
    };
 
    //O var _onDragEnd = function( event )
-   private _onDragEnd ( event:PIXI.interaction.InteractionEvent )
+   private _onDragEnd = ( event:PIXI.interaction.InteractionEvent ): void =>
    {
       //O if ( event.data.identifier !== id )
       if ( event.data.identifier !== this.id )
@@ -186,7 +186,7 @@ class DragEvent
    };
 
    //O this.stopEvent = function( )
-   public stopEvent( )
+   public stopEvent = ( ): void =>
    {
       //O if ( bound )
       if ( this.bound )
@@ -213,7 +213,7 @@ class DragEvent
    };
 
    //O this.startEvent = function( )
-   public startEvent( )
+   public startEvent = ( ): void =>
    {
       //O obj.container.on( 'mousedown', _onDragStart );
       this.objO.container.on( 'mousedown', this._onDragStart );
@@ -223,13 +223,13 @@ class DragEvent
 
    //N These methods are meant to be filled in by anyone who uses this class.
    //O DragEvent.prototype.onPress = function( event, isPressed ) {};
-   public onPress = function( _event: PIXI.interaction.InteractionEvent, _isPressed: boolean ) { };
+   public onPress = ( _event: PIXI.interaction.InteractionEvent, _isPressed: boolean ) => { };
    //O DragEvent.prototype.onDragEnd = function( event ) {};
-   public onDragEnd = function( _event: PIXI.interaction.InteractionEvent ) { };
+   public onDragEnd = ( _event: PIXI.interaction.InteractionEvent ) => { };
    //O DragEvent.prototype.onDragMove = function( event, offset ) {};
-   public onDragMove = function( _event: PIXI.interaction.InteractionEvent, _offset:PIXI.Point ) { };
+   public onDragMove = ( _event: PIXI.interaction.InteractionEvent, _offset:PIXI.Point ) => { };
    //O DragEvent.prototype.onDragStart = function( event ) {};
-   public onDragStart = function( _event: PIXI.interaction.InteractionEvent ) { };
+   public onDragStart = ( _event: PIXI.interaction.InteractionEvent ) => { };
 
 };
 

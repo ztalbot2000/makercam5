@@ -71,7 +71,7 @@ class ClickEvent
    }
 
    //O var _onMouseDown = function (event)
-   private _onMouseDown( event: PIXI.interaction.InteractionEvent )
+   private _onMouseDown = ( event: PIXI.interaction.InteractionEvent ): void =>
    {
       //O mouse.copy(event.data.global);
       this.mouse.copyTo( event.data.global );
@@ -121,7 +121,7 @@ class ClickEvent
    };
 
    //O var _mouseUpAll = function (event)
-   private _mouseUpAll( event: PIXI.interaction.InteractionEvent )
+   private _mouseUpAll = ( event: PIXI.interaction.InteractionEvent ): void =>
    {
       //O if (event.data.identifier !== id)
       if ( event.data.identifier !== this.id )
@@ -154,7 +154,7 @@ class ClickEvent
    };
 
    //O var _onMouseUp = function (event)
-   private _onMouseUp( event: PIXI.interaction.InteractionEvent )
+   private _onMouseUp = ( event: PIXI.interaction.InteractionEvent ): void =>
    {
       //O if (event.data.identifier !== id)
       if ( event.data.identifier !== this.id )
@@ -185,7 +185,7 @@ class ClickEvent
    };
 
    //O var _onMouseUpOutside = function (event)
-   private _onMouseUpOutside( event: PIXI.interaction.InteractionEvent )
+   private _onMouseUpOutside = ( event: PIXI.interaction.InteractionEvent ): void =>
    {
       //O if (event.data.identifier !== id)
       if ( event.data.identifier !== this.id )
@@ -199,7 +199,7 @@ class ClickEvent
    };
 
    //O var _onMouseOver = function (event)
-   private _onMouseOver( event: PIXI.interaction.InteractionEvent )
+   private _onMouseOver = ( event: PIXI.interaction.InteractionEvent ): void =>
    {
       //O if (!ishover)
       if ( ! this.ishover )
@@ -216,7 +216,7 @@ class ClickEvent
    };
 
    //O var _onMouseOut = function (event)
-   private _onMouseOut( event: PIXI.interaction.InteractionEvent )
+   private _onMouseOut = ( event: PIXI.interaction.InteractionEvent ): void =>
    {
       //O if (ishover)
       if ( this.ishover )
@@ -233,14 +233,14 @@ class ClickEvent
    };
 
    //O var _onMouseMove = function (event)
-   private _onMouseMove( event: PIXI.interaction.InteractionEvent )
+   private _onMouseMove = ( event: PIXI.interaction.InteractionEvent ): void =>
    {
       //O self.onMove.call(obj, event);
       this.context.onMove.call( this.objO, event );
    };
 
    //O this.stopEvent = function ()
-   public stopEvent( )
+   public stopEvent = ( ): void =>
    {
       //O if (bound)
       if ( this.bound )
@@ -284,7 +284,7 @@ class ClickEvent
    };
 
    //O this.startEvent = function ()
-   private startEvent( )
+   private startEvent = ( ): void =>
    {
       //O obj.container.on(eventname_mousedown, _onMouseDown);
       this.objO.container.on( this.eventname_mousedown, this._onMouseDown );
@@ -306,15 +306,15 @@ class ClickEvent
 
    //N These methods are meant to be filled in by anyone who uses this class.
    //O ClickEvent.prototype.onHover = function (event, over) { };
-   public onHover( _event: PIXI.interaction.InteractionEvent, _over: boolean ) {};
+   public onHover = ( _event: PIXI.interaction.InteractionEvent, _over: boolean ):void => {};
 
    //O ClickEvent.prototype.onClick = function (event) { };
-   public onClick( _event: PIXI.interaction.InteractionEvent ) {};
+   public onClick = ( _event: PIXI.interaction.InteractionEvent ):void => {};
 
    //O ClickEvent.prototype.onPress = function (event, isPressed) { };
-   public onPress( _event: PIXI.interaction.InteractionEvent, _isPressed: boolean ) {};
+   public onPress = ( _event: PIXI.interaction.InteractionEvent, _isPressed: boolean ):void => {};
    //O ClickEvent.prototype.onMove = function (event) { };
-   public onMove( _event: PIXI.interaction.InteractionEvent ) {};
+   public onMove = ( _event: PIXI.interaction.InteractionEvent ):void => {};
 
 };
 

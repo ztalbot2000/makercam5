@@ -42,7 +42,7 @@ class MouseScrollEvent
    }
 
    //O var _onMouseScroll = function( event )
-   private _onMouseScroll ( event: any): void
+   private _onMouseScroll = ( event: any): void =>
    {
       //O if ( preventDefault )
       if ( this.preventDefault )
@@ -70,7 +70,7 @@ class MouseScrollEvent
    };
 
    //O var _onHover = function( event )
-   private _onMouseOver ( _event : PIXI.interaction.InteractionEvent ): void
+   private _onMouseOver = ( _event : PIXI.interaction.InteractionEvent ): void =>
    {
       //O if ( !bound )
       if ( ! this.bound )
@@ -88,7 +88,7 @@ class MouseScrollEvent
    };
 
    //O var _onMouseOut = function( event )
-   private _onMouseOut ( _event: PIXI.interaction.InteractionEvent ): void
+   private _onMouseOut = ( _event: PIXI.interaction.InteractionEvent ): void =>
    {
       //O if ( bound )
       if ( this.bound )
@@ -107,7 +107,7 @@ class MouseScrollEvent
    };
 
    //O this.stopEvent = function( )
-   public stopEvent( )
+   public stopEvent = ( ): void =>
    {
       //O if ( bound )
       if ( this.bound )
@@ -132,7 +132,7 @@ class MouseScrollEvent
    };
 
    //O this.startEvent = function( )
-   public startEvent( )
+   public startEvent = ( ): void =>
    {
       //O obj.container.on( 'mouseover', _onHover );
       this.objO.container.on( 'mouseover',
@@ -144,9 +144,9 @@ class MouseScrollEvent
 
 
    //O MouseScrollEvent.prototype.onMouseScroll = function( event, delta ) {};
-   public onMouseScroll( _event:
+   public onMouseScroll = ( _event:
                          PIXI.interaction.InteractionEvent,
-                        _delta: PIXI.Point ) {};
+                        _delta: PIXI.Point ) => {};
 };
 
 //O MouseScrollEvent.prototype.constructor = MouseScrollEvent;

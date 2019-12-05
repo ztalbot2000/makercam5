@@ -13,7 +13,7 @@ export default class ExponentialEase extends EaseBase
       this.t = easeIn && easeOut ? 3 : easeOut ? 1 : 2;
    }
 
-   getPosition (p: number): number
+   public getPosition = (p: number): number =>
    {
         let r = (this.t === 1) ? 1 - p : (this.t === 2) ? p : (p < 0.5) ? p * 2 : (1 - p) * 2;
         if (this.pow === 1)

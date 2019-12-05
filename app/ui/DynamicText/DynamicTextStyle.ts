@@ -110,7 +110,7 @@ export default class DynamicTextStyle
    }
 
    //O this.ellipsisSize = function( atlas )
-   public ellipsisSize ( atlas: any ): number
+   public ellipsisSize = ( atlas: any ): number =>
    {
       //O if ( !this.ellipsis )
       if ( !this.ellipsis )
@@ -134,7 +134,7 @@ export default class DynamicTextStyle
    };
 
    //O DynamicTextStyle.prototype.clone = function( )
-   public clone( ): DynamicTextStyle
+   public clone = ( ): DynamicTextStyle =>
    {
       //O var style = new DynamicTextStyle( );
       let style = new DynamicTextStyle( this );
@@ -145,7 +145,7 @@ export default class DynamicTextStyle
    };
 
    //O DynamicTextStyle.prototype.merge = function( style )
-   public merge( style: any )
+   public merge = ( style: any ) =>
    {
       //O if ( typeof style === 'object' )
       if ( typeof style === 'object' )
@@ -250,14 +250,14 @@ export default class DynamicTextStyle
    };
 
    //O DynamicTextStyle.prototype.ctxKey = function( char )
-   public ctxKey( char: string ): string
+   public ctxKey = ( char: string ): string =>
    {
       //O return [ char, this.fill, this.shadow, this.stroke, this.strokeFill, this.strokeShadow ].join( '|' );
       return [ char, this.fill, this.shadow, this.stroke, this.strokeFill, this.strokeShadow ].join( '|' );
    };
 
    //O DynamicTextStyle.prototype.ctxFont = function( )
-   public ctxFont( ): string
+   public ctxFont = ( ): string =>
    {
       //O var fontSize = Math.min( 200, Math.max( 1, this.fontSize || 26 ) ) + "px ";
       let fontSize = Math.min( 200, Math.max( 1, this.fontSize || 26 ) ) + "px ";

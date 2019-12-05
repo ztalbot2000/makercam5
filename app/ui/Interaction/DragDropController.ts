@@ -15,7 +15,7 @@ class DragDropController
    }
 
    //O add: function( item, event )
-   public add( item: any, event: PIXI.interaction.InteractionEvent )
+   public add = ( item: any, event: PIXI.interaction.InteractionEvent ): boolean =>
    {
       //O item._dragDropEventId = event.data.identifier;
       item._dragDropEventId = event.data.identifier;
@@ -32,7 +32,7 @@ class DragDropController
    }
 
    //O getItem: function( object )
-   public getItem( obj: object )
+   public getItem = ( obj: object ) =>
    {
       //O var item = null,
       let item = null;
@@ -70,7 +70,7 @@ class DragDropController
    }
 
    //O getEventItem: function( event, group )
-   public getEventItem( event: PIXI.interaction.InteractionEvent, group: any )
+   public getEventItem = ( event: PIXI.interaction.InteractionEvent, group: any ) =>
    {
       //O var item = null,
       let item = null;

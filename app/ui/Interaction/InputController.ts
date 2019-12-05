@@ -27,7 +27,7 @@ class InputController
    }
 
    //O registrer: function( item, tabIndex, tabGroup )
-   public registrer( item: INameToValueMap, tabIndex: number, tabGroup: string )
+   public registrer = ( item: INameToValueMap, tabIndex: number, tabGroup: string ) =>
    {
       //O var groupName = tabGroup || "default";
       var groupName = tabGroup || "default";
@@ -76,7 +76,7 @@ class InputController
    }
 
    //O set: function( item )
-   public set( item: object )
+   public set = ( item: object ) =>
    {
       //O this.blur( );
       this.blur( );
@@ -85,14 +85,14 @@ class InputController
    }
 
    //O clear: function( )
-   public clear( )
+   public clear = ( ) =>
    {
       //O _currentItem = undefined;
       this._currentItem = undefined;
    }
 
    //O blur: function( )
-   private blur( )
+   private blur = ( ) =>
    {
       //O if ( _currentItem && typeof _currentItem.blur === "function" )
       if ( this._currentItem && typeof this._currentItem.blur === "function" )
@@ -103,7 +103,7 @@ class InputController
    }
 
    //O fireTab: function( )
-   public fireTab( )
+   public fireTab = ( ): void =>
    {
       //O if ( _currentItem )
       if ( this._currentItem )
@@ -122,7 +122,7 @@ class InputController
    }
 
    //O fireNext: function( )
-   public fireNext( )
+   public fireNext = ( ): void =>
    {
       //O if ( _currentItem )
       if ( this._currentItem )
@@ -141,7 +141,7 @@ class InputController
    }
 
    //O firePrev: function( )
-   public firePrev( )
+   public firePrev = ( ): void =>
    {
       //O if ( _currentItem )
       if ( this._currentItem )
@@ -160,7 +160,7 @@ class InputController
    }
 
    //O registrerCheckGroup: function( cb )
-   public registrerCheckGroup( cb: INameToValueMap )
+   public registrerCheckGroup = ( cb: INameToValueMap ): void =>
    {
       //O var name = cb.checkGroup;
       let name = cb.checkGroup;
@@ -185,7 +185,7 @@ class InputController
    }
 
    //O updateCheckGroupSelected: function( cb )
-   public updateCheckGroupSelected( cb: INameToValueMap )
+   public updateCheckGroupSelected = ( cb: INameToValueMap ): void =>
    {
       //O var group = checkGroups[ cb.checkGroup ];
       let group = this.checkGroups[ cb.checkGroup ];
@@ -204,7 +204,7 @@ class InputController
    }
 
    //O getCheckGroupSelectedValue: function( name )
-   public getCheckGroupSelectedValue( name: string ): string
+   public getCheckGroupSelectedValue = ( name: string ): string =>
    {
       //O if ( checkGroupValues[ name ] )
       if ( this.checkGroupValues[ name ] )
@@ -215,7 +215,7 @@ class InputController
    }
 
    //O setCheckGroupSelectedValue: function( name, val )
-   public setCheckGroupSelectedValue( name: string, val: number )
+   public setCheckGroupSelectedValue = ( name: string, val: number ): void =>
    {
       //O var group = checkGroups[ name ];
       let group = this.checkGroups[ name ];

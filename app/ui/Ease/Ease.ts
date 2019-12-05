@@ -23,7 +23,7 @@ class Ease
    public Expo: object;
    public Sine: object;
 
-   private create(fn: (p:number)=>number ): EaseBase
+   private create = (fn: (p:number)=>number ): EaseBase =>
    {
       //O var e = Object.create(EaseBase.prototype);
       let e =  new EaseBase();
@@ -31,7 +31,7 @@ class Ease
       return e;
    }
 
-   private wrapEase(easeInFunction: ExponentialEase, easeOutFunction: ExponentialEase, easeInOutFunction: ExponentialEase): object
+   private wrapEase = (easeInFunction: ExponentialEase, easeOutFunction: ExponentialEase, easeInOutFunction: ExponentialEase): object =>
    {
        return {
           easeIn: easeInFunction,
