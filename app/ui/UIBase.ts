@@ -11,12 +11,12 @@ var UISettings = require('./UISettings'),
  * @param width {Number} Width of the UIObject
  * @param height {Number} Height of the UIObject
  */
-export class UIBase extends UI
+export default class UIBase extends UI
 {
-   constructor (width: number, height: number)
+   constructor (width?: number, height?: number)
    {
       super();
-  
+
       //PIXI.utils.EventEmitter.call(this);
       this.container = new PIXI.Container();
       this.setting = new UISettings();
@@ -30,8 +30,7 @@ export class UIBase extends UI
       this._oldWidth = -1;
       this._oldHeight = -1;
       this.pixelPerfect = true;
-  
-  
+
       //O if (width && isNaN(width) && width.indexOf('%') != -1)
       if (width && isNaN(width) && String(width).indexOf('%') != -1) {
           //this.setting.widthPct = parseFloat(width.replace('%', '')) * 0.01;
@@ -39,7 +38,7 @@ export class UIBase extends UI
       } else {
           this.setting.widthPct = null;
       }
-  
+
       //O if (height && isNaN(height) && height.indexOf('%') != -1)
       if (height && isNaN(height) && String(height).indexOf('%') != -1)
       {
@@ -47,10 +46,10 @@ export class UIBase extends UI
       } else {
           this.setting.heightPct = null;
       }
-  
+
       this.setting.width = width || 0;
       this.setting.height = height || 0;
-  
+
       //actual values
       this._width = 0;
       this._height = 0;
@@ -66,9 +65,9 @@ export class UIBase extends UI
       this._right = null;
       this._top = null;
       this._bottom = null;
-  
+
       this._dragPosition = null; //used for overriding positions if tweens is playing
-  
+
    };
 
    /**
@@ -100,7 +99,7 @@ export class UIBase extends UI
     *
     * @private
     */
-   private update ()
+   public update ()
    {
    };
 

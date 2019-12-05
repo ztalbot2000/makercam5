@@ -1,11 +1,21 @@
-//O function DynamicChar( )
-class DynamicChar
+interface INameToValueMap
 {
+    [key: string]: any;
+}
+
+//N for style data
+//import { DynamicTextStyle } from './DynamicTextStyle';
+import DynamicTextStyle from './DynamicTextStyle';
+
+//O function DynamicChar( )
+export default class DynamicChar
+{
+   //O styledata (texture, orig width, orig height)
    //O this.style = null;
-   public style: string;
+   public style: DynamicTextStyle;
 
    //O this.data = null;
-   public data: number;
+   public data: INameToValueMap;
 
    //O this.space = false;
    public space: boolean;
@@ -33,6 +43,10 @@ class DynamicChar
    //O this.lineIndex = -1;
    public lineIndex: number;
 
+   //New x & y are used by DynamicText and undefined here
+   public x: number;
+   public y: number;
+
    constructor()
    {
       //O styledata (texture, orig width, orig height)
@@ -41,7 +55,7 @@ class DynamicChar
 
       //O char data
       //O this.data = null;
-      this.data = -1;
+      this.data = null;
 
       //O is this char space?
       //O this.space = false;
@@ -69,9 +83,12 @@ class DynamicChar
       //O line index of char
       //O this.lineIndex = -1;
       this.lineIndex = -1;
+
+      //New used by DynamicText and undefined here
+      this.x = this.y = 0;
    }
 }
 
 //O DynamicChar.prototype.constructor = DynamicChar;
 //O module.exports = DynamicChar;
-module.exports = DynamicChar;
+//module.exports = DynamicChar;

@@ -20,15 +20,15 @@ describe('Testing DynamicChar.ts', function ()
 
    describe('Testing DynamicChar variables', function (){});
 
-   it('dynamicChar.data should be a Number', function ()
-   {
-      assert.isNumber(dynamicChar.data, "dynamicChar.data is not a Number. result: " + typeof dynamicChar.data );
-   });
+// it('dynamicChar.data should be a Number', function ()
+// {
+//    assert.equal(dynamicChar.data, INameToValueMap, "dynamicChar.data is not a Number. result: " + typeof dynamicChar.data );
+// });
 
-   it('dynamicChar.data should init to be -1', function ()
-   {
-      assert.equal(dynamicChar.data, -1, "dynamicChar.data is not -1. result: " + dynamicChar.data );
-   });
+// it('dynamicChar.data should init to be -1', function ()
+// {
+//    assert.equal(dynamicChar.data, -1, "dynamicChar.data is not -1. result: " + dynamicChar.data );
+// });
 
    it('dynamicChar.space should be a Boolean', function ()
    {
