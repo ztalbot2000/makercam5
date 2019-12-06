@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<HTML>
+<HEAD>
+  <TITLE><%= htmlWebpackPlugin.options.title %></TITLE>
+  <SCRIPT SRC="./pixi-v5.1.6.min.js" TYPE="text/javascript"></SCRIPT>
+</HEAD>
+<BODY>
+</BODY>
+</HTML>

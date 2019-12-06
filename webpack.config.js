@@ -1,5 +1,8 @@
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
 module.exports = (env, argv) =>
 {
    Externals = {};
@@ -19,8 +22,11 @@ module.exports = (env, argv) =>
    return {
       entry: './app/src/main.ts',
       output: {
-         filename: 'makercam5.js',
-         path: path.resolve(__dirname, './dist')
+         path: path.resolve(__dirname, './dist'),
+         filename: 'makercam5App.js',
+         //library: 'makercam5',
+         //libraryTarget: 'umd',
+         //umdNamedDefine: true
       },
       // Enable sourcemaps for debugging webpack's output.
       devtool: "source-map",
@@ -61,7 +67,14 @@ module.exports = (env, argv) =>
          },
 
          // By default, the dev-server will reload/refresh the page when file changes are detected. devServer.hot option must be disabled or devServer.watchContentBase option must be enabled in order for liveReload to take effect.
+         //liveReload: false,
          liveReload: true,
+
+         // Enable webpack's Hot Module Replacement feature:
+         // Note: requires a lot of other stuff too in index.html ...
+         //hot: true,
+         hot: false,
+
          onListening: function(server) {
             const port = server.listeningApp.address().port;
             console.log('Listening on port:', port);
@@ -73,6 +86,65 @@ module.exports = (env, argv) =>
          // Specify a page to navigate to when opening the browser.
          openPage: 'index.html'
       },
+      plugins: [
+
+         // The plugin will generate an HTML5 file for you that includes
+         // all your webpack bundles in the body using script tags.
+         new HtmlWebpackPlugin({
+
+            // The file to write the HTML to. Defaults to index.html.
+            // It will be placed in path: above.  You can add further
+            // subdirectories if need be
+            filename: 'index.html',
+
+            // The title to use for the generated HTML document
+            title: 'Makercam5',
+
+            // Instead of the default template that would be created
+            // Use ours.
+            template: 'app/src/index.html.template',
+
+            // Allows to overwrite the parameters used in the template
+            // templateParameters: {Boolean|Pbjects|Function}
+
+            // Inject all assets of template at position
+            // inject: true || 'head' || 'body' || false
+            inject: 'head',
+
+            // Adds the given favicon path to the output HTML
+            // favicon: 'favicon.png'
+
+            // Inject the following meta tags
+            meta: {
+               VIEWPORT: 'WIDTH=device-width, INITIAL-SCALE=1, SHRINK-TO-FIT=no'
+            },
+
+            // Inject a base tag.
+            // E.g. base: "https://example.com/path/page.html
+            base: 'http://localhost/~zarf',
+
+            // Controls if and in what ways the output should be minified.
+            // Default is only true for production mode
+            minify: false,
+
+            // Emit the file only if it was changed. Default is true.
+            cache: true,
+
+            // Errors details will be written into the HTML page.
+            // Default is true.
+            showErrors: true,
+
+           // Allows you to add only some chunks (See docs)
+           // (e.g only the unit-test chunks)
+           // chunks:
+           // chunksSortMode:
+           // excludeChunks:
+
+           // true render the link tags as self-closing (XHTML compliant)
+           xhtml: false
+
+         }),
+      ],
       target: 'node',
       externals: Externals,
       node: {
@@ -139,8 +211,6 @@ module.exports = (env, argv) =>
                }
             }
          ]
-      },
-      plugins: [
-      ]
+      }
    };
 };
