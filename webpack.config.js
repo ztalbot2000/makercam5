@@ -24,6 +24,11 @@ module.exports = (env, argv) =>
       output: {
          path: path.resolve(__dirname, './dist'),
          filename: 'makercam5App.js',
+         /// At this time the Grid class is the only thing that works
+         // and since it extends Sprite, it cannot be a Library.
+         // pixi-ui would be a library and it will be created as such
+         // with another entry point. so for now, leave these commented out.
+         // The library name means you would access it via makercam5.Grid.
          //library: 'makercam5',
          //libraryTarget: 'umd',
          //umdNamedDefine: true
@@ -145,13 +150,8 @@ module.exports = (env, argv) =>
 
          }),
       ],
-      target: 'node',
+      target: 'web',
       externals: Externals,
-      node: {
-         fs: 'empty',
-         net: 'empty',
-         tls: 'empty'
-      },
       resolve: {
          // Add '.ts' as resolvable extensions.
          extensions: [".ts", ".js"],
