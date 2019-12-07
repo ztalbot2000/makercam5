@@ -1,0 +1,15 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<HTML XMLNS="http://www.w3.org/1999/xhtml" LANG="en" XML:LANG="en">
+   <HEAD>
+      <TITLE><%= htmlWebpackPlugin.options.title %></TITLE>
+      <META http-equiv="Content-Type" CONTENT="text/html; charset=utf-8" />
+      <STYLE TYPE="text/css" MEDIA="screen">
+          HTML, BODY { HEIGHT:100%; BACKGROUND-color: #ffffff;}
+          BODY { MARGIN:0; PADDING:0; OVERFLOW:HIDDEN; }
+          #makercam5 { WIDTH:100%; HEIGHT:100%; }
+      </STYLE>
+      <SCRIPT SRC="./pixi-v5.1.6.min.js" TYPE="text/javascript"></SCRIPT>
+   </HEAD>
+   <BODY ID="makercam5" WIDTH="100%%" HEIGHT="100%%" ALIGN="LEFT">
+   </BODY>
+</HTML>

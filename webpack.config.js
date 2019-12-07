@@ -46,7 +46,7 @@ module.exports = (env, argv) =>
          publicPath: '/dist/',
 
          // The filename that is considered the index file.
-         index: 'index.html',
+         index: 'makercam5.html',
 
          // Enable gzip compression for everything served:
          compress: false,
@@ -89,7 +89,7 @@ module.exports = (env, argv) =>
          open: true,
 
          // Specify a page to navigate to when opening the browser.
-         openPage: 'index.html'
+         openPage: 'makercam5.html'
       },
       plugins: [
 
@@ -100,21 +100,21 @@ module.exports = (env, argv) =>
             // The file to write the HTML to. Defaults to index.html.
             // It will be placed in path: above.  You can add further
             // subdirectories if need be
-            filename: 'index.html',
+            filename: 'makercam5.html',
 
-            // The title to use for the generated HTML document
+            // The title to use in the generated HTML document
             title: 'Makercam5',
 
             // Instead of the default template that would be created
             // Use ours.
-            template: 'app/src/index.html.template',
+            template: 'app/src/makercam5.html.template',
 
             // Allows to overwrite the parameters used in the template
             // templateParameters: {Boolean|Pbjects|Function}
 
             // Inject all assets of template at position
             // inject: true || 'head' || 'body' || false
-            inject: 'head',
+            inject: 'body',
 
             // Adds the given favicon path to the output HTML
             // favicon: 'favicon.png'
