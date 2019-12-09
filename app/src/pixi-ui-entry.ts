@@ -1,4 +1,8 @@
 
 import UISettings from '../ui/UISettings';
 
-export { UISettings };
+import  ease  from '../ui/Ease/Ease';
+
+
+
+export { UISettings, ease };

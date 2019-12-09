@@ -153,6 +153,8 @@ class Ease
    }
 };
 
-module.exports = new Ease();
+var ease = new Ease();
+
+export default ease;
 
 
