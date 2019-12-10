@@ -1,12 +1,10 @@
-﻿//let EaseBase = require('./EaseBase');
-//let ExponentialEase = require('./ExponentialEase');
-import EaseBase from './EaseBase';
-import ExponentialEase from './ExponentialEase';
+﻿import { EaseBase } from './EaseBase';
+import { ExponentialEase } from './ExponentialEase';
 
 
 let HALF_PI = Math.PI * 0.5;
 
-class Ease
+export class Ease
 {
    public Linear: EaseBase;
    public Power0: object;
@@ -153,8 +151,7 @@ class Ease
    }
 };
 
-var ease = new Ease();
+export var ease = new Ease();
 
-export default ease;
 
 

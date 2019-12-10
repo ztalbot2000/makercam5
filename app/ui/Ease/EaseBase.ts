@@ -1,5 +1,5 @@
 ﻿
-export default class EaseBase
+export class EaseBase
 {
     constructor()
     {

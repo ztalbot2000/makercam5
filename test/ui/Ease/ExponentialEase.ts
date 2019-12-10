@@ -2,7 +2,8 @@
 
 var assert = require('chai').assert;
 
-import  ExponentialEase  from '../../../app/ui/Ease/ExponentialEase';
+import  { ExponentialEase } from '../../../app/ui/Ease/ExponentialEase';
+
 let power = 2;
 let easeIn = 3;
 let easeOut = 1;

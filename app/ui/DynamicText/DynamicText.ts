@@ -1031,7 +1031,7 @@ class DynamicText extends UIBase
 //DynamicText.prototype = Object.create( UIBase.prototype );
 //O DynamicText.prototype.constructor = DynamicText;
 //O module.exports = DynamicText;
-module.exports = DynamicText;
+export default  DynamicText;
 
 
 class AtlasNode

@@ -6,4 +6,4 @@
 };
 
 
-module.exports = Interaction;
+export default Interaction;

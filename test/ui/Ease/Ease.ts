@@ -2,7 +2,7 @@
 
 var assert = require('chai').assert;
 
-import  ease  from '../../../app/ui/Ease/Ease';
+import  { ease } from '../../../app/ui/Ease/Ease';
 
 
 describe('Testing ui/Ease/Ease.ts', function ()

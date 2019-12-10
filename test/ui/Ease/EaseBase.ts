@@ -2,7 +2,7 @@
 
 var assert = require('chai').assert;
 
-import  EaseBase  from '../../../app/ui/Ease/EaseBase';
+import { EaseBase } from '../../../app/ui/Ease/EaseBase';
 
 var easeBase = new EaseBase();
 

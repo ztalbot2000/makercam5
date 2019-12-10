@@ -1,6 +1,6 @@
-﻿import EaseBase from './EaseBase';
+﻿import { EaseBase } from './EaseBase';
 
-export default class ExponentialEase extends EaseBase
+export class ExponentialEase extends EaseBase
 {
    private pow: number;
    private t : number;
