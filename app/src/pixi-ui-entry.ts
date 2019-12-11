@@ -2,8 +2,12 @@
 import UISettings from '../ui/UISettings';
 export { UISettings };
 
+import { Tween }  from '../ui/Tween';
+export { Tween };
+
 // Dynamic Text needs tween, which needs tween and is not ready yet
-//import DynamicText from '../ui/DynamicText/DynamicText';
+import { DynamicText } from '../ui/DynamicText/DynamicText';
+export { DynamicText };
 
 import { ease }  from '../ui/Ease/Ease';
 export { ease };

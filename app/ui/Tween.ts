@@ -495,7 +495,7 @@ class TweenItem
 }
 
 //O var Tween =
-class Tween
+export class Tween
 {
    //O var _tweenItemCache = [ ];
    private _tweenItemCache: Array<TweenItem>;
@@ -900,4 +900,3 @@ class Tween
 };
 
 //O module.exports = Tween;
-module.exports = Tween;
