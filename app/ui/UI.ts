@@ -3,7 +3,7 @@ var UI = {
     //O Stage: require('./Stage'),
     //Stage: require('./Stage'),
     //O Container: require('./Container'),
-    //Container: require('./Container'),
+    Container: require('./Container'),
     //O ScrollingContainer: require('./ScrollingContainer'),
     //ScrollingContainer: require('./ScrollingContainer'),
     //O SortableList: require('./SortableList'),

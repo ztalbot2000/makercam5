@@ -4,7 +4,7 @@
  * @class
  * @memberof PIXI.UI
  */
-export default class UISettings
+export class UISettings
 {
    width: number = 0;
    height: number = 0;
