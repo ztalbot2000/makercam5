@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { UIBase } from '../UIBase';
 
 //O var DragEvent = function( obj )
-class DragEvent
+export class DragEvent
 {
    //New as obj is used by class methods
    private objO: UIBase;
@@ -234,4 +234,4 @@ class DragEvent
 };
 
 //O DragEvent.prototype.constructor = DragEvent;
-module.exports = DragEvent;
+//O module.exports = DragEvent;

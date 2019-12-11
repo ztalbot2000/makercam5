@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { UIBase } from '../UIBase';
 
 //O var MouseScrollEvent = function( obj, preventDefault )
-class MouseScrollEvent
+export class MouseScrollEvent
 {
    //New as obj is used by class methods
    private objO: UIBase;
@@ -151,5 +151,5 @@ class MouseScrollEvent
 
 //O MouseScrollEvent.prototype.constructor = MouseScrollEvent;
 //O module.exports = MouseScrollEvent;
-module.exports = MouseScrollEvent;
+// module.exports = MouseScrollEvent;
 

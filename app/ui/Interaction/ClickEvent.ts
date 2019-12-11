@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { UIBase } from '../UIBase';
 
 //O var ClickEvent = function (obj, includeHover, rightMouseButton, doubleClick)
-class ClickEvent
+export class ClickEvent
 {
    //New as obj is used by class methods
    private objO: UIBase;
@@ -319,4 +319,3 @@ class ClickEvent
 };
 
 //O ClickEvent.prototype.constructor = ClickEvent;
-module.exports = ClickEvent;

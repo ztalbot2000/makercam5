@@ -2,8 +2,7 @@
 import * as PIXI from 'pixi.js';
 
 //O var DragDropController =
-var DragDropController =
-class DragDropController
+export class DragDropController
 {
    //O var _items = [ ];
    private  _items: Array<any>;
@@ -117,4 +116,3 @@ class DragDropController
 };
 
 //O module.exports = DragDropController;
-module.exports = new DragDropController;

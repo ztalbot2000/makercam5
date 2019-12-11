@@ -4,7 +4,7 @@ interface INameToValueMap
 }
 
 //O var InputController =
-class InputController
+export class InputController
 {
    //O var _currentItem;
    private _currentItem: INameToValueMap;
@@ -235,4 +235,3 @@ class InputController
 };
 
 //O module.exports = InputController;
-module.exports = new InputController;
