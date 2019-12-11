@@ -1,5 +1,4 @@
-//O var Helpers = require( './Helpers' );
-let Helpers = require( './Helpers' );
+import  { Helpers }  from './Helpers';
 
 import  { EaseBase }  from './Ease/EaseBase';
 
@@ -386,7 +385,7 @@ class TweenItem
    };
 
    //O TweenItem.prototype.set = function( obj, key, from, to, time, ease: Ease )
-   public set = ( obj: TweenObject, key: string, from: (number|string), to: (number|string), time: number, ease: EaseBase ):void =>
+   public set = ( obj: TweenObject, key: string, from: ( number | string), to: ( number | string ), time: number, ease: EaseBase ):void =>
    {
       //O this.isColor = isNaN( from ) && from[ 0 ] === "#" || isNaN( to ) && to[ 0 ] === "#";
       //New isNaN does not except number|string

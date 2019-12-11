@@ -1,4 +1,4 @@
-﻿var Helpers = {
+﻿export var Helpers = {
    // lerp stands for linear interpolation (A method of curve fitting).
    // It means that the value will change from your from value to your
    // to value over t. The t parameter is set within a range of 0 to 1,
@@ -43,17 +43,22 @@
          b: c % 256,
       };
    },
-   hexToRgb: function ( hex: number): object
+   hexToRgb: function ( hex: ( string | number ) ): object
    {
       if ( hex === null )
           hex = 0xffffff;
 
-      if ( ! isNaN( hex ) )
+      //O if ( ! isNaN( hex ) )
+      if ( typeof hex === 'number' )
+      {
+         //O return this.numberToRgb( hex );
          return this.numberToRgb( hex );
+      }
 
       // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
       let shorthandRegex: RegExp  = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-      var hexS = this.componentToHex( hex );
+      let hexNum = parseInt(hex);
+      let hexS = this.componentToHex( hexNum );
       hexS = hexS.replace( shorthandRegex,
                 function (_m, r, g, b) : string
                 {
@@ -70,4 +75,3 @@
    }
 };
 
-export default Helpers;

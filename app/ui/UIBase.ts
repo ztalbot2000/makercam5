@@ -427,7 +427,7 @@ export default class UIBase extends UI
                    this.y = this._dragPosition.y;
                    this.emit("draggablemove", e);
                }
-               
+
            };
 
            this.drag.onDragEnd = function (e: PIXI.interaction.InteractionEvent) {
@@ -519,7 +519,7 @@ Object.defineProperties(UIBase.prototype, {
                 this.setting.widthPct = parseFloat(val.replace('%', '')) * 0.01;
             else
                 this.setting.widthPct = null;
-            
+
             this.setting.width = val;
             this.updatesettings(true);
         }
@@ -573,7 +573,7 @@ Object.defineProperties(UIBase.prototype, {
                 this.setting.minWidthPct = parseFloat(val.replace('%', '')) * 0.01;
             else
                 this.setting.minWidthPct = null;
-            
+
             this.setting.minWidth = val;
             this.updatesettings(true);
         }
@@ -600,7 +600,7 @@ Object.defineProperties(UIBase.prototype, {
                 this.setting.minHeightPct = parseFloat(val.replace('%', '')) * 0.01;
             else
                 this.setting.minHeightPct = null;
-            
+
             this.setting.minHeight = val;
             this.updatesettings(true);
         }
@@ -627,7 +627,7 @@ Object.defineProperties(UIBase.prototype, {
                 this.setting.maxWidthPct = parseFloat(val.replace('%', '')) * 0.01;
             else
                 this.setting.maxWidthPct = null;
-            
+
 
             this.setting.maxWidth = val;
             this.updatesettings(true);
@@ -655,7 +655,7 @@ Object.defineProperties(UIBase.prototype, {
                 this.setting.maxHeightPct = parseFloat(val.replace('%', '')) * 0.01;
             else
                 this.setting.maxHeightPct = null;
-            
+
             this.setting.maxHeight = val;
             this.updatesettings(true);
         }
@@ -682,7 +682,7 @@ Object.defineProperties(UIBase.prototype, {
                 this.setting.anchorLeftPct = parseFloat(val.replace('%', '')) * 0.01;
             else 
                 this.setting.anchorLeftPct = null;
-            
+
             this.setting.anchorLeft = val;
             this.updatesettings(true);
         }
@@ -709,7 +709,7 @@ Object.defineProperties(UIBase.prototype, {
                 this.setting.anchorRightPct = parseFloat(val.replace('%', '')) * 0.01;
             else
                 this.setting.anchorRightPct = null;
-            
+
             this.setting.anchorRight = val;
             this.updatesettings(true);
         }
@@ -736,7 +736,7 @@ Object.defineProperties(UIBase.prototype, {
                 this.setting.anchorTopPct = parseFloat(val.replace('%', '')) * 0.01;
             else
                 this.setting.anchorTopPct = null;
-            
+
             this.setting.anchorTop = val;
             this.updatesettings(true);
         }
@@ -763,7 +763,7 @@ Object.defineProperties(UIBase.prototype, {
                 this.setting.anchorBottomPct = parseFloat(val.replace('%', '')) * 0.01;
             else 
                 this.setting.anchorBottomPct = null;
-            
+
             this.setting.anchorBottom = val;
             this.updatesettings(true);
         }

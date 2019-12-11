@@ -2,7 +2,7 @@
 
 var assert = require('chai').assert;
 
-import  Helpers  from '../../app/ui/Helpers';
+import  { Helpers }  from '../../app/ui/Helpers';
 
 describe('Testing Helpers.ts', function ()
 {

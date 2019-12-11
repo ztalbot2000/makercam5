@@ -7,7 +7,7 @@ import Interaction from '../ui/Interaction/Interaction';
 
 import  { ease }  from '../ui/Ease/Ease';
 
-import  Helpers  from '../ui/Helpers';
+import  { Helpers } from '../ui/Helpers';
 
 
 
