@@ -7,7 +7,7 @@ import { Sprite } from 'pixi.js';
 import { Global }  from "./Global";
 
 //O public class Grid extends Sprite
-export default class Grid extends PIXI.Sprite
+export class Grid extends PIXI.Sprite
 {
    // the grid class draws the grid and origin axes based on the current zoom level and origin position
    //N The plural of axis is axes ;-)

@@ -1,5 +1,5 @@
 ﻿//O public class Individual
-export default class Individual
+export class Individual
 {
 
    //O public var fitness:Number = NaN;

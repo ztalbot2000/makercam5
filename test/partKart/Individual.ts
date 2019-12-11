@@ -2,7 +2,7 @@
 
 var assert = require('chai').assert;
 
-import Individual  from '../../app/partKart/Individual';
+import { Individual }  from '../../app/partKart/Individual';
 
 var individual = new Individual();
 
