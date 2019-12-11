@@ -37,6 +37,20 @@ module.exports = (env, argv) =>
          // Enable sourcemaps for debugging webpack's output.
          devtool: "source-map",
 
+         // For when --watch is specified, automatically compile ...
+         watchOptions: {
+
+            // Add a delay before rebuilding once the first file changed.
+            aggregateTimeout: 1000,
+
+            // Check for changes every 3 seconds
+            poll: 3000,
+            ignored: ['app/uitry',
+                      'test/uitry',
+                      /node_modules/
+                     ]
+         },
+
          devServer: {
             // Tell the server where to serve content from (Static files only).
             // It is recommended to use an absolute path.
