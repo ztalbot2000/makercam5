@@ -4,11 +4,10 @@ interface INameToValueMap
 }
 
 //N for style data
-//import { DynamicTextStyle } from './DynamicTextStyle';
-import DynamicTextStyle from './DynamicTextStyle';
+import { DynamicTextStyle } from './DynamicTextStyle';
 
 //O function DynamicChar( )
-export default class DynamicChar
+export class DynamicChar
 {
    //O styledata (texture, orig width, orig height)
    //O this.style = null;

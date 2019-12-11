@@ -2,7 +2,7 @@
 
 var assert = require('chai').assert;
 
-import  DynamicTextStyle  from '../../../app/ui/DynamicText/DynamicTextStyle';
+import { DynamicTextStyle } from '../../../app/ui/DynamicText/DynamicTextStyle';
 
 let dynamicTextStyle = new DynamicTextStyle;
 

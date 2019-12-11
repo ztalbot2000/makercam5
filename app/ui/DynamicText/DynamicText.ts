@@ -6,17 +6,15 @@ interface INameToValueMap
 import * as PIXI from 'pixi.js';
 
 //New for check of undefined
-import {isUndefined} from "util";
+import { isUndefined } from "util";
 
 //O var UIBase = require( '../UIBase' );
-//var UIBase = require( '../UIBase' );
-import UIBase from '../UIBase';
+import { UIBase } from '../UIBase';
 //O var DynamicTextStyle = require( './DynamicTextStyle' );
-//var DynamicTextStyle = require( './DynamicTextStyle' );
-import DynamicTextStyle from './DynamicTextStyle';
+import { DynamicTextStyle } from './DynamicTextStyle';
 //O var DynamicChar = require( './DynamicChar' );
-//var DynamicChar = require( './DynamicChar' );
-import DynamicChar from './DynamicChar' ;
+import { DynamicChar } from './DynamicChar' ;
+
 //O var emojiRegex = require( 'emoji-regex' );
 var emojiRegex = require( 'emoji-regex' );
 
@@ -37,7 +35,7 @@ const closeTags = [ '</i>', '</b>', '</font>', '</center>' ];
  * @param [options=null] {DynamicTextStyle} Additional text settings
  */
 //O function DynamicText( text, options )
-class DynamicText extends UIBase
+export class DynamicText extends UIBase
 {
    //O atlas = null;
    //O atlas = new DynamicAtlas( 1 );
@@ -1031,7 +1029,6 @@ class DynamicText extends UIBase
 //DynamicText.prototype = Object.create( UIBase.prototype );
 //O DynamicText.prototype.constructor = DynamicText;
 //O module.exports = DynamicText;
-export default  DynamicText;
 
 
 class AtlasNode

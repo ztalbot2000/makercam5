@@ -1,6 +1,6 @@
 
 //O function DynamicTextStyle( parent )
-export default class DynamicTextStyle
+export class DynamicTextStyle
 {
    //O this.respectDirty = true;
    private respectDirty: boolean;
@@ -733,4 +733,3 @@ export default class DynamicTextStyle
 }
 //O DynamicTextStyle.prototype.constructor = DynamicTextStyle;
 //O module.exports = DynamicTextStyle;
-//module.exports = DynamicTextStyle;

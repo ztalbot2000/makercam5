@@ -49,16 +49,25 @@
           hex = 0xffffff;
 
       //O if ( ! isNaN( hex ) )
+      //N Typescript checks that flowing through we can handle either type.
       if ( typeof hex === 'number' )
       {
          //O return this.numberToRgb( hex );
          return this.numberToRgb( hex );
       }
 
+      //N at this point Typescript thinks hex is a string type
+
       // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+      //O let shorthandRegex: RegExp  = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
       let shorthandRegex: RegExp  = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+
+      //N convert string to number so that componentToHex can be called as it originally did.
       let hexNum = parseInt(hex);
+
+      //O let hexS = this.componentToHex( hex );
       let hexS = this.componentToHex( hexNum );
+
       hexS = hexS.replace( shorthandRegex,
                 function (_m, r, g, b) : string
                 {

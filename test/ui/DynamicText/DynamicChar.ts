@@ -2,7 +2,7 @@
 
 var assert = require('chai').assert;
 
-import  DynamicChar  from '../../../app/ui/DynamicText/DynamicChar';
+import  { DynamicChar } from '../../../app/ui/DynamicText/DynamicChar';
 
 let dynamicChar = new DynamicChar;
 

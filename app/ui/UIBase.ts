@@ -11,7 +11,7 @@ var UISettings = require('./UISettings'),
  * @param width {Number} Width of the UIObject
  * @param height {Number} Height of the UIObject
  */
-export default class UIBase extends UI
+export class UIBase extends UI
 {
    constructor (width?: number, height?: number)
    {
@@ -489,8 +489,8 @@ export default class UIBase extends UI
 }
 
 UIBase.prototype = Object.create(PIXI.utils.EventEmitter.prototype);
-//UIBase.prototype.constructor = UIBase;
-//module.exports = UIBase;
+//O UIBase.prototype.constructor = UIBase;
+//O module.exports = UIBase;
 
 
 Object.defineProperties(UIBase.prototype, {
