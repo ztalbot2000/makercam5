@@ -59,7 +59,7 @@ module.exports = (env, argv) =>
             publicPath: '/dist/',
 
             // The filename that is considered the index file.
-            index: 'makercam5.html',
+            index: 'index.html',
 
             // Enable gzip compression for everything served:
             compress: false,
@@ -102,7 +102,9 @@ module.exports = (env, argv) =>
             open: true,
 
             // Specify a page to navigate to when opening the browser.
-            openPage: 'makercam5.html'
+            // So that all the examples work, this is symbolic linked to
+            // the relevant files.
+            openPage: 'index.html'
          },
          plugins: [
 

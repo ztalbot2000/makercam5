@@ -115,7 +115,7 @@ export class DynamicText extends UIBase
    public static readonly settings =
    {
       //O debugSpriteSheet: false,
-      debugSpriteSheet: false,
+      debugSpriteSheet: true,
 
       //O force one font family for emojis so we dont rerender them multiple times
       //O defaultEmojiFont: "Segoe UI Emoji"
