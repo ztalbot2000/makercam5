@@ -19,7 +19,8 @@ module.exports = (env, argv) =>
       console.log("pixi.js will be bundled for testing");
    }
 
-   return [
+   return [  // We have two entries. One for makercam5App and the other for the library of  pixi-ui.
+             // Note: you need my patch to fix mochapack handling arrays.
       {
          entry: './app/src/makercam5-entry.ts',
          output: {
@@ -34,9 +35,6 @@ module.exports = (env, argv) =>
             //libraryTarget: 'umd',
             //umdNamedDefine: true
          },
-         // Enable sourcemaps for debugging webpack's output.
-         devtool: "source-map",
-
          // For when --watch is specified, automatically compile ...
          watchOptions: {
 
@@ -86,13 +84,13 @@ module.exports = (env, argv) =>
                poll: 5000
             },
 
-            // By default, the dev-server will reload/refresh the page when file changes are detected. devServer.hot option must be disabled or devServer.watchContentBase option must be enabled in order for liveReload to take effect.
-            //liveReload: false,
+            // By default, the dev-server will reload/refresh the page when file changes are detected.
+            // devServer.hot option must be disabled or devServer.watchContentBase option must be enabled
+            // in order for liveReload to take effect.
             liveReload: true,
 
             // Enable webpack's Hot Module Replacement feature:
             // Note: requires a lot of other stuff too in index.html ...
-            //hot: true,
             hot: false,
 
             onListening: function(server) {
@@ -185,6 +183,10 @@ module.exports = (env, argv) =>
                })
             ]
          },
+
+         // Seperate source maps
+         devtool: "source-map",
+
          module: {
             rules: [
                {
@@ -201,16 +203,11 @@ module.exports = (env, argv) =>
                       '/test/uitry'      // Omit all uitry
                   ],
                   use: {
-                     loader: 'babel-loader',
-                     options: {
-                        presets: [
-                           "@babel/preset-env"
-                        ],
-                        plugins: [
-                           "@babel/plugin-proposal-class-properties",
-                           "@babel/plugin-proposal-private-methods"
-                        ]
-                     }
+                     loader: 'babel-loader'
+                     // Note. Do not put options here !!!
+                     // ts-loader or babel-loader may override them.
+                     // i.e ts-loader listFiles: true or
+                     //     ts-loader outdir: 'js'
                   }
                },
                {
@@ -228,10 +225,14 @@ module.exports = (env, argv) =>
                   ],
                   use: {
                      loader: "ts-loader"
+                     // Note. Do not put options here !!!
+                     // ts-loader or babel-loader may override them.
+                     // i.e ts-loader listFiles: true or
+                     //     ts-loader outdir: 'js'
                   }
                }
             ]
-         }
+         },
       },
       {
          entry: './app/src/pixi-ui-entry.ts',
@@ -242,9 +243,6 @@ module.exports = (env, argv) =>
             library: 'pixi-ui',
             libraryTarget: 'umd'
          },
-         // Enable sourcemaps for debugging webpack's output.
-         devtool: "source-map",
- 
          plugins: [
          ],
          target: 'web',
@@ -257,15 +255,15 @@ module.exports = (env, argv) =>
             }
          },
          optimization: {
-            minimizer: [
-               new UglifyJsPlugin({
-                  parallel: true,
-                  uglifyOptions: {
-                     mangle: false
-                  }
-               })
-            ]
+            minimize: false,
          },
+
+         // Enable sourcemaps for debugging webpack's output.
+         // // devtool: "source-map" // without any, there is no sourcemap
+         //devtool: "eval"  // none
+         devtool: "source-map", // one big blob
+         //devtool: "eval-source-map"  // none
+
          module:
          {
             rules: [
@@ -284,15 +282,10 @@ module.exports = (env, argv) =>
                   ],
                   use: {
                      loader: 'babel-loader',
-                     options: {
-                        presets: [
-                           "@babel/preset-env"
-                        ],
-                        plugins: [
-                           "@babel/plugin-proposal-class-properties",
-                           "@babel/plugin-proposal-private-methods"
-                        ]
-                     }
+                     // Note. Do not put options here !!!
+                     // ts-loader or babel-loader may override them.
+                     // i.e ts-loader listFiles: true or
+                     //     ts-loader outdir: 'js'
                   }
                },
                {
@@ -310,10 +303,14 @@ module.exports = (env, argv) =>
                   ],
                   use: {
                      loader: "ts-loader"
+                     // Note. Do not put options here !!!
+                     // ts-loader or babel-loader may override them.
+                     // i.e ts-loader listFiles: true or
+                     //     ts-loader outdir: 'js'
                   }
                }
             ]
-         }
+         },
       }
    ];
 };

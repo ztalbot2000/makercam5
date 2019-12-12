@@ -1,34 +1,70 @@
 {
    "compilerOptions": {
       // Target latest version of ECMAScript.
-        "target": "es5",
+      "target": "es5",
+
       // Process & infer types from .js files.
-        "allowJs": true,
+      "allowJs": true,
+
       // Generates corresponding .map file.
-        "sourceMap": true,
+      "sourceMap": true,
+
       // Remove all comments except copy-right header comments beginning with /*!
-        "removeComments": false,
+      "removeComments": false,
+
       // Enable all strict tests.
-        "strict": true,
+      "strict": true,
+
       // Raise error on expressions and declarations with an implied any type.
-        "noImplicitAny": true,
+      "noImplicitAny": true,
+
       // Report errors on unused locals.
-        "noUnusedLocals": true,
+      "noUnusedLocals": true,
+
       // Report errors on unused parameters.
-        "noUnusedParameters": true,
+      "noUnusedParameters": true,
+
       // Report an error when not all code paths in function return a value.
-        "noImplicitReturns": true,
+      "noImplicitReturns": true,
+
       // In strict null checking mode, the null and undefined values are not in the domain of every type and are only assignable to themselves and any (the one exception being that undefined is also assignable to void).
-        "strictNullChecks": false,
-        "rootDirs": ["app", "test"],
-        "outDir": "js"
+      "strictNullChecks": false,
+
+      // Common root directories to follow
+      "rootDirs": ["app", "test"],
+
+      // Redirect output structure to the directory
+      "outDir": "js",
+
+      // Generate corresponding map files. Default is: false
+      "sourceMap": true,
+
+      // Use specified line feed as lf (unix)
+      "newLine": "lf",
+
+      // Default is False
+      "noEmit": false,
+
+      // Output colors. Default is true, except when piping.  Does this override piping???
+      "pretty": true,
+
+      // Print names of typed files used. Default is false.
+      //"listFiles": true,
+
+      // Print names of all compiled files. Default is false.
+      // This is a good way to check what files are being exposed to the type checking
+      // command 'tsc', which is run by the script tag of the package.json file and not webpack.
+      //"listEmittedFiles": true,
    },
    "include": [
-      "app"
+      "app/partKart",
+      "app/ui",
+      "app/src",
       // - Adding "test" here compiled uitry,
       //   no matter what I tried to exclude
    ],
    "exclude": [
-      "/app/uitry/"
+      "/app/uitry/",
+      "/node_modules/"
    ]
 }

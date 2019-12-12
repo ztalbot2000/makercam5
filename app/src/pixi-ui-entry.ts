@@ -1,3 +1,4 @@
+/*
 
 import { UIBase } from '../ui/UIBase';
 export { UIBase };
@@ -22,3 +23,15 @@ export { DynamicText };
 
 import {  ClickEvent, DragEvent, MouseScrollEvent, InputController  } from '../ui/Interaction/Interaction';
 export { ClickEvent, DragEvent, MouseScrollEvent, InputController  };
+
+*/
+
+var Library = {
+    UI: require('../ui/UI')
+};
+
+//dump everything into extras
+
+Object.assign(PIXI, Library);
+
+module.exports = Library;
