@@ -6,6 +6,9 @@
     // waiting on https://github.com/palantir/tslint/pull/3708
     "no-implicit-dependencies": [true, "dev"],
 
+    // Anyone who puts rules around comments are nuts.  Any comment is better than none
+    "comment-format": [false],
+
     /* tslint-immutable rules */
     // Recommended built-in rules
     "no-var-keyword": true,

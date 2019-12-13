@@ -1,6 +1,7 @@
 ﻿
 /// <reference path="pixi.js" />
-/// <reference path="../bin/pixi-ui.js" />
+//O ../bin/pixi-ui.js
+/// <reference path="./pixi-ui.js" />
 
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR;
 PIXI.settings.RESOLUTION = devicePixelRatio || 1;

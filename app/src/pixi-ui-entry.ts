@@ -26,11 +26,11 @@ export { ClickEvent, DragEvent, MouseScrollEvent, InputController  };
 
 */
 
-var Library = {
+const Library = {
     UI: require('../ui/UI')
 };
 
-//dump everything into extras
+// dump everything into extras
 
 Object.assign(PIXI, Library);
 

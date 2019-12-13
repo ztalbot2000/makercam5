@@ -1,7 +1,7 @@
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TSLintPlugin = require('tslint-webpack-plugin');
 
 module.exports = (env, argv) =>
 {
@@ -107,6 +107,12 @@ module.exports = (env, argv) =>
             openPage: 'index.html'
          },
          plugins: [
+            // Too messy, deal with later
+            // new TSLintPlugin({
+            //    files: ['./app/partKart/**/*.ts',
+            //            './app/src/*.ts'
+            //           ]
+            // }),
 
             // The plugin will generate an HTML5 file for you that includes
             // all your webpack bundles in the body using script tags.
@@ -237,7 +243,11 @@ module.exports = (env, argv) =>
          },
       },
       {
-         entry: './app/src/pixi-ui-entry.ts',
+         entry: {
+            "pixi-ui-entry": './app/src/pixi-ui-entry.ts',
+            // working on this ...
+            // "DynamicText-entry": './app/src/DynamicText.js'
+         },
          output: {
             path: path.resolve(__dirname, './dist'),
             filename: 'pixi-ui.js',
@@ -246,6 +256,10 @@ module.exports = (env, argv) =>
             libraryTarget: 'umd'
          },
          plugins: [
+            // Too messy, deal with later
+            // new TSLintPlugin({
+            //     files: ['./app/ui//**/*.ts']
+            // })
          ],
          target: 'web',
          externals: Externals,
