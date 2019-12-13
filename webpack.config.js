@@ -3,6 +3,69 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TSLintPlugin = require('tslint-webpack-plugin');
 
+const devServerOptions =
+{
+   stats: {
+     // Enables disables colors on the console
+     colors: true
+   },
+   // Tell the server where to serve content from (Static files only).
+   // It is recommended to use an absolute path.
+   contentBase: path.join(__dirname, 'dist'),
+
+   // The bundled files will be available in the browser under this path.
+   // Make sure devServer.publicPath always starts and ends with a forward slash.
+   publicPath: '/dist/',
+
+   // The filename that is considered the index file.
+   index: 'index.html',
+
+   // Enable gzip compression for everything served:
+   compress: false,
+
+   // Specify a port number to listen for requests on.
+   port: 9000,
+
+   // Enables/Disables colors on the console
+   // Available on cli only --color
+   // color: true,
+
+   // Tell dev-server to watch the files served by the devServer.contentBase option.
+   // It is disabled by default. When enabled, file changes will trigger a full page reload.
+   watchContentBase: true,
+
+   // Control options related to watching the files.
+   // webpack uses the file system to get notified of file changes.
+   // In some cases this does not work.
+   // In these cases, use polling:
+   watchOptions: {
+      // Set to 5 seconds
+      poll: 5000
+   },
+
+   // By default, the dev-server will reload/refresh the page when file changes are detected.
+   // devServer.hot option must be disabled or devServer.watchContentBase option must be enabled
+   // in order for liveReload to take effect.
+   liveReload: true,
+
+   // Enable webpack's Hot Module Replacement feature:
+   // Note: requires a lot of other stuff too in index.html ...
+   hot: false,
+
+   onListening: function(server) {
+      const port = server.listeningApp.address().port;
+      console.log('Listening on port:', port);
+   },
+
+   // Tells dev-server to open the browser after server had been started.
+   open: true,
+
+   // Specify a page to navigate to when opening the browser.
+   // So that all the examples work, this is symbolic linked to
+   // the relevant files.
+   openPage: 'index.html'
+};
+
 module.exports = (env, argv) =>
 {
    Externals = {};
@@ -33,7 +96,10 @@ module.exports = (env, argv) =>
             // The library name means you would access it via makercam5.Grid.
             //library: 'makercam5',
             //libraryTarget: 'umd',
-            //umdNamedDefine: true
+            //umdNamedDefine: true,
+
+            // Turn off pathInfo, incrasing build time
+            pathinfo: false,
          },
          // For when --watch is specified, automatically compile ...
          watchOptions: {
@@ -49,63 +115,8 @@ module.exports = (env, argv) =>
                      ]
          },
 
-         devServer: {
-            // Tell the server where to serve content from (Static files only).
-            // It is recommended to use an absolute path.
-            contentBase: path.join(__dirname, 'dist'),
+         devServer: devServerOptions,
 
-            // The bundled files will be available in the browser under this path.
-            // Make sure devServer.publicPath always starts and ends with a forward slash.
-            publicPath: '/dist/',
-
-            // The filename that is considered the index file.
-            index: 'index.html',
-
-            // Enable gzip compression for everything served:
-            compress: false,
-
-            // Specify a port number to listen for requests on.
-            port: 9000,
-
-            // Enables/Disables colors on the console
-            // Available on cli only --color
-            // color: true,
-
-            // Tell dev-server to watch the files served by the devServer.contentBase option.
-            // It is disabled by default. When enabled, file changes will trigger a full page reload.
-            watchContentBase: true,
-
-            // Control options related to watching the files.
-            // webpack uses the file system to get notified of file changes.
-            // In some cases this does not work.
-            // In these cases, use polling:
-            watchOptions: {
-               // Set to 5 seconds
-               poll: 5000
-            },
-
-            // By default, the dev-server will reload/refresh the page when file changes are detected.
-            // devServer.hot option must be disabled or devServer.watchContentBase option must be enabled
-            // in order for liveReload to take effect.
-            liveReload: true,
-
-            // Enable webpack's Hot Module Replacement feature:
-            // Note: requires a lot of other stuff too in index.html ...
-            hot: false,
-
-            onListening: function(server) {
-               const port = server.listeningApp.address().port;
-               console.log('Listening on port:', port);
-            },
-
-            // Tells dev-server to open the browser after server had been started.
-            open: true,
-
-            // Specify a page to navigate to when opening the browser.
-            // So that all the examples work, this is symbolic linked to
-            // the relevant files.
-            openPage: 'index.html'
-         },
          plugins: [
             // Too messy, deal with later
             // new TSLintPlugin({
@@ -212,7 +223,7 @@ module.exports = (env, argv) =>
                   ],
                   use: {
                      loader: 'babel-loader'
-                     // Note. Do not put options here !!!
+                     // Note. Do not put other compile options here !!!
                      // ts-loader or babel-loader may override them.
                      // i.e ts-loader listFiles: true or
                      //     ts-loader outdir: 'js'
@@ -232,11 +243,15 @@ module.exports = (env, argv) =>
                      '/test/uitry'       // Omit all uitry
                   ],
                   use: {
-                     loader: "ts-loader"
-                     // Note. Do not put options here !!!
+                     loader: "ts-loader",
+                     // Note. Do not put other compile options here !!!
                      // ts-loader or babel-loader may override them.
                      // i.e ts-loader listFiles: true or
                      //     ts-loader outdir: 'js'
+                     options: {
+                        transpileOnly: true,
+                        experimentalWatchApi: true,
+                     },
                   }
                }
             ]
@@ -253,7 +268,10 @@ module.exports = (env, argv) =>
             filename: 'pixi-ui.js',
             // The library name means you would access it via pixi-ui.button.
             library: 'pixi-ui',
-            libraryTarget: 'umd'
+            libraryTarget: 'umd',
+
+            // Turn off pathInfo, incrasing build time
+            pathinfo: false,
          },
          plugins: [
             // Too messy, deal with later
@@ -298,7 +316,7 @@ module.exports = (env, argv) =>
                   ],
                   use: {
                      loader: 'babel-loader',
-                     // Note. Do not put options here !!!
+                     // Note. Do not put other compile options here !!!
                      // ts-loader or babel-loader may override them.
                      // i.e ts-loader listFiles: true or
                      //     ts-loader outdir: 'js'
@@ -318,11 +336,15 @@ module.exports = (env, argv) =>
                      '/test/uitry/'      // Omit all uitry
                   ],
                   use: {
-                     loader: "ts-loader"
-                     // Note. Do not put options here !!!
+                     loader: "ts-loader",
+                     // Note. Do not other put compile options here !!!
                      // ts-loader or babel-loader may override them.
                      // i.e ts-loader listFiles: true or
                      //     ts-loader outdir: 'js'
+                     options: {
+                        transpileOnly: true,
+                        experimentalWatchApi: true,
+                     },
                   }
                }
             ]

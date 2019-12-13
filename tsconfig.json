@@ -55,6 +55,12 @@
       // This is a good way to check what files are being exposed to the type checking
       // command 'tsc', which is run by the script tag of the package.json file and not webpack.
       //"listEmittedFiles": true,
+
+      // Does incremental compiles
+      "incremental": true,
+
+      // Incremental compile is placed in <thisfile>
+      "tsBuildInfoFile": "./js/tsbuildinfo",
    },
    "include": [
       "app/partKart",
