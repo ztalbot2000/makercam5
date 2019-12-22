@@ -60,7 +60,7 @@ export class Ticker
    // @private
    //
    //O Ticker.prototype.update = function (time)
-   private static update (time :number)
+   public update (time :number)
    {
        //O Ticker.shared._now = time;
        Ticker.shared._now = time;
@@ -79,7 +79,7 @@ export class Ticker
        if (!Ticker.shared._disabled)
        {
           //O requestAnimationFrame(Ticker.shared.update);
-          requestAnimationFrame(Ticker.update);
+          requestAnimationFrame(Ticker.shared.update);
        }
    }
 
@@ -132,7 +132,7 @@ export class Ticker
          Ticker.shared = this;
          //O this.update(performance.now(), true);
          //N parameter true is not defined in call of function 
-         Ticker.update(performance.now());
+         this.update(performance.now());
       }
    }
 }
