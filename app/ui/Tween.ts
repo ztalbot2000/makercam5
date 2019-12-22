@@ -497,6 +497,8 @@ class TweenItem
 //O var Tween =
 export class Tween
 {
+   public static instance: Tween;
+
    //O var _tweenItemCache = [ ];
    private _tweenItemCache: Array<TweenItem>;
 
@@ -512,18 +514,27 @@ export class Tween
 
    constructor()
    {
-      //O var _tweenItemCache = [ ];
-      this._tweenItemCache = [ ];
+      if ( ! Tween.instance )
+      {
 
-      //O var _tweenObjects = {};
-      //New. This is an array not an Empty Object
-      this._tweenObjects = [];
+         //O var _tweenItemCache = [ ];
+         this._tweenItemCache = [ ];
 
-      //O var currentId = 1;
-      this._currentId = 1;
+         //O var _tweenObjects = {};
+         //New. This is an array not an Empty Object
+         this._tweenObjects = [];
 
-      //O var _callbackItemCache = [ ];
-      this._callbackItemCache = [ ];
+         //O var currentId = 1;
+         this._currentId = 1;
+
+         //O var _callbackItemCache = [ ];
+         this._callbackItemCache = [ ];
+
+         Tween.instance = this;
+
+     }
+
+     return Tween.instance;
 
    };
 

@@ -1,3 +1,5 @@
+//import { Container } from './Container';
+import { UIBase } from './UIBase';
 /**
  * Settings object for all UIObjects
  *
@@ -36,26 +38,34 @@ export class UISettings
    anchorTopPct: number = null;
    anchorBottomPct: number = null;
 
-   pivotX: number = 0;
-   pivotY: number = 0;
-   scaleX: number = 1;
-   scaleY: number = 1;
-   verticalAlign: number = null;
-   horizontalAlign: number = null;
+   //O pivotX: number = 0;
+   //O pivotY: number = 0;
+   //N Combine as PIXI has it
+   pivot: PIXI.Point = new PIXI.Point( 0, 0 );
+   //O scaleX: number = 1;
+   //O scaleY: number = 1;
+   //N Combine as PIXI has it
+   scale: PIXI.Point = new PIXI.Point(1, 1);
+
+   verticalAlign: string = null;     // holds strings of 'middle' 'bottom'
+   horizontalAlign: string = null;   // holds strings of 'right' 'left' 'center'
    rotation: number = null;
    blendMode: number = null;
    tint: number = null;
    alpha: number = 1;
 
 
-   draggable: number = null;
+   draggable: boolean = false;
    dragRestricted: boolean = false;
-   dragRestrictAxis: number = null; //x, y
+   dragRestrictAxis: string = null; //holds strings of 'x' 'y'
    dragThreshold: number = 0;
-   dragGroup: number = null;
-   dragContainer: number = null;
-   droppable: number = null;
-   droppableReparent: number = null;
-   dropGroup: number = null;
+   dragGroup: string = null;
+   //New
+   //container: Container = null;
+   //dragContainer: PIXI.Sprite = null;
+   dragContainer: PIXI.Container = null;
+   droppable: boolean = false;
+   droppableReparent: UIBase = null;
+   dropGroup: string = null;
 
 }

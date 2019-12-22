@@ -1,4 +1,5 @@
-﻿export var Helpers = {
+﻿export class Helpers
+{
    // lerp stands for linear interpolation (A method of curve fitting).
    // It means that the value will change from your from value to your
    // to value over t. The t parameter is set within a range of 0 to 1,
@@ -6,7 +7,7 @@
    // Therefore, 0.5 will be halfway between
 
    // Possibly change callers to mathf.lerp ???
-   Lerp: function (start: number, stop: number, amt: number): number
+   static Lerp = (start: number, stop: number, amt: number): number =>
    {
       if ( amt > 1 )
          amt = 1;
@@ -14,36 +15,42 @@
          amt = 0;
 
       return start + ( stop - start ) * amt;
-   },
-   Round: function(num: number, decimals: number): number
+   }
+
+   static Round = (num: number, decimals: number): number =>
    {
       var pow = Math.pow( 10, decimals );
 
       return Math.round( num * pow ) / pow;
-   },
-   componentToHex: function(c: number): string
+   }
+
+   static componentToHex = (c: number): string =>
    {
       let hex = c.toString( 16 );
 
       return hex.length == 1 ? "0" + hex : hex;
-   },
-   rgbToHex: function( r: number, g: number, b: number): string
+   }
+
+   static rgbToHex = ( r: number, g: number, b: number): string =>
    {
-      return "#" + this.componentToHex( r ) + this.componentToHex( g ) + this.componentToHex( b );
-   },
-   rgbToNumber: function ( r: number, g: number, b: number): number
+      return "#" + Helpers.componentToHex( r ) + Helpers.componentToHex( g ) + Helpers.componentToHex( b );
+   }
+
+   static rgbToNumber = ( r: number, g: number, b: number): number =>
    {
       return r * 65536 + g * 256 + b;
-   },
-   numberToRgb: function (c: number): object
+   }
+
+   static numberToRgb = (c: number): object =>
    {
       return {
          r: Math.floor( c / (256 * 256) ),
          g: Math.floor( c / 256 ) % 256,
          b: c % 256,
       };
-   },
-   hexToRgb: function ( hex: ( string | number ) ): object
+   }
+
+   static hexToRgb = ( hex: ( string | number ) ): object =>
    {
       if ( hex === null )
           hex = 0xffffff;
@@ -53,7 +60,7 @@
       if ( typeof hex === 'number' )
       {
          //O return this.numberToRgb( hex );
-         return this.numberToRgb( hex );
+         return Helpers.numberToRgb( hex );
       }
 
       //N at this point Typescript thinks hex is a string type
@@ -66,7 +73,7 @@
       let hexNum = parseInt(hex);
 
       //O let hexS = this.componentToHex( hex );
-      let hexS = this.componentToHex( hexNum );
+      let hexS = Helpers.componentToHex( hexNum );
 
       hexS = hexS.replace( shorthandRegex,
                 function (_m, r, g, b) : string

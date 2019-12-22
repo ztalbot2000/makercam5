@@ -1,5 +1,8 @@
 //O var UIBase = require( './UIBase' );
-var UIBase = require( './UIBase' );
+import { UIBase } from'./UIbase';
+
+import * as PIXI from 'pixi.js';
+
 
 /**
  * An UI Container object
@@ -21,11 +24,12 @@ export class Container extends UIBase
       //O UIBase.call( this, width, height );
       super ( width, height );
 
-      this.width = width;
-      this.height = height;
+      //New 
+      //this.width = width;
+      //this.height = height;
 
       //O this.container.hitArea = new PIXI.Rectangle( 0, 0, 0, 0 );
-      this.hitArea = new PIXI.Rectangle( 0, 0, 0, 0 );
+      this.container.hitArea = new PIXI.Rectangle( 0, 0, 0, 0 );
    }
 
    //O Container.prototype.update = function( )
@@ -34,12 +38,27 @@ export class Container extends UIBase
       //O //if (this.container.interactive)
       //if (this.container.interactive)
       //O {
+          //N hitArea.width and hitArea.height does not exist on pixi V4 or V5
+          //N Event though hitArea is a rectangle, but it could be another
+          //N Shape. It is suggested that hitArea be redone
+          //N See:
+          //N  html5gamedevs.com/topic/42185-how-to-update-hitarea-of-a-sprite/
+          this.container.hitArea = new PIXI.Rectangle( 0, 0, this.width, this.height );
+ 
          //O this.container.hitArea.width = this._width;
-         this.hitArea.width = this._width;
          //O this.container.hitArea.height = this._height;
-         this.hitArea.height = this._height;
       //O }
    };
+
+   //New. hopefully resolves UIBase.ts
+   // dragContainer.container
+   public get dragContainer(): PIXI.Container
+   {
+     if (this.dragContainer)
+        return this.dragContainer;
+
+     return this.setting.dragContainer;
+   }
 }
 
 //O Container.prototype = Object.create( UIBase.prototype );

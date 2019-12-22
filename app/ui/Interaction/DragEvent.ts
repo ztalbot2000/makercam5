@@ -2,10 +2,11 @@ import * as PIXI from 'pixi.js';
 import { UIBase } from '../UIBase';
 
 //O var DragEvent = function( obj )
-export class DragEvent
+export class DragEvent extends PIXI.interaction.InteractionEvent
 {
    //New as obj is used by class methods
    private objO: UIBase;
+
    private bound: boolean;
    private start: PIXI.Point;
    private offset: PIXI.Point;
@@ -13,15 +14,16 @@ export class DragEvent
    private movementX: number;
    private movementY: number;
    private cancel: boolean;
-   private dragging: boolean;
+   public dragging: boolean;
    //New context was originally named self.
    //Hmm Change ClickEvent to Arrow functions would solve this
    public context: DragEvent;
    private id: number;
 
-
    constructor( obj: UIBase )
    {
+      super ();
+
       //O var bound = false,
       this.bound = false;
       //O start = new PIXI.Point( ),
@@ -45,6 +47,9 @@ export class DragEvent
 
       //O obj.container.interactive = true;
       obj.container.interactive = true;
+
+      //New Solve dragDropController not on DragEvent
+      //this._dragDropController = new DragDropController();
 
       //O this.startEvent( );
       this.startEvent( );

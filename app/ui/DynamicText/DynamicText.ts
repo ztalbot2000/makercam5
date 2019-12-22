@@ -3,7 +3,6 @@ interface INameToValueMap
     [key: string]: any;
 }
 
-import * as PIXI from 'pixi.js';
 
 //New for check of undefined
 import { isUndefined } from "util";
@@ -52,6 +51,7 @@ export class DynamicText extends UIBase
 
    //O defaultstyle for this textobject
    //O var defaultStyle = this._style = new DynamicTextStyle( this );
+   private _style: DynamicTextStyle;
    private defaultStyle: DynamicTextStyle;
 
    //O collection of all processed char
@@ -66,7 +66,7 @@ export class DynamicText extends UIBase
    //O var charContainer = new PIXI.Container( );
    private charContainer: PIXI.Container;
    //O this.container.addChild( charContainer );
-   private container: PIXI.Container;
+   public container: PIXI.Container;
 
    //O the input text
    //O this._inputText = text;
@@ -79,9 +79,9 @@ export class DynamicText extends UIBase
 
    //O states
    //O var lastWidth = 0;
-   public lastWidth = 0;
+   public lastWidth: number;
    //O lastHeight = 0;
-   public lastHeight = 0;
+   public lastHeight: number;
 
    //O this.dirtyText = true;
    public dirtyText: boolean;
@@ -131,15 +131,14 @@ export class DynamicText extends UIBase
    //Hmmm changed self to context
    private context: DynamicText;
 
-   constructor( text: string, options: INameToValueMap )
+   constructor( text: string, options?: INameToValueMap )
    {
-      super();
+      //O UIBase.call( this, options.width || 0, options.height || 0 );
+      super(options.width || 0, options.height || 0);
 
       //O options = options || {};
       this.options = options || {};
 
-      //O UIBase.call( this, options.width || 0, options.height || 0 );
-      UIBase.call( this, options.width || 0, options.height || 0 );
 
       //O create atlas
       //O if ( atlas === null )
@@ -227,11 +226,11 @@ export class DynamicText extends UIBase
    public render = ( ) =>
    {
       //O var yOffset = 0;
-      let yOffset = 0;
+      let yOffset: number = 0;
       //O var xOffset = 0;
-      let xOffset = 0;
+      let xOffset: number = 0;
       //O var currentLine = -1;
-      let currentLine = -1;
+      let currentLine: number = -1;
       //O var i;
       let i: number = 0;
 
@@ -287,15 +286,15 @@ export class DynamicText extends UIBase
                //O case 'right':
                case 'right':
                   //O xOffset = this._width - lineWidth;
-                  //F Must have meant width not _width
-                  xOffset = this.width - lineWidth;
+                  //C _width is a number and not a possible (string | number)
+                  xOffset = this._width - lineWidth;
                   //O break;
                   break;
                //O case 'center':
                case 'center':
                   //O xOffset = ( this._width - lineWidth ) * 0.5;
-                  //F Must have meant width not _width
-                  xOffset = ( this.width - lineWidth ) * 0.5;
+                  //C _width is a number and not a possible (string | number)
+                  xOffset = ( this._width - lineWidth ) * 0.5;
                   //O break;
                   break;
                //O default:
@@ -324,7 +323,7 @@ export class DynamicText extends UIBase
 
          //O add new sprite
          //O var tex = char.data.texture;
-         var tex = this.char.data.texture;
+         var tex = char.data.texture;
          //O var sprite = spriteCache[ i ];
          var sprite = this.spriteCache[ i ];
 
@@ -559,7 +558,7 @@ export class DynamicText extends UIBase
                   for ( let d = 0; d < 3; d++ )
                   {
                      //O var dot = ellipsisData[ d ];
-                     let dot = this.ellipsisData[ d ];
+                     let dot = ellipsisData[ d ];
                      //O dot.value = ".";
                      dot.value = ".";
                      //O dot.data = atlas.getCharObject( dot.value, style );
@@ -578,7 +577,7 @@ export class DynamicText extends UIBase
                      //O renderChars[ renderIndex ] = dot;
                      this.renderChars[ renderIndex ] = dot;
                      //O renderIndex++;
-                     this.renderIndex++;
+                     renderIndex++;
                   }
                }
             }
@@ -666,7 +665,7 @@ export class DynamicText extends UIBase
       let inputArray = Array.from( this._inputText );
 
       //O for ( var i = 0; i < inputArray.length; i++ )
-      for ( let i = 0; i < this.inputArray.length; i++ )
+      for ( let i = 0; i < inputArray.length; i++ )
       {
          //O style = styleTree[ styleTree.length - 1 ];
          this.style = styleTree[ styleTree.length - 1 ];
@@ -711,7 +710,7 @@ export class DynamicText extends UIBase
                   //O style.fontStyle = 'italic';
                   this.style.fontStyle = 'italic';
                   //O styleTree.push( style );
-                  this.styleTree.push( this.style );
+                  styleTree.push( this.style );
                }
                //O else if ( tag === "<b>" )
                else if ( tag === "<b>" )
@@ -949,7 +948,10 @@ export class DynamicText extends UIBase
             //O lastWidth = self._width;
             this.lastWidth = this.context._width;
             //O lastHeight = self.height;
-            this.lastHeight = this.context.height;
+            //N height can be either a number or a string.
+            if (typeof this.context.height === 'number')
+               this.lastHeight = this.context.height;
+
             //O self.prepareForRender( );
             this.context.prepareForRender( );
             //O self.render( );
