@@ -4,7 +4,6 @@ import { UISettings } from './UISettings';
 //let UI = require( './UI' );
 // import { UI } from './UI' ;
 //O DragEvent = require( './Interaction/DragEvent' ),
-//let DragEvent = require( './Interaction/DragEvent' );
 import { DragEvent } from './Interaction/DragEvent' ;
 //O DragDropController = require( './Interaction/DragDropController' );
 import { DragDropController } from './Interaction/DragDropController';
@@ -21,10 +20,7 @@ import * as PIXI from 'pixi.js';
 //
 
 //O function UIBase( width, height )
-// export class UIBase extends UI
-// export class UIBase extends PIXI.DisplayObject
 export class UIBase extends PIXI.utils.EventEmitter
-// export class UIBase extends PIXI.Sprite
 {
    //O this.container = new PIXI.Container( );
    public container: PIXI.Container;
@@ -84,8 +80,9 @@ export class UIBase extends PIXI.utils.EventEmitter
    //O this._bottom = null;
    private _bottom: number;
 
-   //O this._dragPosition = null;                //used for overriding positions if tweens is playing
-   private _dragPosition: PIXI.Point;            //used for overriding positions if tweens is playing
+   // Used for overriding positions if tweens is playing
+   //O this._dragPosition = null;
+   private _dragPosition: PIXI.Point;
 
    //N create an instance of the DragDropController
    protected _dragDropController: DragDropController;
@@ -98,9 +95,9 @@ export class UIBase extends PIXI.utils.EventEmitter
 
    constructor ( width: number | string, height: number | string )
    {
-      super();
       //O PIXI.utils.EventEmitter.call( this );
-      PIXI.utils.EventEmitter.call( this );
+      super();
+
       //O this.container = new PIXI.Container( );
       this.container = new PIXI.Container( );
       //O this.setting = new UISettings( );

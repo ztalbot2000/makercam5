@@ -1,4 +1,5 @@
-﻿export class Helpers
+﻿//O var Helpers =
+export class Helpers
 {
    // lerp stands for linear interpolation (A method of curve fitting).
    // It means that the value will change from your from value to your
@@ -6,7 +7,8 @@
    // 0 being your from value, 1 being your to value.
    // Therefore, 0.5 will be halfway between
 
-   // Possibly change callers to mathf.lerp ???
+   //O Lerp: function (start, stop, amt)
+   //Hmmm Possibly change callers to mathf.lerp ???
    static Lerp = (start: number, stop: number, amt: number): number =>
    {
       if ( amt > 1 )
@@ -17,6 +19,7 @@
       return start + ( stop - start ) * amt;
    }
 
+   //O Round: function(number, decimals)
    static Round = (num: number, decimals: number): number =>
    {
       var pow = Math.pow( 10, decimals );
@@ -24,6 +27,7 @@
       return Math.round( num * pow ) / pow;
    }
 
+   //O componentToHex: function(c)
    static componentToHex = (c: number): string =>
    {
       let hex = c.toString( 16 );
@@ -31,16 +35,19 @@
       return hex.length == 1 ? "0" + hex : hex;
    }
 
+   //O rgbToHex: function(r, g, b)
    static rgbToHex = ( r: number, g: number, b: number): string =>
    {
       return "#" + Helpers.componentToHex( r ) + Helpers.componentToHex( g ) + Helpers.componentToHex( b );
    }
 
+   //O rgbToNumber: function (r, g, b)
    static rgbToNumber = ( r: number, g: number, b: number): number =>
    {
       return r * 65536 + g * 256 + b;
    }
 
+   //O numberToRgb: function (c)
    static numberToRgb = (c: number): object =>
    {
       return {
@@ -50,6 +57,7 @@
       };
    }
 
+   //O hexToRgb: function (hex)
    static hexToRgb = ( hex: ( string | number ) ): object =>
    {
       if ( hex === null )
@@ -90,4 +98,3 @@
       } : null;
    }
 };
-

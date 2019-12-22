@@ -1,116 +1,91 @@
-﻿// let stage = require('./Stage');
+﻿//O stage = require('./Stage');
 import { Stage } from './Stage';
-// let container = require('./Container');
+//O container = require('./Container');
 import { Container } from './Container';
-// let dynamicText = require('./DynamicText/DynamicText');
+//O ScrollingContainer: require('./ScrollingContainer'),
+// import { ScrollingContainer } from './ScrollingContainer'),
+//O SortableList: require('./SortableList'),
+// import { SortableList } from './SortableList'),
+//O Sprite: require('./Sprite'),
+// import { Sprite } from './Sprite'),
+//O TilingSprite: require('./TilingSprite'),
+// import { TilingSprite } from './TilingSprite'),
+//O SliceSprite: require('./SliceSprite'),
+// import { SliceSprite } from './SliceSprite'),
+//O Slider: require('./Slider'),
+// import { Slider } from './Slider'),
+//O ScrollBar: require('./ScrollBar'),
+// import { ScrollBar } from './ScrollBar'),
+//O Text: require('./Text'),
+// import { Text } from './Text'),
+//O dynamicText = require('./DynamicText/DynamicText');
 import { DynamicText } from './DynamicText/DynamicText';
-// let dynamicTextStyle = require('./DynamicText/DynamicTextStyle');
+//O dynamicTextStyle = require('./DynamicText/DynamicTextStyle');
 import { DynamicTextStyle } from './DynamicText/DynamicTextStyle';
-// let helpers = require('./Helpers');
+//O Button: require('./Button'),
+// import { Button } from './Button'),
+//O CheckBox: require('./CheckBox'),
+// import { CheckBox } from './CheckBox'),
+//O helpers = require('./Helpers');
 import { Helpers } from './Helpers';
-// let tween = require('./Tween');
+//O tween = require('./Tween');
 import { Tween } from './Tween';
-// let ease = require('./Ease/Ease');
+//O ease = require('./Ease/Ease');
 import { Ease } from './Ease/Ease';
-// let interaction = require('./Interaction/Interaction');
-// import { Interaction } from './Interaction/Interaction';
-// let ticker = require('./Ticker';
+//O interaction = require('./Interaction/Interaction');
+import { Interaction } from './Interaction/Interaction';
+//O Base = require('./UIBase';
+import  { UIBase } from './UIBase';
+//O Ticker = require('./Ticker';
 import  { Ticker } from './Ticker';
-
-// let clickEvent = require( './Interaction/ClickEvent' );
-import { ClickEvent } from './Interaction/ClickEvent';
-// let dragEvent = require( './Interaction/DragEvent';
-import { DragEvent } from './Interaction/DragEvent';
-// let mouseScrollEvent = require( './Interaction/MouseScrollEvent' );
-import { MouseScrollEvent } from './Interaction/MouseScrollEvent';
-// let inputController = require( './Interaction/InputController' );
-import { InputController } from './Interaction/InputController';
-
-
-
-
-
-
-// let base = require('./UIBase');
-import { UIBase } from './UIBase';
 
 //O var UI = {
 export interface UI
 {
 
     //O Stage: require('./Stage'),
-    //Stage: require('./Stage'),
     Stage: Stage,
-    // get Stage () { return stage };
     //O Container: require('./Container'),
-    // Container: require('./Container'),
     Container: Container,
-    // get Container () { return container };
     //O ScrollingContainer: require('./ScrollingContainer'),
-    //ScrollingContainer: require('./ScrollingContainer'),
+    // ScrollingContainer: ScrollingContainer,
     //O SortableList: require('./SortableList'),
-    //SortableList: require('./SortableList'),
+    // SortableList: SortableList,
+    // SortableList: require('./SortableList'),
     //O Sprite: require('./Sprite'),
-    //Sprite: require('./Sprite'),
+    // Sprite: Sprite,
     //O TilingSprite: require('./TilingSprite'),
-    //TilingSprite: require('./TilingSprite'),
+    // TilingSprite: TilingSprite,
     //O SliceSprite: require('./SliceSprite'),
-    //SliceSprite: require('./SliceSprite'),
+    // SliceSprite: SliceSprite,
     //O Slider: require('./Slider'),
-    //Slider: require('./Slider'),
+    // Slider: Slider,
     //O ScrollBar: require('./ScrollBar'),
-    //ScrollBar: require('./ScrollBar'),
+    // ScrollBar: ScrollBar,
     //O Text: require('./Text'),
-    //Text: require('./Text'),
+    // Text: Text,
     //O DynamicText: require('./DynamicText/DynamicText'),
-    // DynamicText: require('./DynamicText/DynamicText'),
     DynamicText: DynamicText,
-    // get DynamicText() { return dynamicText };
     //O DynamicTextStyle: require('./DynamicText/DynamicTextStyle'),
-    // DynamicTextStyle: require('./DynamicText/DynamicTextStyle'),
-    //get DynamicTextStyle() { return dynamicTextStyle };
     DynamicTextStyle: DynamicTextStyle,
     //O TextInput: require('./TextInput'),
-    //TextInput: require('./TextInput'),
+    // TextInput: TextInput,
     //O Button: require('./Button'),
-    //Button: require('./Button'),
+    // Button: Button,
     //O CheckBox: require('./CheckBox'),
-    //CheckBox: require('./CheckBox'),
+    // CheckBox: CheckBox,
     //O Helpers: require('./Helpers'),
-    // Helpers: require('./Helpers'),
-    //get Helpers() { return helpers };
     Helpers: Helpers,
     //O Tween: require('./Tween'),
-    // Tween: require('./Tween'),
-    // get Tween() { return tween };
     Tween: Tween,
     //O Ease: require('./Ease/Ease'),
-    // Ease: require('./Ease/Ease'),
-    // get Ease() { return ease };
     Ease: Ease,
     //O Interaction: require('./Interaction/Interaction'),
-    // Interaction: require('./Interaction/Interaction'),
-    // get Interaction() { return interaction };
-    // Interaction: Interaction,
-    //get ClickEvent() { return clickEvent };
-    ClickEvent:  ClickEvent,
-    //get DragEvent() { return dragEvent };
-    DragEvent: DragEvent,
-    //get MouseScrollEvent() { return mouseScrollEvent };
-    MouseScrollEvent:  MouseScrollEvent,
-    //get InputController() { return inputController };
-    InputController: InputController,
-
-
-
-
+    Interaction: Interaction,
     //O Base: require('./UIBase'),
-    // Base: require('./UIBase'),
-    // get Base() { return base };
-    UIBase: UIBase,
+    Base: UIBase,
     //O Ticker: require('./Ticker').shared,
-    //Ticker: require('./Ticker').shared,
-    // get Ticker() { return ticker.shared };
+    //Hmmm Fixme?  FixMe fixMe fixme. Needs to be Ticker.shared ????
     Ticker: Ticker,
 };
 
