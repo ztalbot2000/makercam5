@@ -60,7 +60,7 @@ export class Ticker
    // @private
    //
    //O Ticker.prototype.update = function (time)
-   public update (time :number)
+   private update (time :number)
    {
        //O Ticker.shared._now = time;
        Ticker.shared._now = time;
