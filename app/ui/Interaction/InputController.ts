@@ -234,4 +234,8 @@ export class InputController
    }
 };
 
+let inputController = new InputController();
+
+export { inputController };
+
 //O module.exports = InputController;
