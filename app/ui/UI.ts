@@ -9,7 +9,7 @@ import { Container } from './Container';
 //O Sprite: require('./Sprite');
 // import { Sprite } from './Sprite';
 //O TilingSprite: require('./TilingSprite');
-// import { TilingSprite } from './TilingSprite';
+import { TilingSprite } from './TilingSprite';
 //O SliceSprite: require('./SliceSprite');
 import { SliceSprite } from './SliceSprite';
 //O Slider: require('./Slider');
@@ -55,7 +55,7 @@ export interface UI
     //O Sprite: require('./Sprite'),
     // Sprite: Sprite,
     //O TilingSprite: require('./TilingSprite'),
-    // TilingSprite: TilingSprite,
+    TilingSprite: TilingSprite,
     //O SliceSprite: require('./SliceSprite'),
     SliceSprite: SliceSprite,
     //O Slider: require('./Slider'),
