@@ -34,7 +34,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    //O this.stage = null;
    public stage: UIBase;
    //O this.initialized = false;
-   private initialized: boolean;
+   protected initialized: boolean;
    //O this.dragInitialized = false;
    private dragInitialized: boolean;
    //O this.dropInitialized = false;
@@ -774,7 +774,9 @@ export class UIBase extends PIXI.utils.EventEmitter
    //
 
    //O UIBase.prototype.initialize = function( )
-   private initialize = ( ): void =>
+   //New cannot be private or protected. Typescript complains that
+   //    only an instance of SliceSprite can call it.
+   public initialize = ( ): void =>
    {
       //O this.initialized = true;
       this.initialized = true;

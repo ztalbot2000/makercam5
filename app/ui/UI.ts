@@ -3,29 +3,29 @@ import { Stage } from './Stage';
 //O container = require('./Container');
 import { Container } from './Container';
 //O ScrollingContainer: require('./ScrollingContainer'),
-// import { ScrollingContainer } from './ScrollingContainer'),
-//O SortableList: require('./SortableList'),
-// import { SortableList } from './SortableList'),
-//O Sprite: require('./Sprite'),
-// import { Sprite } from './Sprite'),
-//O TilingSprite: require('./TilingSprite'),
-// import { TilingSprite } from './TilingSprite'),
-//O SliceSprite: require('./SliceSprite'),
-// import { SliceSprite } from './SliceSprite'),
-//O Slider: require('./Slider'),
-// import { Slider } from './Slider'),
-//O ScrollBar: require('./ScrollBar'),
-// import { ScrollBar } from './ScrollBar'),
-//O Text: require('./Text'),
-// import { Text } from './Text'),
+// import { ScrollingContainer } from './ScrollingContainer';
+//O SortableList: require('./SortableList');
+// import { SortableList } from './SortableList';
+//O Sprite: require('./Sprite');
+// import { Sprite } from './Sprite';
+//O TilingSprite: require('./TilingSprite');
+// import { TilingSprite } from './TilingSprite';
+//O SliceSprite: require('./SliceSprite');
+import { SliceSprite } from './SliceSprite';
+//O Slider: require('./Slider');
+// import { Slider } from './Slider';
+//O ScrollBar: require('./ScrollBar');
+// import { ScrollBar } from './ScrollBar';
+//O Text: require('./Text');
+// import { Text } from './Text';
 //O dynamicText = require('./DynamicText/DynamicText');
 import { DynamicText } from './DynamicText/DynamicText';
 //O dynamicTextStyle = require('./DynamicText/DynamicTextStyle');
 import { DynamicTextStyle } from './DynamicText/DynamicTextStyle';
-//O Button: require('./Button'),
-// import { Button } from './Button'),
-//O CheckBox: require('./CheckBox'),
-// import { CheckBox } from './CheckBox'),
+//O Button: require('./Button');
+// import { Button } from './Button';
+//O CheckBox: require('./CheckBox');
+// import { CheckBox } from './CheckBox';
 //O helpers = require('./Helpers');
 import { Helpers } from './Helpers';
 //O tween = require('./Tween');
@@ -57,7 +57,7 @@ export interface UI
     //O TilingSprite: require('./TilingSprite'),
     // TilingSprite: TilingSprite,
     //O SliceSprite: require('./SliceSprite'),
-    // SliceSprite: SliceSprite,
+    SliceSprite: SliceSprite,
     //O Slider: require('./Slider'),
     // Slider: Slider,
     //O ScrollBar: require('./ScrollBar'),
