@@ -17,25 +17,23 @@ export class TilingSprite extends UIBase
 {
    private sprite: PIXI.TilingSprite;
 
-   //New  Added as it is defined within
-   // It takes effect when update is called
-   public tint: number;
-   public blendmode: number;
-
    constructor ( t: PIXI.Texture, width: number, height: number )
    {
-      //O UIBase.call( this, width || this.sprite.width, height || this.sprite.height );
+      //Hmm Hack to get around super must be called first
+      //Hmmm, this one might work ?
       super( width || t.width, height || t.height );
 
       //O this.sprite = new PIXI.extras.TilingSprite( t );
       this.sprite = new PIXI.TilingSprite( t );
+      console.log("Hack(TilingSprite):" + width + "," + height + " Could be:" + this.sprite.width +"," + this.sprite.height);
+
+      //O UIBase.call( this, width || this.sprite.width, height || this.sprite.height );
+      super( width || this.sprite.width, height || this.sprite.height );
+
 
       //O this.container.addChild( this.sprite );
       this.container.addChild( this.sprite );
 
-      //New Added as it is used within
-      this.tint = null;
-      this.blendmode = null;
    }
 
    //

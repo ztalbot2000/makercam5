@@ -17,7 +17,7 @@ import { SliceSprite } from './SliceSprite';
 //O ScrollBar: require('./ScrollBar');
 // import { ScrollBar } from './ScrollBar';
 //O Text: require('./Text');
-// import { Text } from './Text';
+import { Text } from './Text';
 //O dynamicText = require('./DynamicText/DynamicText');
 import { DynamicText } from './DynamicText/DynamicText';
 //O dynamicTextStyle = require('./DynamicText/DynamicTextStyle');
@@ -63,7 +63,7 @@ export interface UI
     //O ScrollBar: require('./ScrollBar'),
     // ScrollBar: ScrollBar,
     //O Text: require('./Text'),
-    // Text: Text,
+    Text: Text,
     //O DynamicText: require('./DynamicText/DynamicText'),
     DynamicText: DynamicText,
     //O DynamicTextStyle: require('./DynamicText/DynamicTextStyle'),

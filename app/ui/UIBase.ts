@@ -64,13 +64,13 @@ export class UIBase extends PIXI.utils.EventEmitter
    //O this._maxHeight = null;
    private _maxHeight: number;
    //O this._anchorLeft = null;
-   private _anchorLeft: number;
+   protected _anchorLeft: number;
    //O this._anchorRight = null;
-   private _anchorRight: number;
+   protected _anchorRight: number;
    //O this._anchorTop = null;
-   private _anchorTop: number;
+   protected _anchorTop: number;
    //O this._anchorBottom = null;
-   private _anchorBottom: number;
+   protected _anchorBottom: number;
    //O this._left = null;
    private _left: number;
    //O this._right = null;
@@ -291,7 +291,8 @@ export class UIBase extends PIXI.utils.EventEmitter
     * @private
     */
    //O UIBase.prototype.baseupdate = function( )
-   private baseupdate = ( ): void =>
+   //New must be protected as it is called by Text
+   public baseupdate = ( ): void =>
    {
       //O return if parent size didnt change
       //O if ( this.parent !== null )
