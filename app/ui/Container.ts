@@ -24,10 +24,6 @@ export class Container extends UIBase
       //O UIBase.call( this, width, height );
       super ( width, height );
 
-      //New 
-      //this.width = width;
-      //this.height = height;
-
       //O this.container.hitArea = new PIXI.Rectangle( 0, 0, 0, 0 );
       this.container.hitArea = new PIXI.Rectangle( 0, 0, 0, 0 );
    }

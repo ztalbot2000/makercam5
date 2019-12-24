@@ -93,7 +93,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    protected containerStart: PIXI.Point;
    protected dragContext: UIBase;
 
-   constructor ( width: number | string, height: number | string )
+   constructor ( width?: number | string, height?: number | string )
    {
       //O PIXI.utils.EventEmitter.call( this );
       super();

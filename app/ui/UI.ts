@@ -7,7 +7,7 @@ import { Container } from './Container';
 //O SortableList: require('./SortableList');
 // import { SortableList } from './SortableList';
 //O Sprite: require('./Sprite');
-// import { Sprite } from './Sprite';
+import { Sprite } from './Sprite';
 //O TilingSprite: require('./TilingSprite');
 import { TilingSprite } from './TilingSprite';
 //O SliceSprite: require('./SliceSprite');
@@ -53,7 +53,7 @@ export interface UI
     // SortableList: SortableList,
     // SortableList: require('./SortableList'),
     //O Sprite: require('./Sprite'),
-    // Sprite: Sprite,
+    Sprite: Sprite,
     //O TilingSprite: require('./TilingSprite'),
     TilingSprite: TilingSprite,
     //O SliceSprite: require('./SliceSprite'),

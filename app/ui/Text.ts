@@ -18,15 +18,12 @@ export class Text extends UIBase
    constructor( text: string, PIXITextStyle: PIXI.TextStyle )
    {
       //Hmm Hack to get around super must be called first
-      super(text.length *7,7);
+      super();
 
       //O this._text = new PIXI.Text( text, PIXITextStyle );
-      // @ts-ignore
       this._text = new PIXI.Text( text, PIXITextStyle );
-      console.log("Hack(Text):" + text.length * 7 + ",7 Should be:" + this._text.width +"," + this._text.height);
 
       //O UIBase.call( this, this._text.width, this._text.height );
-      //UIBase.call( this, this._text.width, this._text.height );
       super(this._text.width, this._text.height);
 
       //O this.container.addChild( this._text );
