@@ -1,5 +1,5 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+//const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TSLintPlugin = require('tslint-webpack-plugin');
 
@@ -183,7 +183,8 @@ module.exports = (env, argv) =>
 
             })
          ],
-         target: 'web',
+         //target: 'umd',
+         //target: 'web',
          externals: Externals,
          resolve: {
             // Add '.ts' as resolvable extensions.
@@ -192,16 +193,16 @@ module.exports = (env, argv) =>
                $: "jquery/src/jquery",
             }
          },
-         optimization: {
-            minimizer: [
-               new UglifyJsPlugin({
-                  parallel: true,
-                  uglifyOptions: {
-                     mangle: false
-                  }
-               })
-            ]
-         },
+         //optimization: {
+         //   minimizer: [
+         //      new UglifyJsPlugin({
+         //         parallel: true,
+         //         uglifyOptions: {
+         //            mangle: false
+         //         }
+         //      })
+         //   ]
+         //},
 
          // Seperate source maps
          devtool: "source-map",
@@ -259,8 +260,9 @@ module.exports = (env, argv) =>
       },
       {
          entry: {
-            //"pixi-ui-entry": './app/src/pixi-ui-entry.ts',
             "index.ts": './app/ui/index.ts',
+            // working on this ...
+            // "DynamicText-entry": './app/src/DynamicText.js'
          },
          output: {
             path: path.resolve(__dirname, './dist'),
@@ -269,7 +271,7 @@ module.exports = (env, argv) =>
             library: 'pixi-ui',
 
             // Turn off pathInfo, increasing build time
-            pathinfo: true,
+            pathinfo: false,
          },
          plugins: [
             // Too messy, deal with later
@@ -277,7 +279,8 @@ module.exports = (env, argv) =>
             //     files: ['./app/ui//**/*.ts']
             // })
          ],
-         target: 'web',
+         //target: 'umd',
+         //target: 'web',
          externals: Externals,
          resolve: {
             // Add '.ts' as resolvable extensions.
