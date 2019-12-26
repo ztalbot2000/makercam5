@@ -259,19 +259,17 @@ module.exports = (env, argv) =>
       },
       {
          entry: {
-            "pixi-ui-entry": './app/src/pixi-ui-entry.ts',
-            // working on this ...
-            // "DynamicText-entry": './app/src/DynamicText.js'
+            //"pixi-ui-entry": './app/src/pixi-ui-entry.ts',
+            "index.ts": './app/ui/index.ts',
          },
          output: {
             path: path.resolve(__dirname, './dist'),
             filename: 'pixi-ui.js',
             // The library name means you would access it via pixi-ui.button.
             library: 'pixi-ui',
-            libraryTarget: 'umd',
 
-            // Turn off pathInfo, incrasing build time
-            pathinfo: false,
+            // Turn off pathInfo, increasing build time
+            pathinfo: true,
          },
          plugins: [
             // Too messy, deal with later

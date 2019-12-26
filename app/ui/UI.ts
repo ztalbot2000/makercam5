@@ -39,8 +39,9 @@ import  { UIBase } from './UIBase';
 //O Ticker = require('./Ticker';
 import  { Ticker } from './Ticker';
 
-//O var UI = {
-export interface UI
+//O var UI =
+ export var UI =
+//export interface UI
 {
 
     //O Stage: require('./Stage'),

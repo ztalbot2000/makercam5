@@ -26,8 +26,11 @@ export { ClickEvent, DragEvent, MouseScrollEvent, InputController  };
 
 */
 
+import * as PIXI from 'pixi.js'
+import { UI } from '../ui/UI';
+
 const Library = {
-    UI: require('../ui/UI')
+    UI: UI
 };
 
 // dump everything into extras

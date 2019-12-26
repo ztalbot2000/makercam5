@@ -1,5 +1,5 @@
 //O var UIBase = require( './UIBase' );
-import { UIBase } from'./UIbase';
+import { UIBase } from'./UIBase';
 
 import * as PIXI from 'pixi.js';
 
