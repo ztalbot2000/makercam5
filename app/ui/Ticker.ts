@@ -1,8 +1,9 @@
-//O var Tween = require('./Tween');
-var Tween = require('./Tween');
 
 import * as PIXI from 'pixi.js'
 
+//O var Tween = require('./Tween');
+//N No brackets, imports the default created Tween Instance from new.
+import  Tween  from './Tween';
 
 //class Ticker extends PIXI.utils.EventEmitter
 export class Ticker extends PIXI.utils.EventEmitter
@@ -149,8 +150,8 @@ export class Ticker extends PIXI.utils.EventEmitter
 
 //O Ticker.shared = new Ticker(true);
 //N exported name cannot be same as class name
-let ticker = new Ticker(true);
-export default ticker ;
+//let ticker = new Ticker(true);
+export default new Ticker(true);
 //O module.exports = Ticker;
 
 

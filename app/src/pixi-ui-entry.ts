@@ -24,7 +24,6 @@ export { DynamicText };
 import {  ClickEvent, DragEvent, MouseScrollEvent, InputController  } from '../ui/Interaction/Interaction';
 export { ClickEvent, DragEvent, MouseScrollEvent, InputController  };
 
-*/
 
 import * as PIXI from 'pixi.js'
 import { UI } from '../ui/UI';
@@ -38,3 +37,4 @@ const Library = {
 Object.assign(PIXI, Library);
 
 module.exports = Library;
+*/

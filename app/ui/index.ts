@@ -1,13 +1,13 @@
 //O UI: require('./UI')
-//import { UI } from './UI';
+import { UI } from './UI';
 
 //N
 //import * as PIXI from 'pixi.js';
 
 //O var Library = {
 var Library = {
-    UI: require('./UI')
-    //UI: UI,
+    //UI: require('./UI')
+    UI: UI,
 };
 
 //O //dump everything into extras

@@ -910,4 +910,6 @@ export class Tween
    }
 };
 
+export default new Tween();
+
 //O module.exports = Tween;
