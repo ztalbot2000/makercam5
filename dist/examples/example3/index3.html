@@ -30,9 +30,9 @@
 
 
         function init() {
-            var whiteBG = PIXI.Texture.fromFrame("./UI/ui-box-1.png");
-            var innerBG = PIXI.Texture.fromFrame("./UI/ui-box-2.png");
-            var lineSprite = PIXI.Texture.fromFrame("./UI/ui-horizontal-line-border.png");
+            var whiteBG = PIXI.Texture.from("./UI/ui-box-1.png");
+            var innerBG = PIXI.Texture.from("./UI/ui-box-2.png");
+            var lineSprite = PIXI.Texture.from("./UI/ui-horizontal-line-border.png");
 
             container = new PIXI.UI.SliceSprite(whiteBG, 5);
             container.height = 100;

@@ -37,20 +37,20 @@
 
 
         function init() {
-            var cb1_bg = PIXI.Texture.fromFrame("./UI/cb-1-bg.png");
-            var cb1_mark = PIXI.Texture.fromFrame("./UI/cb-1-mark.png");
-            var cb2_bg = PIXI.Texture.fromFrame("./UI/cb-2-bg.png");
-            var cb2_mark = PIXI.Texture.fromFrame("./UI/cb-2-mark.png");
+            var cb1_bg = PIXI.Texture.from("./UI/cb-1-bg.png");
+            var cb1_mark = PIXI.Texture.from("./UI/cb-1-mark.png");
+            var cb2_bg = PIXI.Texture.from("./UI/cb-2-bg.png");
+            var cb2_mark = PIXI.Texture.from("./UI/cb-2-mark.png");
 
-            var whiteBG = PIXI.Texture.fromFrame("./UI/ui-box-1.png");
-            var innerBG = PIXI.Texture.fromFrame("./UI/ui-box-2.png");
-            var solidBox = PIXI.Texture.fromFrame("./UI/solid-box.png");
-            var lineSprite = PIXI.Texture.fromFrame("./UI/ui-horizontal-line-border.png");
+            var whiteBG = PIXI.Texture.from("./UI/ui-box-1.png");
+            var innerBG = PIXI.Texture.from("./UI/ui-box-2.png");
+            var solidBox = PIXI.Texture.from("./UI/solid-box.png");
+            var lineSprite = PIXI.Texture.from("./UI/ui-horizontal-line-border.png");
             var textStyle = { fill: '#000000', fontSize: 18, fontFamily: 'Lucida Sans Typewriter' };
 
 
             button = new PIXI.UI.Button({
-                background: new PIXI.UI.SliceSprite(PIXI.Texture.fromFrame("./UI/cb-1-bg.png"), 10),
+                background: new PIXI.UI.SliceSprite(PIXI.Texture.from("./UI/cb-1-bg.png"), 10),
             });
 
             button.on("hover", function (isHover) {

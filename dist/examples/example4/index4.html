@@ -30,10 +30,10 @@
 
 
         function init() {
-            var whiteBG = PIXI.Texture.fromFrame("./UI/ui-box-1.png");
-            var innerBG = PIXI.Texture.fromFrame("./UI/ui-box-2.png");
-            var solidBox = PIXI.Texture.fromFrame("./UI/solid-box.png");
-            var lineSprite = PIXI.Texture.fromFrame("./UI/ui-horizontal-line-border.png");
+            var whiteBG = PIXI.Texture.from("./UI/ui-box-1.png");
+            var innerBG = PIXI.Texture.from("./UI/ui-box-2.png");
+            var solidBox = PIXI.Texture.from("./UI/solid-box.png");
+            var lineSprite = PIXI.Texture.from("./UI/ui-horizontal-line-border.png");
             var textStyle = { fill: ['#ffffff', '#ededed'], fontSize: 18, fontFamily: 'Calibri', fontWeight: 'bold' };
 
             kasse = new PIXI.UI.SliceSprite(whiteBG, 5);
