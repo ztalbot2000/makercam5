@@ -289,9 +289,9 @@ module.exports = (env, argv) =>
       },
       output: {
          path: path.resolve(__dirname, './dist'),
-         filename: 'pixi-ui.js',
+         filename: 'pixi_ui.js',
          // The library name means you would access it via pixi-ui.button.
-         library: 'pixi-ui',
+         library: 'pixi_ui',
 
          // Turn off pathInfo, increasing build time
          pathinfo: false,
