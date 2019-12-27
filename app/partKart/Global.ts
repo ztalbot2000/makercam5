@@ -1,9 +1,6 @@
 ﻿//O package com.partkart{
 
-//New
-import {Undo} from './Undo';
-
-import { Point } from 'pixi.js';
+import * as PIXI from 'pixi.js';
 
 //J Typescript does not like this, too bad.
 //J Point.prototype.normalize = function(scale: number ): void
@@ -82,7 +79,7 @@ export class Global
    }
 
    //N As this method does not exist on PIXI Point
-   static normalize (point: Point, scale: number ): Point
+   static normalize (point: PIXI.Point, scale: number ): PIXI.Point
    {
      let norm: number = Math.sqrt(point.x * point.x + point.y * point.y);
      if (norm != 0)
@@ -137,10 +134,10 @@ export class Global
    }
 
    //O public static function withinTolerance(p1:Point, p2:Point, factor:Number = 1):Boolean
-   static withinTolerance(p1: Point, p2: Point, factor: number = 1)
+   static withinTolerance(p1: PIXI.Point, p2: PIXI.Point, factor: number = 1)
    {
       //O var diff:Point = new Point(Math.pow(p1.x-p2.x,2),Math.pow(p1.y-p2.y,2));
-      let diff = new Point(Math.pow(p1.x-p2.x,2),Math.pow(p1.y-p2.y,2));
+      let diff = new PIXI.Point(Math.pow(p1.x-p2.x,2),Math.pow(p1.y-p2.y,2));
       //O if (diff.x + diff.y < Math.pow(Global.tolerance*factor,2))
       if (diff.x + diff.y < Math.pow(this.tolerance*factor,2))
       {
@@ -219,7 +216,7 @@ export class Global
    //     Using 'bc -l' this would c(23/sqrt(970)) * 180/(4*a(1))
 
    //O public static function getAngle(v1:Point, v2:Point):Number
-   static getAngle(v1: Point, v2: Point): number
+   static getAngle(v1: PIXI.Point, v2: PIXI.Point): number
    {
       // Scales the line segment between (0,0) and the current point
       // to a set length.
@@ -248,10 +245,10 @@ export class Global
    // Return null if there is no intersection
    //---------------------------------------------------------------
    //O public static function lineIntersect(A:Point,B:Point,E:Point,F:Point,as_seg:Boolean=false):Point 
-   static lineIntersect(A: Point, B: Point, E: Point, F: Point, as_seg: boolean=false): Point
+   static lineIntersect(A: PIXI.Point, B: PIXI.Point, E: PIXI.Point, F: PIXI.Point, as_seg: boolean=false): PIXI.Point
    {
       //O var ip:Point;
-      let ip: Point;
+      let ip: PIXI.Point;
       //O var a1:Number;
       let a1: number = 0;
       //O var a2:Number;
@@ -277,7 +274,7 @@ export class Global
       if (denom == 0) {
          return undefined;
       }
-      ip=new Point();
+      ip=new PIXI.Point();
       ip.x=(b1*c2 - b2*c1)/denom;
       ip.y=(a2*c1 - a1*c2)/denom;
 

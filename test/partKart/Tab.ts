@@ -2,9 +2,6 @@
 
 var assert = require('chai').assert;
 
-//N Unused?
-//import { Point } from 'pixi.js';
-
 import Tab  from '../../app/partKart/Tab';
 
 var tloc = 15;

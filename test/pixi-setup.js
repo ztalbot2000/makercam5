@@ -26,3 +26,6 @@ global.cancelAnimationFrame = function (id) {
   clearTimeout(id);
 };
 copyProps(window, global);
+
+var PIXI = require('pixi.js');
+global.PIXI = PIXI;

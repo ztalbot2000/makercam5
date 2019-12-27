@@ -2,8 +2,9 @@
 
 var assert = require('chai').assert;
 
+import * as PIXI from 'pixi.js';
+
 import { Global }  from '../../app/partKart/Global';
-import { Point } from 'pixi.js';
 
 describe('Testing Global.js', function ()
 {
@@ -169,17 +170,17 @@ describe('Testing Global.js', function ()
       assert.isFunction(Global.getAngle, "Global.getAngle: expected " + expectedResult + " received = " + typeof Global.getAngle);
    });
 
-   it('new Point(3,4) should create a point at (3,4)', function ()
+   it('new PIXI.Point(3,4) should create a point at (3,4)', function ()
    {
-      let P1 = new Point(3,4);
+      let P1 = new PIXI.Point(3,4);
       assert.equal(P1.x, 3, "Point.x: expected " + 3 + " received = P1.x:" + P1.x + " P1.y:" + P1.y);
       assert.equal(P1.y, 4, "Point.y: expected " + 4 + " received = " + P1.y);
    });
 
    it('Global.getAngle(P0(6,3), P1=(5,13) should return 42° (0.74 rads)', function ()
    {
-      let P0 = new Point(6,3);
-      let P1 = new Point(5,13);
+      let P0 = new PIXI.Point(6,3);
+      let P1 = new PIXI.Point(5,13);
       let expectedResult = .74;
       let result = Global.getAngle(P0,P1);
       assert.closeTo(result, expectedResult, .05, "Global.getAngle: expected " + expectedResult + " received = " + result);
