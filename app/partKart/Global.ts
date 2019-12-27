@@ -1,5 +1,8 @@
 ﻿//O package com.partkart{
 
+//New
+import {Undo} from './Undo';
+
 import * as PIXI from 'pixi.js';
 
 //J Typescript does not like this, too bad.

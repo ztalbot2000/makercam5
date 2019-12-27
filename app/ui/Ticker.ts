@@ -5,7 +5,7 @@ import * as PIXI from 'pixi.js'
 
 
 //class Ticker extends PIXI.utils.EventEmitter
-export class Ticker
+export class Ticker extends PIXI.utils.EventEmitter
 {
    //O this._disabled = true;
    _disabled: boolean;
@@ -17,12 +17,13 @@ export class Ticker
    Time: number;
    //O this.Ms = 0;
    Ms: number;
-   EE: PIXI.utils.EventEmitter;
 
    static shared: Ticker;
 
    constructor (autoStart?: boolean)
    {
+      super();
+
       //O this._disabled = true;
       this._disabled = true;
       if ( ! Ticker.shared )
@@ -47,9 +48,6 @@ export class Ticker
 
          //O Ticker.shared = this;
          Ticker.shared = new Ticker(true);
-
-         //New
-         this.EE = new PIXI.utils.EventEmitter();
       }
       // Ticker.shared = this;
       return Ticker.shared;
@@ -71,7 +69,7 @@ export class Ticker
        //O Ticker.shared.DeltaTime = Ticker.shared.Ms * 0.001;
        Ticker.shared.DeltaTime = Ticker.shared.Ms * 0.001;
        //O Ticker.shared.emit("update", Ticker.shared.DeltaTime);
-       Ticker.shared.EE.emit("update", Ticker.shared.DeltaTime);
+       Ticker.shared.emit("update", Ticker.shared.DeltaTime);
        //O Tween._update(Ticker.shared.DeltaTime);
        Tween._update(Ticker.shared.DeltaTime);
 
@@ -84,24 +82,36 @@ export class Ticker
    }
 
    //O Ticker.on = function (event, fn, context)
-   public on = (event: string, fn: Function, context: any) =>
+   // ts-ignore is for:
+   // Property on type Ticker => Type 'void' is not assignable to type 'this'. 
+   // Also resolved with --strictFunctionTypes
+   // @ts-ignore
+   public on = (event: string | symbol, fn: Function, context?: any) =>
    {
       //O Ticker.shared.on.apply(this.shared,arguments);
-      Ticker.shared.EE.on(event, fn, context);
+      Ticker.shared.on(event, fn, context);
    }
 
    //O Ticker.once = function (event, fn, context)
-   public once = (event: string, fn: Function, context: any) =>
+   // ts-ignore is for:
+   // Property on type Ticker => Type 'void' is not assignable to type 'this'. 
+   // Also resolved with --strictFunctionTypes
+   // @ts-ignore
+   public once = (event: string | symbol, fn: Function, context?: any) =>
    {
       //O Ticker.prototype.once.apply(this.shared, arguments);
-      Ticker.shared.EE.once(event, fn, context);
+      Ticker.shared.once(event, fn, context);
    }
 
    //O Ticker.removeListener = function (event, fn)
-   public removeListener = (event: string, fn: Function) =>
+   // ts-ignore is for:
+   // Property on type Ticker => Type 'void' is not assignable to type 'this'. 
+   // Also resolved with --strictFunctionTypes
+   // @ts-ignore
+   public removeListener = (event: string |  symbol, fn?: Function, context?: any) =>
    {
       //O Ticker.prototype.removeListener.apply(this.shared, arguments);
-      Ticker.shared.EE.removeListener(event, fn);
+      Ticker.shared.removeListener(event, fn, context);
    };
 
    get disabled (): boolean
