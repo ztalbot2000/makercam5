@@ -24,7 +24,7 @@
             uiStage.resize(window.innerWidth, window.innerHeight);
         });
 
-        PIXI.loader.add('./UI/UISprites.json').load(function () {
+        PIXI.Loader.shared.add('./UI/UISprites.json').load(function () {
             init();
         });
 

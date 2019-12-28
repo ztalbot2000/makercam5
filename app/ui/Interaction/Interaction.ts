@@ -10,8 +10,8 @@ import { InputController } from './InputController';
 
 
 //O var Interaction =
-//export var Interaction =
-export interface Interaction
+export var Interaction =
+// export interface Interaction
 {
    //O ClickEvent: require('./ClickEvent'),
    ClickEvent: ClickEvent,

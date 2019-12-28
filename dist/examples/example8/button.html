@@ -31,7 +31,7 @@
         }
         window.addEventListener("resize", resizeFunction);
         resizeFunction();
-        PIXI.loader.add('../UISprites.json').load(function () {
+        PIXI.Loader.shared.add('../UISprites.json').load(function () {
             init();
         });
 

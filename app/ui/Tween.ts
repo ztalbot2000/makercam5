@@ -862,7 +862,7 @@ export class Tween
    };
 
    //O set: function( obj, params )
-   private set = ( obj: any, params: INameToValueMap ): void  =>
+   public set = ( obj: any, params: INameToValueMap ): void  =>
    {
       //O var object = getObject( obj );
       let tweenObject = this.getTweenObject( obj );

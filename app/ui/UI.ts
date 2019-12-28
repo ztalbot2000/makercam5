@@ -13,7 +13,7 @@ import { TilingSprite } from './TilingSprite';
 //O SliceSprite: require('./SliceSprite');
 import { SliceSprite } from './SliceSprite';
 //O Slider: require('./Slider');
-// import { Slider } from './Slider';
+import { Slider } from './Slider';
 //O ScrollBar: require('./ScrollBar');
 // import { ScrollBar } from './ScrollBar';
 //O Text: require('./Text');
@@ -60,7 +60,7 @@ import  { Ticker } from './Ticker';
     //O SliceSprite: require('./SliceSprite'),
     SliceSprite: SliceSprite,
     //O Slider: require('./Slider'),
-    // Slider: Slider,
+    Slider: Slider,
     //O ScrollBar: require('./ScrollBar'),
     // ScrollBar: ScrollBar,
     //O Text: require('./Text'),
