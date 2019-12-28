@@ -1951,6 +1951,10 @@ export class UIBase extends PIXI.utils.EventEmitter
 
    //O pivot:
    //N Combine as PIXI has it
+   get pivot( ): PIXI.Point
+   {
+      return this.setting.pivot;
+   };
    set pivot( val: PIXI.Point )
    {
       //O this.setting.pivotX = val;
