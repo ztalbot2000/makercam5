@@ -19,7 +19,7 @@ export class Container extends UIBase
    public width: number;
    public height: number;
 
-   constructor( width: number, height: number )
+   constructor( width?: number, height?: number )
    {
       //O UIBase.call( this, width, height );
       super ( width, height );

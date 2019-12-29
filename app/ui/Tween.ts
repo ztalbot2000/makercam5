@@ -1,6 +1,7 @@
 import  { Helpers }  from './Helpers';
 
 import  { EaseBase }  from './Ease/EaseBase';
+import  { Ease }  from './Ease/Ease';
 
 interface INameToValueMap
 {
@@ -778,7 +779,7 @@ export class Tween
    };
 
    //O fromTo: function( obj, time, paramsFrom, paramsTo, ease )
-   public fromTo = ( obj: any, time: number, paramsFrom:INameToValueMap, paramsTo:INameToValueMap, ease:EaseBase ): void =>
+   public fromTo = ( obj: any, time: number, paramsFrom:INameToValueMap, paramsTo:INameToValueMap, ease:Ease): void =>
    {
       //O var object = getObject( obj );
       let tweenObject = this.getTweenObject( obj );

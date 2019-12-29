@@ -5,7 +5,7 @@ import { Container } from './Container';
 //O ScrollingContainer: require('./ScrollingContainer'),
 // import { ScrollingContainer } from './ScrollingContainer';
 //O SortableList: require('./SortableList');
-// import { SortableList } from './SortableList';
+import { SortableList } from './SortableList';
 //O Sprite: require('./Sprite');
 import { Sprite } from './Sprite';
 //O TilingSprite: require('./TilingSprite');
@@ -51,7 +51,7 @@ import  { Ticker } from './Ticker';
     //O ScrollingContainer: require('./ScrollingContainer'),
     // ScrollingContainer: ScrollingContainer,
     //O SortableList: require('./SortableList'),
-    // SortableList: SortableList,
+    SortableList: SortableList,
     // SortableList: require('./SortableList'),
     //O Sprite: require('./Sprite'),
     Sprite: Sprite,

@@ -93,6 +93,10 @@ export class UIBase extends PIXI.utils.EventEmitter
    protected containerStart: PIXI.Point;
    protected dragContext: UIBase;
 
+   public _sortListThenByValue: string;
+   public _sortListValue: string;
+   public _sortListRnd: number;
+
    constructor ( width?: number | string, height?: number | string )
    {
       //O PIXI.utils.EventEmitter.call( this );
