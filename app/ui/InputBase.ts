@@ -1,8 +1,8 @@
 //O var UIBase = require( './UIBase' );
 import { UIBase } from './UIBase';
 //O var InputController = require( './Interaction/InputController' );
-//N InputController is exported as an instance
-import { inputController } from './Interaction/InputController';
+//N No brackets, imports the default created InputController Instance from new.
+import InputController from './Interaction/InputController';
 //O var ClickEvent = require( './Interaction/ClickEvent' );
 
 // base object for all Input type objects
@@ -48,7 +48,7 @@ export class InputBase extends UIBase
       this.container.interactive = true;
       //O InputController.registrer( this, tabIndex, tabGroup );
       //N InputController is exported as an instance
-      inputController.registrer( this, tabIndex, tabGroup );
+      InputController.registrer( this, tabIndex, tabGroup );
 
       //O this.container.on( "pointerupoutside", function( e )
       this.container.on( "pointerupoutside", this.pointerUpOutside);
@@ -73,8 +73,8 @@ export class InputBase extends UIBase
          if ( this.context._useTab )
          {
             //O InputController.fireTab( );
-            //N ImportController is exported as an instance
-            inputController.fireTab( );
+            //N InputController is exported as an instance
+            InputController.fireTab( );
             //O e.preventDefault( );
             e.preventDefault( );
          }
@@ -86,8 +86,8 @@ export class InputBase extends UIBase
          if ( this.context._usePrev )
          {
             //O InputController.firePrev( );
-            //N ImportController is exported as an instance
-            inputController.firePrev( );
+            //N InputController is exported as an instance
+            InputController.firePrev( );
             //O e.preventDefault( );
             e.preventDefault( );
          }
@@ -99,8 +99,8 @@ export class InputBase extends UIBase
          if ( this.context._useNext )
          {
             //O InputController.fireNext( );
-            //N ImportController is exported as an instance
-            inputController.fireNext( );
+            //N InputController is exported as an instance
+            InputController.fireNext( );
             //O e.preventDefault( );
             e.preventDefault( );
          }
@@ -200,8 +200,8 @@ export class InputBase extends UIBase
          //O this._bindEvents( );
          this._bindEvents( );
          //O InputController.set( this );
-         //N ImportController is exported as an instance
-         inputController.set( this );
+         //N InputController is exported as an instance
+         InputController.set( this );
          //O this.emit( "focusChanged", true );
          this.emit( "focusChanged", true );
          //O this.emit( "focus" );
@@ -217,8 +217,8 @@ export class InputBase extends UIBase
       if ( this._focused )
       {
          //O InputController.clear( );
-         //N ImportController is exported as an instance
-         inputController.clear( );
+         //N InputController is exported as an instance
+         InputController.clear( );
          //O this._focused = false;
          this._focused = false;
          //O this._clearEvents( );

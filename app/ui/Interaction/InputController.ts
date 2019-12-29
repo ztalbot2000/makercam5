@@ -241,8 +241,7 @@ export class InputController
    }
 };
 
-let inputController = new InputController();
-
-export { inputController };
+//N exported name cannot be same as class name, so export instance as default
+export default new InputController();
 
 //O module.exports = InputController;

@@ -5,7 +5,8 @@ import { DragEvent } from './DragEvent';
 //O MouseScrollEvent: require('./MouseScrollEvent'),
 import { MouseScrollEvent } from './MouseScrollEvent';
 //O InputController: require('./InputController')
-import { InputController } from './InputController';
+//N No brackets, imports the default created InputController instance from new.
+import InputController from './InputController';
 
 
 
