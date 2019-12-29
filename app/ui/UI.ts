@@ -29,8 +29,10 @@ import { DynamicTextStyle } from './DynamicText/DynamicTextStyle';
 //O helpers = require('./Helpers');
 import { Helpers } from './Helpers';
 //O tween = require('./Tween');
-import { Tween } from './Tween';
+//N No brackets, imports the default created Tween Instance from new.
+import Tween from './Tween';
 //O ease = require('./Ease/Ease');
+//N No brackets, imports the default created Ease Instance from new.
 import  Ease  from './Ease/Ease';
 //O interaction = require('./Interaction/Interaction');
 import { Interaction } from './Interaction/Interaction';
@@ -40,8 +42,7 @@ import  { UIBase } from './UIBase';
 import  { Ticker } from './Ticker';
 
 //O var UI =
- export var UI =
-//export interface UI
+export var UI =
 {
 
     //O Stage: require('./Stage'),
@@ -86,8 +87,7 @@ import  { Ticker } from './Ticker';
     Base: UIBase,
     //O Ticker: require('./Ticker').shared,
     //Hmmm Fixme?  FixMe fixMe fixme. Needs to be Ticker.shared ????
-    Ticker: Ticker,
+    Ticker: Ticker.shared,
 };
 
 //O module.exports = UI;
-// module.exports = UI;
