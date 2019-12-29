@@ -44,7 +44,7 @@ interface INameToValueMap
 export class Slider extends UIBase
 {
    //O this._amt = 0;
-   private _amt: number;
+   protected _amt: number;
    //O this._disabled = false;
    private _disabled: boolean;
 
@@ -52,7 +52,7 @@ export class Slider extends UIBase
    //O this.track = options.track;
    private track: SliceSprite;
    //O this.handle = options.handle;
-   private handle: SliceSprite;
+   protected handle: SliceSprite;
    //O this.fill = options.fill || null;
    private fill: SliceSprite;
    //O this._minValue = options.minValue || 0;
@@ -60,13 +60,13 @@ export class Slider extends UIBase
    //O this._maxValue = options.maxValue || 100;
    private _maxValue: number;
    //O this.decimals = options.decimals || 0;
-   private decimals: number;
+   protected decimals: number;
    //O this.vertical = options.vertical || false;
-   private vertical: boolean;
+   protected vertical: boolean;
    //O this._onValueChange = options.onValueChange || null;
-   private _onValueChange: Function;
+   protected _onValueChange: Function;
    //O this._onValueChanging = options.onValueChanging || null;
-   private _onValueChanging: Function;
+   protected _onValueChanging: Function;
 
    //N Keep track of drag event
    private _dragEventID: number;

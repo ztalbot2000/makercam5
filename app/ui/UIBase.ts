@@ -726,12 +726,12 @@ export class UIBase extends PIXI.utils.EventEmitter
    public removeChild ( UIObject: UIBase ): void
    {
       //O var argumentLenght = arguments.length;
-      let argumentLenght = arguments.length;
+      let argumentsLength = arguments.length;
       //O if ( argumentLenght > 1 )
-      if ( argumentLenght > 1 )
+      if ( argumentsLength > 1 )
       {
          //O for ( var i = 0; i < argumentLenght; i++ )
-         for ( let i = 0; i < argumentLenght; i++ )
+         for ( let i = 0; i < argumentsLength; i++ )
          {
             //O this.removeChild( arguments[ i ] );
             this.removeChild( arguments[ i ] );

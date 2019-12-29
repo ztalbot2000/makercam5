@@ -194,4 +194,5 @@ export class Ease
    }
 };
 
+//NC exported name cannot be same as class name, so export instance as default
 export default new Ease();

@@ -90,13 +90,13 @@ export class SortableList extends Container
    public removeChild<TChildren extends UIBase[]>(...children: TChildren): TChildren[0]
    {
       //O var argumentLenght = arguments.length;
-      let argumentLenght = children.length;
+      let argumentsLength = children.length;
 
       //O if ( arguments.length > 1 )
-      if ( argumentLenght > 1 )
+      if ( argumentsLength > 1 )
       {
          //O for ( let i = 0; i < arguments.length; i++ )
-         for ( let i = 0; i < argumentLenght; i++ )
+         for ( let i = 0; i < argumentsLength; i++ )
          {
             //O this.removeChild( arguments[ i ] );
             this.removeChild( children[ i ] );

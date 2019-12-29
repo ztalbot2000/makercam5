@@ -615,7 +615,7 @@ export class Tween
    }
 
    //O to: function( obj, time, params, ease )
-   public to = ( obj: any, time: number, params: INameToValueMap, ease: EaseBase ): void =>
+   public to = ( obj: any, time: number, params: INameToValueMap, ease?: EaseBase ): void =>
    {
       //O var object = getObject( obj );
       let tweenObject = this.getTweenObject( obj );
@@ -911,6 +911,7 @@ export class Tween
    }
 };
 
+//N exported name cannot be same as class name, so export instance as default
 export default new Tween();
 
 //O module.exports = Tween;

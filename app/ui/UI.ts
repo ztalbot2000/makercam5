@@ -3,7 +3,7 @@ import { Stage } from './Stage';
 //O container = require('./Container');
 import { Container } from './Container';
 //O ScrollingContainer: require('./ScrollingContainer'),
-// import { ScrollingContainer } from './ScrollingContainer';
+import { ScrollingContainer } from './ScrollingContainer';
 //O SortableList: require('./SortableList');
 import { SortableList } from './SortableList';
 //O Sprite: require('./Sprite');
@@ -15,7 +15,7 @@ import { SliceSprite } from './SliceSprite';
 //O Slider: require('./Slider');
 import { Slider } from './Slider';
 //O ScrollBar: require('./ScrollBar');
-// import { ScrollBar } from './ScrollBar';
+import { ScrollBar } from './ScrollBar';
 //O Text: require('./Text');
 import { Text } from './Text';
 //O dynamicText = require('./DynamicText/DynamicText');
@@ -49,10 +49,9 @@ import  { Ticker } from './Ticker';
     //O Container: require('./Container'),
     Container: Container,
     //O ScrollingContainer: require('./ScrollingContainer'),
-    // ScrollingContainer: ScrollingContainer,
+    ScrollingContainer: ScrollingContainer,
     //O SortableList: require('./SortableList'),
     SortableList: SortableList,
-    // SortableList: require('./SortableList'),
     //O Sprite: require('./Sprite'),
     Sprite: Sprite,
     //O TilingSprite: require('./TilingSprite'),
@@ -62,7 +61,7 @@ import  { Ticker } from './Ticker';
     //O Slider: require('./Slider'),
     Slider: Slider,
     //O ScrollBar: require('./ScrollBar'),
-    // ScrollBar: ScrollBar,
+    ScrollBar: ScrollBar,
     //O Text: require('./Text'),
     Text: Text,
     //O DynamicText: require('./DynamicText/DynamicText'),

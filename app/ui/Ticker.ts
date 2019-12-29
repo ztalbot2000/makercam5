@@ -149,7 +149,7 @@ export class Ticker extends PIXI.utils.EventEmitter
 }
 
 //O Ticker.shared = new Ticker(true);
-//N exported name cannot be same as class name
+//NC exported name cannot be same as class name, so export instance as default
 //let ticker = new Ticker(true);
 export default new Ticker(true);
 //O module.exports = Ticker;

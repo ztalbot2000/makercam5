@@ -79,12 +79,12 @@ export class Stage extends PIXI.Container
    addChild<TChildren extends UIBase[]>(...children: TChildren): TChildren[0]
    {
       //O var argumentLenght = arguments.length;
-      let argumentLenght = children.length;
+      let argumentsLength = children.length;
       //O if ( argumentLenght > 1 )
-      if ( argumentLenght > 1 )
+      if ( argumentsLength > 1 )
       {
          //O for ( var i = 0; i < argumentLenght; i++ )
-         for ( let i = 0; i < argumentLenght; i++ )
+         for ( let i = 0; i < argumentsLength; i++ )
          {
             //O this.addChild( arguments[ i ] );
             this.addChild( children[ i ] );
@@ -128,12 +128,12 @@ export class Stage extends PIXI.Container
    public removeChild<TChildren extends UIBase[]>(...children: TChildren): TChildren[0]
    {
       //O var argumentLenght = arguments.length;
-      let argumentLenght = children.length;
+      let argumentsLength = children.length;
       //O if ( argumentLenght > 1 )
-      if ( argumentLenght > 1 )
+      if ( argumentsLength > 1 )
       {
          //O for ( var i = 0; i < argumentLenght; i++ )
-         for ( let i = 0; i < argumentLenght; i++ )
+         for ( let i = 0; i < argumentsLength; i++ )
          {
             //O this.removeChild( arguments[ i ] );
             this.removeChild( children[ i ] );
