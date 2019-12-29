@@ -1,10 +1,9 @@
 //O var UIBase = require( './UIBase' );
 import { UIBase } from './UIBase';
 //O var InputController = require( './Interaction/InputController' );
-//N ImportController is exported as an instance
+//N InputController is exported as an instance
 import { inputController } from './Interaction/InputController';
 //O var ClickEvent = require( './Interaction/ClickEvent' );
-//import { ClickEvent } from './Interaction/ClickEvent';
 
 // base object for all Input type objects
 //
@@ -15,6 +14,7 @@ import { inputController } from './Interaction/InputController';
 // @param height {number} passed to uibase
 // @param tabIndex {(PIXI.UI.SliceSprite|PIXI.UI.Sprite)} will be used as background for input
 //
+
 //O function InputBase( width, height, tabIndex, tabGroup )
 export class InputBase extends UIBase
 {
@@ -27,13 +27,18 @@ export class InputBase extends UIBase
 
    protected __down: boolean;
 
+   //N keep track of mouseEvent and solve e not read
+   protected _mouseDownEventID: number;
+   protected _pointerDownEventID: number;
+
    constructor ( width: number, height: number, tabIndex: number, tabGroup: string )
    {
       //O UIBase.call( this, width, height );
+      //N call super instead of prototype contructor UIBase.call
       super( width, height );
 
       //O var self = this;
-      //New Changed self to context for clarity
+      //N Changed self to context for clarity
       this.context = this;
       //O this._focused = false;
       this._focused = false;
@@ -42,7 +47,7 @@ export class InputBase extends UIBase
       //O this.container.interactive = true;
       this.container.interactive = true;
       //O InputController.registrer( this, tabIndex, tabGroup );
-      //N ImportController is exported as an instance
+      //N InputController is exported as an instance
       inputController.registrer( this, tabIndex, tabGroup );
 
       //O this.container.on( "pointerupoutside", function( e )
@@ -103,10 +108,11 @@ export class InputBase extends UIBase
    };
 
    //O var documentMouseDown = function( e )
-   //N fix  'e' is declared but its value is never read.
-   //Hmmm would not even take an optional parameter
-   public documentMouseDown = ( ): void =>
+   public documentMouseDown = (e: PIXI.interaction.InteractionEvent ): void =>
    {
+      //N keep track of mouseEvent and solve e not read
+      this._mouseDownEventID = e.data.identifier;
+
       //O if ( !self.__down )
       if ( !this.context.__down )
       {
@@ -116,10 +122,11 @@ export class InputBase extends UIBase
    };
 
    //O this.container.on( "pointerdown", function( e )
-   //N fix  'e' is declared but its value is never read.
-   //Hmmm would not even take an optional parameter
-   public pointerDown = ( ): void =>
+   public pointerDown = (e: PIXI.interaction.InteractionEvent ): void =>
    {
+      //N keep track of pointerDownEvent and solve e not read
+      this._pointerDownEventID = e.data.identifier;
+
       //O self.focus( );
       this.context.focus( );
       //O self.__down = true;
@@ -127,24 +134,34 @@ export class InputBase extends UIBase
    };
 
    //O this.container.on( "pointerup", function( e )
-   //N fix  'e' is declared but its value is never read.
-   //Hmmm would not even take an optional parameter
-   public pointerUp = ( ): void =>
+   public pointerUp = (e: PIXI.interaction.InteractionEvent ): void =>
    {
+      //N keep track of pointerDownEvent and solve e not read
+      if (this._pointerDownEventID != e.data.identifier)
+      {
+         //Hmmm not sure about this
+         // return
+      }
+
       //O self.__down = false;
       this.context.__down = false;
    };
 
    //O this.container.on( "pointerupoutside", function( e )
-   //N fix  'e' is declared but its value is never read.
-   //Hmmm would not even take an optional parameter
-   public pointerUpOutside = ( ): void =>
+   public pointerUpOutside = (e: PIXI.interaction.InteractionEvent ): void =>
    {
+      //N keep track of pointerDownEvent and solve e not read
+      if (this._pointerDownEventID != e.data.identifier)
+      {
+         //Hmmm not sure about this
+         // return
+      }
+
       //O self.__down = false;
       this.context.__down = false;
    };
 
-   //O //var cancelFocusEvent = new ClickEvent(this.stage)
+   //O // var cancelFocusEvent = new ClickEvent(this.stage)
 
    //O this._bindEvents = function( )
    public _bindEvents = ( ): void =>

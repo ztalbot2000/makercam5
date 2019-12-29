@@ -3,17 +3,18 @@ import { UIBase } from './UIBase';
 
 import * as PIXI from 'pixi.js';
 
-/**
- * A sliced sprite with dynamic width and height.
- *
- * @class
- * @memberof PIXI.UI
- * @param Texture {PIXI.Texture} the texture for this SliceSprite
- * @param BorderWidth {Number} Width of the sprite borders
- * @param horizontalSlice {Boolean} Slice the sprite horizontically
- * @param verticalSlice {Boolean} Slice the sprite vertically
- * @param [tile=false] {Boolean} tile or streach
- */
+//
+// A sliced sprite with dynamic width and height.
+//
+// @class
+// @memberof PIXI.UI
+// @param Texture {PIXI.Texture} the texture for this SliceSprite
+// @param BorderWidth {Number} Width of the sprite borders
+// @param horizontalSlice {Boolean} Slice the sprite horizontically
+// @param verticalSlice {Boolean} Slice the sprite vertically
+// @param [tile=false] {Boolean} tile or streach
+//
+
 //O function SliceSprite( texture, borderWidth, horizontalSlice, verticalSlice, tile )
 export class SliceSprite extends UIBase
 {
@@ -36,6 +37,7 @@ export class SliceSprite extends UIBase
    constructor ( texture: PIXI.Texture, borderWidth: number, horizontalSlice: boolean, verticalSlice: boolean, tile: boolean)
    {
       //O UIBase.call( this, texture.width, texture.height );
+      //N call super instead of UIBase constructor
       super( texture.width, texture.height );
 
       //O var ftl, ftr, fbl, fbr, ft, fb, fl, fr, ff, stl, str, sbl, sbr, st, sb, sl, sr, sf,
@@ -56,7 +58,7 @@ export class SliceSprite extends UIBase
       //O if ( vs ) this.setting.minHeight = borderWidth * 2;
       if ( this.vs ) this.setting.minHeight = borderWidth * 2;
 
-      //New tile was not saved
+      //N tile was not saved
       this.tile = tile;
    }
 
@@ -99,10 +101,11 @@ export class SliceSprite extends UIBase
          this.fr = new PIXI.Rectangle( this.f.x + this.f.width - this.bw, this.f.y, this.bw, this.f.height );
          //O ff = new PIXI.Rectangle( f.x + bw, f.y, f.width - bw * 2, f.height );
          this.ff = new PIXI.Rectangle( this.f.x + this.bw, this.f.y, this.f.width - this.bw * 2, this.f.height );
-      }                                                     //vs
+      }
       //O else
       else
       {
+         //O // vs
          //O ft = new PIXI.Rectangle( f.x, f.y, f.width, bw );
          this.ft = new PIXI.Rectangle( this.f.x, this.f.y, this.f.width, this.bw );
          //O fb = new PIXI.Rectangle( f.x, f.y + f.height - bw, f.width, bw );
@@ -111,10 +114,9 @@ export class SliceSprite extends UIBase
          this.ff = new PIXI.Rectangle( this.f.x, this.f.y + this.bw, this.f.width, this.f.height - this.bw * 2 );
       }
 
-      //O //TODO: swap frames if rotation
-      //TODO: swap frames if rotation
+      //O // TODO: swap frames if rotation
 
-      //O make sprites
+      //O // make sprites
       //O sf = tile ? new PIXI.TilingSprite( new PIXI.Texture( t, ff ) ) : new PIXI.Sprite( new PIXI.Texture( t, ff ) );
       this.sf = this.tile ? new PIXI.TilingSprite( new PIXI.Texture( this.t, this.ff ) ) : new PIXI.Sprite( new PIXI.Texture( this.t, this.ff ) );
       //O this.container.addChildAt( sf, 0 );
@@ -165,7 +167,7 @@ export class SliceSprite extends UIBase
          this.container.addChildAt( this.sb, 0 );
       }
 
-      //O set constant position and sizes
+      //O // set constant position and sizes
       //O if ( vs && hs ) st.x = sb.x = sl.y = sr.y = stl.width = str.width = sbl.width = sbr.width = stl.height = str.height = sbl.height = sbr.height = bw;
       if ( this.vs && this.hs ) this.st.x = this.sb.x = this.sl.y = this.sr.y = this.stl.width = this.str.width = this.sbl.width = this.sbr.width = this.stl.height = this.str.height = this.sbl.height = this.sbr.height = this.bw;
       //O if ( hs ) sf.x = sl.width = sr.width = bw;

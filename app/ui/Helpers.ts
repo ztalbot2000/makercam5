@@ -1,11 +1,11 @@
 ﻿//O var Helpers =
 export class Helpers
 {
-   // lerp stands for linear interpolation (A method of curve fitting).
-   // It means that the value will change from your from value to your
-   // to value over t. The t parameter is set within a range of 0 to 1,
-   // 0 being your from value, 1 being your to value.
-   // Therefore, 0.5 will be halfway between
+   //NC lerp stands for linear interpolation (A method of curve fitting).
+   //NC It means that the value will change from your from value to your
+   //NC to value over t. The t parameter is set within a range of 0 to 1,
+   //NC 0 being your from value, 1 being your to value.
+   //NC Therefore, 0.5 will be halfway between
 
    //O Lerp: function (start, stop, amt)
    //Hmmm Possibly change callers to mathf.lerp ???
@@ -73,7 +73,7 @@ export class Helpers
 
       //N at this point Typescript thinks hex is a string type
 
-      // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+      //O // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
       //O let shorthandRegex: RegExp  = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
       let shorthandRegex: RegExp  = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
 
@@ -98,3 +98,5 @@ export class Helpers
       } : null;
    }
 };
+
+//O module.exports = Helpers;

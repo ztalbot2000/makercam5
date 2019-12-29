@@ -93,7 +93,7 @@ export class Stage extends PIXI.Container
       //O else
       else
       {
-         //New for proper typing
+         //N For proper typing
          let child = children[0];
 
          //O if ( UIObject.parent !== null )
@@ -141,7 +141,7 @@ export class Stage extends PIXI.Container
       }
       else
       {
-         //New for proper typing
+         //N For proper typing
          let child = children[0];
 
          //O PIXI.Container.prototype.removeChild.call( this, UIObject.container );
@@ -243,7 +243,7 @@ export class Stage extends PIXI.Container
    }
 
    //O Object.defineProperties( Stage.prototype,
-   //O _width:
+   //O // _width:
    get _width( ) : number | string   // must have same type
    {
       //O return this.__width;
@@ -262,7 +262,7 @@ export class Stage extends PIXI.Container
       }
    }
 
-   //O _height:
+   //O // _height:
    get _height( ): number | string
    {
       //O return this.__height;
@@ -272,6 +272,7 @@ export class Stage extends PIXI.Container
    set _height( val: number | string )
    {
       //O if ( !isNaN( val ) )
+      //N isNaN is not type safe
       if ( typeof val === 'number' )
       {
          //O this.__height = val;
@@ -282,8 +283,5 @@ export class Stage extends PIXI.Container
    }
 };
 //O Stage.prototype = Object.create( PIXI.Container.prototype );
-//N Also add PIXI.Container attributes to Stage
-//Stage.prototype = Object.create( PIXI.Container.prototype );
-
 //O Stage.prototype.constructor = Stage;
 //O module.exports = Stage;

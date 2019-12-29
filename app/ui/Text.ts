@@ -10,6 +10,7 @@ import { UIBase } from './UIBase';
 // @param Text {String} Text content
 // @param TextStyle {PIXI.TextStyle} Style used for the Text
 //
+
 //O function Text( text, PIXITextStyle )
 export class Text extends UIBase
 {
@@ -24,6 +25,7 @@ export class Text extends UIBase
       this._text = new PIXI.Text( text, PIXITextStyle );
 
       //O UIBase.call( this, this._text.width, this._text.height );
+      //N call super instead of UIBase prototype constructor
       super(this._text.width, this._text.height);
 
       //O this.container.addChild( this._text );
@@ -34,7 +36,7 @@ export class Text extends UIBase
    //O this.baseupdate = function( )
    public baseupdate = ( ): void =>
    {
-      //O force original text width unless using anchors
+      //O // force original text width unless using anchors
       //O if ( this._anchorLeft === null || this._anchorRight === null )
       if ( this._anchorLeft === null || this._anchorRight === null )
       {
@@ -50,7 +52,7 @@ export class Text extends UIBase
          this._text.width = this._width;
       }
 
-      //O force original text height unless using anchors
+      //O // force original text height unless using anchors
       //O if ( this._anchorTop === null || this._anchorBottom === null )
       if ( this._anchorTop === null || this._anchorBottom === null )
       {
@@ -81,7 +83,7 @@ export class Text extends UIBase
          this._text.tint = this.tint;
       }
 
-      //O set blendmode
+      //O // set blendmode
       //O if ( this.blendMode !== null )
       if ( this.blendMode !== null )
       {
@@ -91,7 +93,7 @@ export class Text extends UIBase
    };
 
    //O Object.defineProperties( Text.prototype,
-   //O value:
+   //O // value:
    //O get: function( )
    get  value ( ): string
    {
@@ -107,16 +109,16 @@ export class Text extends UIBase
       this.updatesettings( true );
    }
 
-   //O text:
+   //O // text:
    //O get: function( ): PIXI.Text
-   //New I believe this is what is wanted
+   //N I believe this is what is wanted
    get text ( ): PIXI.Text
    {
       //O return this.value;
       return this._text;
    }
    //O set: function( val )
-   //New I believe this is what is wanted
+   //N I believe this is what is wanted
    set text ( val: PIXI.Text )
    {
       //O this.value = val;
@@ -127,4 +129,3 @@ export class Text extends UIBase
 //O Text.prototype = Object.create( UIBase.prototype );
 //O Text.prototype.constructor = Text;
 //O module.exports = Text;
-

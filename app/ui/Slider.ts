@@ -14,6 +14,7 @@ import Ease from './Ease/Ease';
 //O var Helpers = require( './Helpers' );
 import { Helpers } from './Helpers';
 
+//N imported SliceSprite as it was needed
 import { SliceSprite } from './SliceSprite';
 
 interface INameToValueMap
@@ -48,7 +49,7 @@ export class Slider extends UIBase
    //O this._disabled = false;
    private _disabled: boolean;
 
-   //O set options
+   //O // set options
    //O this.track = options.track;
    private track: SliceSprite;
    //O this.handle = options.handle;
@@ -83,6 +84,7 @@ export class Slider extends UIBase
    constructor ( options: INameToValueMap )
    {
       //O UIBase.call( this );
+      //N call super instead of UIBase constructor
       super ( );
 
       //O this._amt = 0;
@@ -91,7 +93,6 @@ export class Slider extends UIBase
       this._disabled = false;
 
       //O //set options
-      //set options
       //O this.track = options.track;
       this.track = options.track;
       //O this.handle = options.handle;
@@ -153,7 +154,7 @@ export class Slider extends UIBase
          if ( this.fill ) this.fill.verticalAlign = "middle";
       }
 
-      //N maxPosition is never defined
+      //N dragMaxPosition is never defined
       this.dragMaxPosition = null;
       this.dragLocalMousePosition = null;
       this.dragStartValue = null;
@@ -161,6 +162,7 @@ export class Slider extends UIBase
       this._lastChanging = null;
    }
 
+   //O Slider.prototype.update = function( soft )
    public update = ( soft?: boolean ) =>
    {
       //O val handleSize;
@@ -264,7 +266,7 @@ export class Slider extends UIBase
       //O var startValue = 0;
       this.dragStartValue = 0;
 
-      //O Handle dragging
+      //O // Handle dragging
       //O var handleDrag = new DragEvent( this.handle );
       let handleDrag = new DragEvent( this.handle );
 
@@ -280,7 +282,7 @@ export class Slider extends UIBase
       //O handleDrag.onDragEnd = function( )
       handleDrag.onDragEnd = this.handleDragOnDragEnd;
 
-      //O Bar pressing/dragging
+      //O // Bar pressing/dragging
       //O var localMousePosition = new PIXI.Point( );
       this.dragLocalMousePosition = new PIXI.Point( );
       //O var trackDrag = new DragEvent( this.track );
@@ -360,17 +362,24 @@ export class Slider extends UIBase
 
    public trackDragOnPress = (event: PIXI.interaction.InteractionEvent, isPressed: boolean): void =>
    {
+      //O if (isPressed)
       if (isPressed)
+      {
+         //O this.updatePositionToMouse(event.data.global, true);
          this.updatePositionToMouse(event.data.global, true);
+      }
 
+      //O event.stopPropagation();
       event.stopPropagation();
    };
    public trackDragOnDragMove = (event: PIXI.interaction.InteractionEvent): void =>
    {
+      //O this.updatePositionToMouse(event.data.global, false);
       this.updatePositionToMouse(event.data.global, false);
    };
    public trackDragOnDragEnd = (): void =>
    {
+      //O this.triggerValueChange();
       this.triggerValueChange();
    };
 
@@ -381,6 +390,7 @@ export class Slider extends UIBase
       //O event.stopPropagation( );
       event.stopPropagation( );
    };
+
    //O handleDrag.onDragStart = function( event )
    //N event is not read and can be omitted
    public handleDragOnDragStart = ( event: PIXI.interaction.InteractionEvent): void =>
@@ -393,6 +403,7 @@ export class Slider extends UIBase
       //O maxPosition = self.vertical ? self._height - self.handle._height : self._width - self.handle._width;
       this.dragMaxPosition = this.context.vertical ? this.context._height - this.context.handle._height : this.context._width - this.context.handle._width;
    };
+
    //O handleDrag.onDragMove = function( event, offset )
    //N event is not read and can be omitted
    public handleDragOnDragMove = ( event: PIXI.interaction.InteractionEvent, offset: PIXI.Point ): void =>
@@ -412,6 +423,7 @@ export class Slider extends UIBase
       //O self.update( );
       this.context.update( );
    };
+
    //O handleDrag.onDragEnd = function( )
    public handleDragOnDragEnd = ( ): void =>
    {
@@ -422,7 +434,7 @@ export class Slider extends UIBase
    };
 
    //O Object.defineProperties( Slider.prototype,
-   //O value:
+   //O // value:
    //O get: function( )
    get value( ): number
    {
@@ -451,7 +463,7 @@ export class Slider extends UIBase
       this.update( );
    };
 
-   //O onValueChange:
+   //O // onValueChange:
    //O get: function( )
    get onValueChange( ): Function
    {
@@ -465,7 +477,7 @@ export class Slider extends UIBase
       this._onValueChange = val;
    };
 
-   //O onValueChanging:
+   //O // onValueChanging:
    //O get: function( )
    get onValueChanging( ): Function
    {
@@ -479,7 +491,7 @@ export class Slider extends UIBase
       this._onValueChanging = val;
    };
 
-   //O minValue:
+   //O // minValue:
    //O get: function( )
    get minValue( ): number
    {
@@ -495,7 +507,7 @@ export class Slider extends UIBase
       this.update( );
    };
 
-   //O maxValue:
+   //O // maxValue:
    //O get: function( )
    get maxValue( ): number
    {
@@ -511,7 +523,7 @@ export class Slider extends UIBase
       this.update( );
    };
  
-   //O disabled:
+   //O // disabled:
    //O get: function( )
    get disabled( ): boolean
    {
@@ -538,6 +550,5 @@ export class Slider extends UIBase
 
 //O Slider.prototype = Object.create( UIBase.prototype );
 //O Slider.prototype.constructor = Slider;
-//O module.exports = Slider;
-
 //O Slider.prototype.update = function( soft )
+//O module.exports = Slider;

@@ -71,10 +71,11 @@ export class DragDropController
    //O getEventItem: function( event, group )
    public getEventItem = ( event: PIXI.interaction.InteractionEvent, group: any ) =>
    {
-      //O var item = null,
+      //O var item = null;
       let item = null;
-      //O index, id = event.data.identifier;
+      //O var index;
       let index = null;
+      //O var id = event.data.identifier;
       let id = event.data.identifier;
 
       //O for ( var i = 0; i < _items.length; i++ )

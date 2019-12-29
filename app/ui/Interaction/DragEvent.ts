@@ -94,8 +94,10 @@ export class DragEvent extends PIXI.interaction.InteractionEvent
    {
       //O if ( event.data.identifier !== id )
       if ( event.data.identifier !== this.id )
+      {
          //O return;
          return;
+      }
 
       //O mouse.copy( event.data.global );
       this.mouse.copyTo( event.data.global );
@@ -115,6 +117,7 @@ export class DragEvent extends PIXI.interaction.InteractionEvent
             //O return;
             return;
          }
+
          //O if ( obj.dragRestrictAxis !== null )
          if ( this.objO.dragRestrictAxis !== null )
          {

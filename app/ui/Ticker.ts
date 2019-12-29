@@ -23,13 +23,13 @@ export class Ticker extends PIXI.utils.EventEmitter
 
    constructor (autoStart?: boolean)
    {
+      // PIXI.utils.EventEmitter.call(this);
       super();
 
       //O this._disabled = true;
       this._disabled = true;
       if ( ! Ticker.shared )
       {
-
          //O this._now = 0;
          this._now = 0;
 

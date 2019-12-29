@@ -1,11 +1,13 @@
 //import { Container } from './Container';
 import { UIBase } from './UIBase';
-/**
- * Settings object for all UIObjects
- *
- * @class
- * @memberof PIXI.UI
- */
+
+//
+// Settings object for all UIObjects
+//
+// @class
+// @memberof PIXI.UI
+//
+
 export class UISettings
 {
    //O this.width = 0;
@@ -74,10 +76,10 @@ export class UISettings
    //N Combine as PIXI has it
    scale: PIXI.Point = new PIXI.Point(1, 1);
 
-   // holds strings of 'middle' 'bottom'
+   //NC holds strings of 'middle' 'bottom'
    //O verticalAlign = null;
    verticalAlign: string = null;
-   // holds strings of 'right' 'left' 'center'
+   //NC holds strings of 'right' 'left' 'center'
    //O horizontalAlign = null;
    horizontalAlign: string = null;
    //O rotation = null;
@@ -109,5 +111,6 @@ export class UISettings
    droppableReparent: UIBase = null;
    //O dropGroup = null;
    dropGroup: string = null;
-
 }
+
+//O module.exports = UISettings;

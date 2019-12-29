@@ -23,6 +23,7 @@ interface INameToValueMap
 // @param tweenTime {Number} if above 0 the sort will be animated
 // @param tweenEase {PIXI.UI.Ease} ease method used for animation
 //
+
 //O function SortableList( desc, tweenTime, tweenEase )
 export class SortableList extends Container
 {
@@ -105,7 +106,7 @@ export class SortableList extends Container
       //O else
       else
       {
-         //New for proper typing
+         //N For proper typing
          let child = children[0];
 
          //O Container.prototype.removeChild.call( this, UIObject );
@@ -236,8 +237,8 @@ export class SortableList extends Container
          }
       }
 
-      //O force it to update parents when sort animation
-      //O is done (prevent scrolling container bug)
+      //O // force it to update parents when sort animation
+      //O // is done (prevent scrolling container bug)
       //O if ( this.tweenTime > 0 )
       if ( this.tweenTime > 0 )
       {

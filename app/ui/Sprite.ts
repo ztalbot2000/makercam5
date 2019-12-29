@@ -9,6 +9,7 @@ import { UIBase } from './UIBase';
 // @memberof PIXI.UI
 // @param Texture {PIXI.Texture} The texture for the sprite
 //
+
 //O function Sprite( t )
 export class Sprite extends UIBase
 {
@@ -23,13 +24,14 @@ export class Sprite extends UIBase
       this.sprite = new PIXI.Sprite( t );
 
       //O UIBase.call( this, this.sprite.width, this.sprite.height );
+      //N Call super instead of UIBase prototype
       super( this.sprite.width, this.sprite.height );
 
       //O this.container.addChild( this.sprite );
       this.container.addChild( this.sprite );
    }
 
-   //N  Use these to deprecate all the Texture from* methods
+   //N Use these to deprecate all the Texture from* methods
    //N function textureFrom(name, source, crossorigin, scaleMode)
             //N resourceOptions: {
             //N     mipmap:
@@ -98,6 +100,6 @@ export class Sprite extends UIBase
 
 //O Sprite.prototype = Object.create( UIBase.prototype );
 //O Sprite.prototype.constructor = Sprite;
+//O Sprite.fromFrame = function( frameId )
 //O module.exports = Sprite;
 
-//O Sprite.fromFrame = function( frameId )

@@ -26,7 +26,7 @@ export class ClickEvent
 
    constructor( obj: UIBase, includeHover: boolean, rightMouseButton: boolean, doubleClick: boolean )
    {
-      //New as obj is used by class methods
+      //N As obj is used by class methods
       this.objO = obj;
 
       //O var bound = false,
@@ -125,8 +125,10 @@ export class ClickEvent
    {
       //O if (event.data.identifier !== id)
       if ( event.data.identifier !== this.id )
+      {
          //O return;
          return;
+      }
 
       //O offset.set(event.data.global.x - this.mouse.x, event.data.global.y - this.mouse.y);
       this.offset.set( event.data.global.x - this.mouse.x, event.data.global.y - this.mouse.y );
@@ -158,8 +160,10 @@ export class ClickEvent
    {
       //O if (event.data.identifier !== id)
       if ( event.data.identifier !== this.id )
+      {
          //O return;
          return;
+      }
 
       //O _mouseUpAll(event);
       this._mouseUpAll( event );
@@ -261,13 +265,16 @@ export class ClickEvent
          //O bound = false;
          this.bound = false;
       }
+
       //O obj.container.removeListener(eventname_mousedown, _onMouseDown);
       this.objO.container.removeListener( this.eventname_mousedown, this._onMouseDown );
 
       //O if (!right)
       if ( ! this.right )
+      {
          //obj.container.removeListener('touchstart', _onMouseDown);
          this.objO.container.removeListener( 'touchstart', this._onMouseDown );
+      }
 
       //O if (hover)
       if ( this.hover )
@@ -291,8 +298,10 @@ export class ClickEvent
 
       //O if (!right)
       if ( ! this.right )
+      {
          //O obj.container.on('touchstart', _onMouseDown);
          this.objO.container.on( 'touchstart', this._onMouseDown );
+      }
 
       //O if (hover)
       if ( this.hover )

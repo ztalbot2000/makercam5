@@ -22,7 +22,9 @@ interface INameToValueMap
     [key: string]: any;
 }
 
+// For proper type checking of Point
 type Direction = 'x' | 'y';
+
 //
 // An UI Container object with expandMask hidden and possibility to enable scrolling
 //
@@ -40,6 +42,7 @@ type Direction = 'x' | 'y';
 // @param [options.overflowY=0] {Number} how much can be scrolled past content dimensions
 // @param [options.overflowX=0] {Number} how much can be scrolled past content dimensions
 //
+
 //O function ScrollingContainer( options )
 export class ScrollingContainer extends Container
 {
@@ -81,7 +84,6 @@ export class ScrollingContainer extends Container
    private boundCached = performance.now( ) - 1000;
 
    //NC Used but not defined
-   //In base class private containerStart: PIXI.Point;
    private targetPosition: PIXI.Point;
    private lastPosition: PIXI.Point;
    private Position: PIXI.Point;
@@ -104,6 +106,7 @@ export class ScrollingContainer extends Container
    constructor( options: INameToValueMap )
    {
       //O Container.call( this, options.width, options.height );
+      //N call super instead of UIBase constructor
       super( options.width, options.height );
 
       //O options = options || {};
@@ -262,7 +265,8 @@ export class ScrollingContainer extends Container
    //O ScrollingContainer.prototype.getInnerBounds = function( force )
    public getInnerBounds = ( force?: boolean ): PIXI.Rectangle =>
    {
-      //O this is a temporary fix, because we cant rely on innercontainer height if the children is positioned > 0 y.
+      //O // this is a temporary fix, because we cant rely on
+      //O // innercontainer height if the children is positioned > 0 y.
       //O if ( force || performance.now( ) - this.boundCached > 1000 )
       if ( force || performance.now( ) - this.boundCached > 1000 )
       {
@@ -313,7 +317,7 @@ export class ScrollingContainer extends Container
 
       //O this.updateDirection = function( direction, delta )
 
-      //O Drag scroll
+      //O // Drag scroll
       //O if ( this.dragScrolling )
       if ( this.dragScrolling )
       {
@@ -329,7 +333,7 @@ export class ScrollingContainer extends Container
          drag.onDragEnd = this.dragOnDragEnd;
       }
 
-      //O Mouse scroll
+      //O // Mouse scroll
       //O var scrollSpeed = new PIXI.Point( );
       this.scrollSpeed = new PIXI.Point( );
       //O var scroll = new MouseScrollEvent( this, true );
@@ -663,6 +667,5 @@ export class ScrollingContainer extends Container
 
 //O ScrollingContainer.prototype = Object.create( Container.prototype );
 //O ScrollingContainer.prototype.constructor = ScrollingContainer;
-//O module.exports = ScrollingContainer;
-
 //O ScrollingContainer.prototype.initialize = function( )
+//O module.exports = ScrollingContainer;

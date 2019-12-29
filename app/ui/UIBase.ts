@@ -42,17 +42,18 @@ export class UIBase extends PIXI.utils.EventEmitter
    //O this.dirty = true;
    private dirty: boolean;
    //O this._oldWidth = -1;
-   //New. Never referenced _oldWidth
+   //N Never referenced _oldWidth
    // private _oldWidth: number;
    //O this._oldHeight = -1;
-   //New. Never referenced _oldHeight
+   //N Never referenced _oldHeight
    // private _oldHeight: number;
    //O this.pixelPerfect = true;
    private pixelPerfect: boolean;
 
-   //O actual values
+   //O // actual values
    //O this._width = 0;
-   public _width: number;  // DynamicText uses it so it must be public
+   //NC DynamicText uses it so it must be public
+   public _width: number;
    //O this._height = 0;
    public _height: number;
    //O this._minWidth = null;
@@ -80,7 +81,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    //O this._bottom = null;
    private _bottom: number;
 
-   // Used for overriding positions if tweens is playing
+   //NC Used for overriding positions if tweens is playing
    //O this._dragPosition = null;
    private _dragPosition: PIXI.Point;
 
@@ -100,6 +101,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    constructor ( width?: number | string, height?: number | string )
    {
       //O PIXI.utils.EventEmitter.call( this );
+      //N call super instead of PIXI.utils.EventEmitter.call
       super();
 
       //O this.container = new PIXI.Container( );
@@ -121,16 +123,16 @@ export class UIBase extends PIXI.utils.EventEmitter
       //O this.dirty = true;
       this.dirty = true;
       //O this._oldWidth = -1;
-      //New. Never referenced _oldwidth
+      //N Never referenced _oldwidth
       //this._oldWidth = -1;
       //O this._oldHeight = -1;
-      //New. Never referenced _oldHeight
+      //N Never referenced _oldHeight
       // this._oldHeight = -1;
       //O this.pixelPerfect = true;
       this.pixelPerfect = true;
 
       //O if ( width && isNaN( width ) && width.indexOf( '%' ) != -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( width && typeof width === 'string'  && width.indexOf( '%' ) != -1 )
       {
          //O this.setting.widthPct = parseFloat( width.replace( '%', '' ) ) * 0.01;
@@ -143,7 +145,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
 
       //O if ( height && isNaN( height ) && height.indexOf( '%' ) != -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( height && typeof height === 'string' && height.indexOf( '%' ) != -1 )
       {
          //O this.setting.heightPct = parseFloat( height.replace( '%', '' ) ) * 0.01;
@@ -155,7 +157,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.heightPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( width && typeof width === 'number' )
       {
           //O this.setting.width = width || 0;
@@ -165,7 +167,7 @@ export class UIBase extends PIXI.utils.EventEmitter
           this.setting.width = 0;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( height && typeof height === 'number' )
       {
           //O this.setting.height = height || 0;
@@ -175,7 +177,7 @@ export class UIBase extends PIXI.utils.EventEmitter
           this.setting.height = 0;
       }
 
-      //O actual values
+      //O // actual values
       //O this._width = 0;
       this._width = 0;
       //O this._height = 0;
@@ -266,6 +268,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    //
 
    //O UIBase.prototype.update = function( ) {};
+   //N must be public
    public update = (): void => {};
 
    //
@@ -289,23 +292,23 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    };
 
-   /**
-    * Updates the UIObject with all base settings
-    *
-    * @private
-    */
+   //
+   // Updates the UIObject with all base settings
+   //
+   // @private
+   //
    //O UIBase.prototype.baseupdate = function( )
-   //New must be protected as it is called by Text
+   //N Must be protected as it is called by Text
    public baseupdate = ( ): void =>
    {
-      //O return if parent size didnt change
+      //O // return if parent size didnt change
       //O if ( this.parent !== null )
       if ( this.parent !== null )
       {
          //O var parentHeight, parentWidth;
          let parentHeight, parentWidth;
 
-         //O transform convertion (% etc)
+         //O // transform convertion (% etc)
          //O this.dirty = true;
          this.dirty = true;
          //O this._width = this.actual_width;
@@ -363,7 +366,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          //O if ( this.horizontalAlign === null )
          if ( this.horizontalAlign === null )
          {
-            //O get anchors (use left right if conflict)
+            //O // get anchors (use left right if conflict)
             //O if ( this._anchorLeft !== null && this._anchorRight === null && this._right !== null )
             if ( this._anchorLeft !== null && this._anchorRight === null && this._right !== null )
             {
@@ -443,7 +446,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          //O if ( this.verticalAlign === null )
          if ( this.verticalAlign === null )
          {
-            //O get anchors (use top bottom if conflict)
+            //O // get anchors (use top bottom if conflict)
             //O if ( this._anchorTop !== null && this._anchorBottom === null && this._bottom !== null )
             if ( this._anchorTop !== null && this._anchorBottom === null && this._bottom !== null )
             {
@@ -512,7 +515,7 @@ export class UIBase extends PIXI.utils.EventEmitter
             }
          }
 
-         //O min/max sizes
+         //O // min/max sizes
          //O if ( this._maxWidth !== null && this._width > this._maxWidth )
          if ( this._maxWidth !== null && this._width > this._maxWidth )
          {
@@ -541,7 +544,7 @@ export class UIBase extends PIXI.utils.EventEmitter
             this._height = this._minHeight;
          }
 
-         //O pure vertical/horizontal align
+         //O // pure vertical/horizontal align
          //O if ( this.horizontalAlign !== null )
          if ( this.horizontalAlign !== null )
          {
@@ -590,7 +593,7 @@ export class UIBase extends PIXI.utils.EventEmitter
             this.container.position.y += pivotYOffset;
          }
 
-         //O Unrestricted dragging
+         //O // Unrestricted dragging
          //O if ( this.dragging && !this.setting.dragRestricted )
          if ( this.dragging && !this.setting.dragRestricted )
          {
@@ -600,7 +603,7 @@ export class UIBase extends PIXI.utils.EventEmitter
             this.container.position.y = this._dragPosition.y;
          }
 
-         //O scale
+         //O // scale
          //O if ( this.setting.scaleX !== null )
          if ( this.setting.scale.x !== null )
          {
@@ -614,7 +617,7 @@ export class UIBase extends PIXI.utils.EventEmitter
             this.container.scale.y = this.setting.scale.y;
          }
 
-         //O pivot
+         //O // pivot
          //O if ( this.setting.pivotX !== null )
          if ( this.setting.pivot.x !== null )
          {
@@ -643,7 +646,7 @@ export class UIBase extends PIXI.utils.EventEmitter
             this.container.rotation = this.setting.rotation;
          }
 
-         //O make pixel perfect
+         //O // make pixel perfect
          //O if ( this.pixelPerfect )
          if ( this.pixelPerfect )
          {
@@ -758,8 +761,9 @@ export class UIBase extends PIXI.utils.EventEmitter
 
             //O // oldParent._recursivePostUpdateTransform();
             // oldParent._recursivePostUpdateTransform();
-            //O setTimeout( function( )                      //hack but cant get the transforms to update propertly otherwice?
-            setTimeout( function( )                      //hack but cant get the transforms to update propertly otherwice?
+            //O // hack but cant get the transforms to update propertly otherwice?
+            //O setTimeout( function( )
+            setTimeout( function( )
             {
                //O if ( oldUIParent.updatesettings )
                if ( oldUIParent.updatesettings )
@@ -779,8 +783,8 @@ export class UIBase extends PIXI.utils.EventEmitter
    //
 
    //O UIBase.prototype.initialize = function( )
-   //New cannot be private or protected. Typescript complains that
-   //    only an instance of SliceSprite can call it.
+   //N Cannot be private or protected. Typescript complains that
+   //  only an instance of SliceSprite can call it.
    public initialize = ( ): void =>
    {
       //O this.initialized = true;
@@ -893,7 +897,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    public onDragStart ( e: PIXI.interaction.InteractionEvent )
    {
       //O var added = DragDropController.add( this, e );
-      //N use our instance of DragDropController
+      //N Use our instance of DragDropController
       let added = this._dragDropController.add( this, e );
       //O if ( !this.dragging && added )
       if ( !this.dragging && added )
@@ -945,7 +949,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          //O Return to container after 0ms if not picked up by a droppable
          //O setTimeout( function( )
          let dragContext = this.dragContext;
-         //New
+         //N
          let _dragDropController = this._dragDropController;
          setTimeout( function( )
          {
@@ -975,6 +979,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
+   //O this.onDrop = function ( e )
    public onDrop ( event: PIXI.interaction.InteractionEvent )
    {
       //O var item = DragDropController.getEventItem( event, context.dropGroup );
@@ -1001,6 +1006,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
+   //O this.onDragMove ( e, offset )
    public onDragMove ( e: PIXI.interaction.InteractionEvent, offset: PIXI.Point )
    {
       //O if ( this.dragging )
@@ -1018,6 +1024,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    }
 
    //O Object.defineProperties  UIBase.prototype,
+   //O // x:
    get x(): number
    {
       //O return this.setting.left;
@@ -1030,7 +1037,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.left = val;
    }
 
-   //O y:
+   //O // y:
    get y(): number
    {
       //O return this.setting.top;
@@ -1043,7 +1050,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.top = val;
    }
 
-   //O width:
+   //O // width:
    get width(): number | string
    {
       //O return this.setting.width;
@@ -1065,7 +1072,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.widthPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.width = val;
@@ -1075,7 +1082,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_width:
+   //O // actual_width:
    get actual_width ( ): number
    {
       //O if ( this.dirty )
@@ -1097,7 +1104,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._width;
    }
 
-   //O height:
+   //O // height:
    get height( ): number | string
    {
       //O return this.setting.height;
@@ -1107,7 +1114,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set height( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.heightPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1119,7 +1126,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.heightPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.height = val;
@@ -1129,7 +1136,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_height:
+   //O // actual_height:
    get actual_height(): number
    {
       //O if ( this.dirty )
@@ -1151,7 +1158,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._height;
    }
 
-   //O minWidth:
+   //O // minWidth:
    get minWidth( ): number | string
    {
       //O return this.setting.minWidth;
@@ -1161,7 +1168,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set minWidth( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.minWidthPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1173,7 +1180,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.minWidthPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.minWidth = val;
@@ -1183,7 +1190,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_minWidth:
+   //O // actual_minWidth:
    get actual_minWidth( ): number
    {
       //O if ( this.dirty )
@@ -1204,7 +1211,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       //O return this._minWidth;
       return this._minWidth;
    }
-   //O minHeight:
+   //O // minHeight:
    get minHeight( ): number | string
    {
       //O return this.setting.minHeight;
@@ -1214,7 +1221,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set minHeight( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.minHeightPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1226,7 +1233,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.minHeightPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.minHeight = val;
@@ -1236,7 +1243,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_minHeight:
+   //O // actual_minHeight:
    get actual_minHeight( ): number
    {
       //O if ( this.dirty )
@@ -1258,7 +1265,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._minHeight;
    }
 
-   //O maxWidth:
+   //O // maxWidth:
    get maxWidth( ): number | string
    {
       //O return this.setting.maxWidth;
@@ -1268,7 +1275,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set maxWidth( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.maxWidthPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1280,7 +1287,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.maxWidthPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.maxWidth = val;
@@ -1290,7 +1297,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_maxWidth:
+   //O // actual_maxWidth:
    get actual_maxWidth ( ): number
    {
       //O if ( this.dirty )
@@ -1312,7 +1319,7 @@ export class UIBase extends PIXI.utils.EventEmitter
      return this._maxWidth;
    }
 
-   //O maxHeight:
+   //O // maxHeight:
    get maxHeight(): number | string
    {
       //O return this.setting.maxHeight;
@@ -1322,7 +1329,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set maxHeight( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.maxHeightPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1334,7 +1341,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.maxHeightPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.maxHeight = val;
@@ -1344,7 +1351,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_maxHeight:
+   //O // actual_maxHeight:
    get actual_maxHeight(): number
    {
       if ( this.dirty )
@@ -1365,7 +1372,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._maxHeight;
    }
 
-   //O anchorLeft:
+   //O // anchorLeft:
    get anchorLeft( ): number | string
    {
       return this.setting.anchorLeft;
@@ -1374,7 +1381,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set anchorLeft( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.anchorLeftPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1386,7 +1393,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.anchorLeftPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.anchorLeft = val;
@@ -1396,7 +1403,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_anchorLeft:
+   //O // actual_anchorLeft:
    get actual_anchorLeft(): number
    {
       if ( this.dirty )
@@ -1417,7 +1424,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._anchorLeft;
    }
 
-   //O anchorRight:
+   //O // anchorRight:
    get anchorRight(): number | string
    {
       //O return this.setting.anchorRight;
@@ -1427,7 +1434,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set anchorRight( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.anchorRightPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1439,7 +1446,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.anchorRightPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.anchorRight = val;
@@ -1449,7 +1456,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_anchorRight:
+   //O // actual_anchorRight:
    get actual_anchorRight(): number
    {
       //O if ( this.dirty )
@@ -1471,7 +1478,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._anchorRight;
    }
 
-   //O anchorTop:
+   //O // anchorTop:
    get anchorTop(): number | string
    {
       //O return this.setting.anchorTop;
@@ -1481,7 +1488,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set anchorTop( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.anchorTopPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1493,7 +1500,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.anchorTopPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.anchorTop = val;
@@ -1503,7 +1510,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_anchorTop:
+   //O // actual_anchorTop:
    get actual_anchorTop( ): number
    {
       //O if ( this.dirty )
@@ -1525,7 +1532,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._anchorTop;
    }
 
-   //O anchorBottom:
+   //O // anchorBottom:
    get anchorBottom( ): number | string
    {
       //O return this.setting.anchorBottom;
@@ -1535,7 +1542,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set anchorBottom ( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.anchorBottomPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1557,7 +1564,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_anchorBottom:
+   //O // actual_anchorBottom:
    get actual_anchorBottom ( ): number
    {
       //O if ( this.dirty )
@@ -1579,7 +1586,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._anchorBottom;
    }
 
-   //O left:
+   //O // left:
    get left ( ): number | string
    {
       //O return this.setting.left;
@@ -1589,7 +1596,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set left( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.leftPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1601,7 +1608,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.leftPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.left = val;
@@ -1611,7 +1618,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_left:
+   //O // actual_left:
    get actual_left ( ): number
    {
       //O if ( this.dirty )
@@ -1633,7 +1640,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._left;
    }
 
-   //O right:
+   //O // right:
    get right ( ): number | string
    {
       //O return this.setting.right;
@@ -1643,7 +1650,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set right( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.rightPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1655,7 +1662,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.rightPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.right = val;
@@ -1665,7 +1672,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_right:
+   //O // actual_right:
    get actual_right ( ): number
    {
       //O if ( this.dirty )
@@ -1687,7 +1694,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._right;
    }
 
-   //O top:
+   //O // top:
    get top ( ): number | string
    {
       //O return this.setting.top;
@@ -1697,7 +1704,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set top ( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string'  && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.topPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1709,7 +1716,7 @@ export class UIBase extends PIXI.utils.EventEmitter
          this.setting.topPct = null;
       }
 
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'number' )
       {
          //O this.setting.top = val;
@@ -1719,7 +1726,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_top:
+   //O // actual_top:
    get actual_top ( ): number
    {
       //O if ( this.dirty )
@@ -1741,7 +1748,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._top;
    }
 
-   //O bottom:
+   //O // bottom:
    get bottom ( ): number | string
    {
       //O return this.setting.bottom;
@@ -1751,7 +1758,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    set bottom( val: number | string )
    {
       //O if ( isNaN( val ) && val.indexOf( '%' ) !== -1 )
-      //New isNaN cannot be done on number
+      //N isNaN cannot be done on number
       if ( typeof val === 'string' && val.indexOf( '%' ) !== -1 )
       {
          //O this.setting.bottomPct = parseFloat( val.replace( '%', '' ) ) * 0.01;
@@ -1773,7 +1780,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O actual_bottom:
+   //O // actual_bottom:
    get actual_bottom( ): number
    {
       //O if ( this.dirty )
@@ -1795,7 +1802,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       return this._bottom;
    }
 
-   //O verticalAlign:
+   //O // verticalAlign:
    get verticalAlign( ): string              // holds strings of 'middle' 'bottom'
    {
       //O return this.setting.verticalAlign;
@@ -1810,7 +1817,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.baseupdate( );
    }
 
-   //O valign:
+   //O // valign:
    get valign( ): string                     // holds strings of 'middle' 'bottom'
    {
       //O return this.setting.verticalAlign;
@@ -1825,7 +1832,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.baseupdate( );
    }
 
-   //O horizontalAlign:
+   //O // horizontalAlign:
    get horizontalAlign( ): string            // holds strings of 'right' 'left' 'center'
    {
       //O return this.setting.horizontalAlign;
@@ -1840,7 +1847,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.baseupdate( );
    }
 
-   //O align:
+   //O // align:
    get align( ): string                      // holds strings of 'right' 'left' 'center'
    {
       //O return this.setting.horizontalAlign;
@@ -1855,7 +1862,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.baseupdate( );
    }
 
-   //O tint:
+   //O // tint:
    get tint( ): number
    {
       //O return this.setting.tint;
@@ -1870,7 +1877,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.update( );
    }
 
-   //O alpha:
+   //O // alpha:
    get alpha( ): number
    {
       //O return this.setting.alpha;
@@ -1885,7 +1892,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.container.alpha = val;
    }
 
-   //O rotation:
+   //O // rotation:
    get rotation( ): number
    {
       //O return this.setting.rotation;
@@ -1900,7 +1907,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.container.rotation = val;
    }
 
-   //O blendMode:
+   //O // blendMode:
    get blendMode( ): number
    {
       //O return this.setting.blendMode;
@@ -2006,7 +2013,7 @@ export class UIBase extends PIXI.utils.EventEmitter
    //   this.container.scale.y = val;
    //}
 
-   //O scale:
+   //O // scale:
    //O get scale( ): number
    //N Combine as PIXI has it
    get scale( ): PIXI.Point
@@ -2029,7 +2036,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       //this.container.scale.y = val;
    }
 
-   //O draggable:
+   //O // draggable:
    get draggable( ): boolean
    {
       //O return this.setting.draggable;
@@ -2057,7 +2064,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O dragRestricted:
+   //O // dragRestricted:
    get dragRestricted( ): boolean
    {
       //O return this.setting.dragRestricted;
@@ -2070,7 +2077,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.setting.dragRestricted = val;
    }
 
-   //O dragRestrictAxis:
+   //O // dragRestrictAxis:
    get dragRestrictAxis( ): string    // 'x' || 'y' for example
    {
       //O return this.setting.dragRestrictAxis;
@@ -2083,7 +2090,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.setting.dragRestrictAxis = val;
    }
 
-   //O dragThreshold:
+   //O // dragThreshold:
    get dragThreshold( ): number
    {
       //O return this.setting.dragThreshold;
@@ -2096,7 +2103,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.setting.dragThreshold = val;
    }
 
-   //O dragGroup:
+   //O // dragGroup:
    get dragGroup( ): string
    {
       //O return this.setting.dragGroup;
@@ -2109,7 +2116,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.setting.dragGroup = val;
    }
 
-   //O dragContainer:
+   //O // dragContainer:
    get dragContainer( ): PIXI.Container
    {
       //O return this.setting.dragContainer;
@@ -2122,7 +2129,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.setting.dragContainer = val;
    }
 
-   //O droppable:
+   //O // droppable:
    get droppable( ): boolean
    {
       //O return this.setting.droppable;
@@ -2150,7 +2157,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       }
    }
 
-   //O droppableReparent:
+   //O // droppableReparent:
    get droppableReparent( ): UIBase
    {
       //O return this.setting.droppableReparent;
@@ -2163,7 +2170,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.setting.droppableReparent = val;
    }
 
-   //O dropGroup:
+   //O // dropGroup:
    get dropGroup( ): string
    {
       //O return this.setting.dropGroup;
@@ -2176,7 +2183,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.setting.dropGroup = val;
    }
 
-   //O renderable:
+   //O // renderable:
    get renderable( ): boolean
    {
       //O return this.container.renderable;
@@ -2189,7 +2196,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.container.renderable = val;
    }
 
-   //O visible:
+   //O // visible:
    get visible( ): boolean
    {
       //O return this.container.visible;
@@ -2202,7 +2209,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.container.visible = val;
    }
 
-   //O cacheAsBitmap:
+   //O // cacheAsBitmap:
    get cacheAsBitmap( ): boolean
    {
       //O return this.container.cacheAsBitmap;
@@ -2215,7 +2222,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.container.cacheAsBitmap = val;
    }
 
-   //O onClick:
+   //O // onClick:
    get onClick( ): () => void
    {
       //O return this.container.click;
@@ -2230,13 +2237,13 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.click = val;
    }
 
-   //New PIXI.container does not have a function called click
+   //N PIXI.container does not have a function called click
    public click ()
    {
         this.emit("click");
    };
 
-   //O interactive:
+   //O // interactive:
    get interactive( ): boolean
    {
       //O return this.container.interactive;
@@ -2249,7 +2256,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.container.interactive = val;
    }
 
-   //O interactiveChildren:
+   //O // interactiveChildren:
    get interactiveChildren( ): boolean
    {
       //O return this.container.interactiveChildren;
@@ -2262,7 +2269,7 @@ export class UIBase extends PIXI.utils.EventEmitter
       this.container.interactiveChildren = val;
    }
 
-   //O parentLayer:
+   //O // parentLayer:
    //N parentLayer is Unused in project
    //get parentLayer( ): number
    //{
@@ -2279,9 +2286,6 @@ export class UIBase extends PIXI.utils.EventEmitter
 };
 
 //O UIBase.prototype = Object.create( PIXI.utils.EventEmitter.prototype );
-//N Add eventEmiter functionality to UIBase
-//UIBase.prototype = Object.create( PIXI.utils.EventEmitter.prototype );
-
 //O UIBase.prototype.constructor = UIBase;
 //O module.exports = UIBase;
 

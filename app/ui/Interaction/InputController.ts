@@ -30,7 +30,7 @@ export class InputController
    public registrer = ( item: INameToValueMap, tabIndex: number, tabGroup: string ) =>
    {
       //O var groupName = tabGroup || "default";
-      var groupName = tabGroup || "default";
+      let groupName = tabGroup || "default";
 
       //O var items = tabGroups[ groupName ];
       var items:any;
@@ -45,6 +45,7 @@ export class InputController
 
       //O var i = items.indexOf( item );
       let i = items.indexOf( item );
+
       //O if ( i === -1 )
       if ( i === -1 )
       {
@@ -194,10 +195,13 @@ export class InputController
       {
          //O var b = group[ val ];
          let b = group[ val ];
+
          //O if ( b !== cb )
          if ( b !== cb )
+         {
             //O b.checked = false;
             b.checked = false;
+         }
       }
       //O checkGroupValues[ cb.checkGroup ] = cb.value;
       this.checkGroupValues[ cb.checkGroup ] = cb.value;
@@ -208,8 +212,11 @@ export class InputController
    {
       //O if ( checkGroupValues[ name ] )
       if ( this.checkGroupValues[ name ] )
+      {
          //O return checkGroupValues[ name ];
          return this.checkGroupValues[ name ];
+      }
+
       //O return "";
       return "";
    }

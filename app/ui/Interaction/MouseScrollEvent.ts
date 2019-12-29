@@ -4,7 +4,7 @@ import { UIBase } from '../UIBase';
 //O var MouseScrollEvent = function( obj, preventDefault )
 export class MouseScrollEvent
 {
-   //New as obj is used by class methods
+   //N As obj is used by class methods
    private objO: UIBase;
 
    private preventDefault: boolean;
@@ -13,7 +13,7 @@ export class MouseScrollEvent
    private bound: boolean;
    //O delta = new PIXI.Point( ),
    private delta:PIXI.Point;
-   //New context was originally named self.
+   //N context was originally named self.
    //Hmm Change ClickEvent to Arrow functions would solve this
    //O self = this;
    public context: MouseScrollEvent;
@@ -31,7 +31,7 @@ export class MouseScrollEvent
       //Hmm. Change self to context fixes typescript compile
       this.context = this;
 
-      //New
+      //N
       this.preventDefault = preventDefault;
 
       //O obj.container.interactive = true;
@@ -152,4 +152,3 @@ export class MouseScrollEvent
 //O MouseScrollEvent.prototype.constructor = MouseScrollEvent;
 //O module.exports = MouseScrollEvent;
 // module.exports = MouseScrollEvent;
-

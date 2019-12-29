@@ -1,8 +1,8 @@
 ﻿import { EaseBase } from './EaseBase';
 import { ExponentialEase } from './ExponentialEase';
 
-// Map the various Ease functions to their exact names
-// See: https://www.typescriptlang.org/docs/handbook/advanced-types.html
+//NC Map the various Ease functions to their exact names
+//NC See: https://www.typescriptlang.org/docs/handbook/advanced-types.html
 interface EaseMap
 {
     easeIn: EaseBase;
@@ -111,7 +111,7 @@ export class Ease
           new ExponentialEase(4, 0, 1),
           new ExponentialEase(4, 1, 1));
 
-      //Bounce
+      //O // Bounce
       this.Bounce = {
         BounceIn: this.create(function (p: number): number {
            if ((p = 1 - p) < 1 / 2.75) {
@@ -153,7 +153,7 @@ export class Ease
         })
       };
 
-      //Circ
+      //O // Circ
       this.Circ = {
          CircIn: this.create(function (p: number): number {
              return -(Math.sqrt(1 - (p * p)) - 1);
@@ -166,7 +166,7 @@ export class Ease
          })
       };
 
-      //Expo
+      //O // Expo
       this.Expo = {
          ExpoIn: this.create(function (p: number): number {
             return Math.pow(2, 10 * (p - 1)) - 0.001;
@@ -179,7 +179,7 @@ export class Ease
          })
       };
  
-      //Sine
+      //O // Sine
       this.Sine = {
          SineIn: this.create(function (p: number): number {
             return -Math.cos(p * HALF_PI) + 1;
