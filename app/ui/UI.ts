@@ -31,7 +31,7 @@ import { Helpers } from './Helpers';
 //O tween = require('./Tween');
 import { Tween } from './Tween';
 //O ease = require('./Ease/Ease');
-import { Ease } from './Ease/Ease';
+import  Ease  from './Ease/Ease';
 //O interaction = require('./Interaction/Interaction');
 import { Interaction } from './Interaction/Interaction';
 //O Base = require('./UIBase';
