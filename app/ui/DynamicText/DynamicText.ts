@@ -49,12 +49,12 @@ export class DynamicText extends UIBase
    //O var autoHeight = !options.height;
    private autoHeight: boolean;
 
-   //O defaultstyle for this textobject
+   //O // defaultstyle for this textobject
    //O var defaultStyle = this._style = new DynamicTextStyle( this );
    private _style: DynamicTextStyle;
    private defaultStyle: DynamicTextStyle;
 
-   //O collection of all processed char
+   //O // collection of all processed char
    //O var chars = this.chars = [ ];
    private chars: Array<DynamicChar>; // missing xOffset. lineheight ...
    //private chars: Array<DynamicText>;
@@ -68,16 +68,16 @@ export class DynamicText extends UIBase
    //O this.container.addChild( charContainer );
    public container: PIXI.Container;
 
-   //O the input text
+   //O // the input text
    //O this._inputText = text;
    private _inputText: string;
 
-   //O list of rendered sprites (temp)
+   //O // list of rendered sprites (temp)
    //O var sprites = [ ];
    //N unused
    //private sprites = [ ];
 
-   //O states
+   //O // states
    //O var lastWidth = 0;
    public lastWidth: number;
    //O lastHeight = 0;
@@ -90,7 +90,7 @@ export class DynamicText extends UIBase
    //O this.dirtyRender = true;
    public dirtyRender: boolean;
 
-   //O dictionary for line data
+   //O // dictionary for line data
    //O var lineWidthData = [ ];
    private lineWidthData: Array<number>;
    //O var lineHeightData = [ ];
@@ -104,26 +104,26 @@ export class DynamicText extends UIBase
    //O var charCount = 0;
    private charCount: number;
 
-   //O ellipsis caches (not nessesary when no sprites)
+   //O // ellipsis caches (not nessesary when no sprites)
    //O var lineEllipsisData = [ ];
    private lineEllipsisData: Array<Array<DynamicChar>>;
    //O var lineHasEllipsis = [ ];
    private lineHasEllipsis: Array<boolean>;
 
-   //O DynamicText.settings =
+   //O // DynamicText.settings =
    //N A way to handle class constants
    public static readonly settings =
    {
       //O debugSpriteSheet: false,
       debugSpriteSheet: true,
 
-      //O force one font family for emojis so we dont rerender them multiple times
+      //O // force one font family for emojis so we dont rerender them multiple times
       //O defaultEmojiFont: "Segoe UI Emoji"
       defaultEmojiFont: "Segoe UI Emoji"
    };
 
 
-   //O PIXIUI update, lazy update (bad solution needs rewrite when converted to pixi plugin)
+   //O // PIXIUI update, lazy update (bad solution needs rewrite when converted to pixi plugin)
    //O this.lazyUpdate = null;
    private lazyUpdate:  ReturnType<typeof setTimeout>;
 
@@ -131,16 +131,17 @@ export class DynamicText extends UIBase
    //Hmmm changed self to context
    private context: DynamicText;
 
-   constructor( text: string, options?: INameToValueMap )
+   constructor( text: string, options: INameToValueMap = {"width":0, "height":0} )
    {
+
       //O UIBase.call( this, options.width || 0, options.height || 0 );
-      super(options.width || 0, options.height || 0);
+      super(options.width, options.height);
 
       //O options = options || {};
-      this.options = options || {};
+      this.options = options;
 
 
-      //O create atlas
+      //O // create atlas
       //O if ( atlas === null )
       if ( this.atlas === null )
       {
@@ -153,13 +154,13 @@ export class DynamicText extends UIBase
       //O var autoHeight = ! options.height;
       this.autoHeight = ! options.height;
 
-      //O defaultstyle for this textobject
+      //O // defaultstyle for this textobject
       //O var defaultStyle = this._style = new DynamicTextStyle( this );
       this.defaultStyle = this._style = new DynamicTextStyle( this );
       //O defaultStyle.merge( options.style );
       this.defaultStyle.merge( options.style );
 
-      //O collection of all processed char
+      //O // collection of all processed char
       //O var chars = this.chars = [ ];
       this.chars = this.chars = [ ];
       //O var renderChars = [ ];
@@ -171,16 +172,16 @@ export class DynamicText extends UIBase
       //O this.container.addChild( charContainer );
       this.container.addChild( this.charContainer );
 
-      //O the input text
+      //O // the input text
       //O this._inputText = text;
       this._inputText = text;
 
-      //O list of rendered sprites (temp)
+      //O // list of rendered sprites (temp)
       //O var sprites = [ ];
       //N unused
       // this.sprites = [ ];
 
-      //O states
+      //O // states
       //O var lastWidth = 0;
       this.lastWidth = 0;
       //O lastHeight = 0;
@@ -193,7 +194,7 @@ export class DynamicText extends UIBase
       //O this.dirtyRender = true;
       this.dirtyRender = true;
 
-      //O dictionary for line data
+      //O // dictionary for line data
       //O var lineWidthData = [ ];
       this.lineWidthData = [ ];
       //O var lineHeightData = [ ];
@@ -212,7 +213,7 @@ export class DynamicText extends UIBase
       //O var lineHasEllipsis = [ ];
       this.lineHasEllipsis = [ ];
 
-      //O PIXIUI update, lazy update (bad solution needs rewrite when converted to pixi plugin)
+      //O // PIXIUI update, lazy update (bad solution needs rewrite when converted to pixi plugin)
       //O this.lazyUpdate = null;
       this.lazyUpdate = null;
 
@@ -221,7 +222,7 @@ export class DynamicText extends UIBase
       this.context = this;
    }
 
-   //O ROUGH TEMP RENDER (with sprites)
+   //O // ROUGH TEMP RENDER (with sprites)
    //O this.render = function( )
    public render = ( ) =>
    {
@@ -267,7 +268,7 @@ export class DynamicText extends UIBase
          //O char = renderChars[ i ];
          char = this.renderChars[ i ];
 
-         //O get line data
+         //O // get line data
          //O if ( currentLine !== char.lineIndex )
          if ( currentLine !== char.lineIndex )
          {
@@ -307,7 +308,7 @@ export class DynamicText extends UIBase
             maxLineWidth = Math.max( lineWidth, maxLineWidth );
          }
 
-         //O no reason to render a blank space or 0x0 letters (no texture created)
+         //O // no reason to render a blank space or 0x0 letters (no texture created)
          //O if ( !char.data.texture || char.space || char.newline )
          if ( ! char.data.texture || char.space || char.newline )
          {
@@ -321,7 +322,7 @@ export class DynamicText extends UIBase
             continue;
          }
 
-         //O add new sprite
+         //O // add new sprite
          //O var tex = char.data.texture;
          var tex = char.data.texture;
          //O var sprite = spriteCache[ i ];
@@ -377,7 +378,7 @@ export class DynamicText extends UIBase
       }
    };
 
-   //O updates the renderChar array and position chars for render
+   //O // updates the renderChar array and position chars for render
    //O this.prepareForRender = function( )
    public prepareForRender = ( ) =>
    {
@@ -423,7 +424,7 @@ export class DynamicText extends UIBase
          //O style = char.style;
          prepStyle = char.style;
 
-         //O lineheight
+         //O // lineheight
          //O lineHeight = Math.max( lineHeight, defaultStyle.lineHeight || style.lineHeight || char.data.lineHeight );
          lineHeight = Math.max( lineHeight, this.defaultStyle.lineHeight || prepStyle.lineHeight || char.data.lineHeight );
 
@@ -443,7 +444,7 @@ export class DynamicText extends UIBase
             //O lineFull = false;
             lineFull = false;
 
-         //O set word index
+         //O // set word index
          //O if ( char.space || char.newline )
          if ( char.space || char.newline )
          {
@@ -457,15 +458,15 @@ export class DynamicText extends UIBase
             char.wordIndex = wordIndex;
          }
 
-         //O textheight
+         //O // textheight
          //O lineFontSize = Math.max( lineFontSize, style.fontSize );
          lineFontSize = Math.max( lineFontSize, prepStyle.fontSize );
 
-         //O lineindex
+         //O // lineindex
          //O char.lineIndex = lineIndex;
          char.lineIndex = lineIndex;
 
-         //O lineAlignment
+         //O // lineAlignment
          //O if ( style.align !== defaultStyle.align )
          if ( prepStyle.align !== this.defaultStyle.align )
          {
@@ -583,7 +584,7 @@ export class DynamicText extends UIBase
             }
          }
 
-         //O Update position and add to renderchars
+         //O // Update position and add to renderchars
          //O if ( ! lineFull )
          if ( ! lineFull )
          {
@@ -601,7 +602,7 @@ export class DynamicText extends UIBase
             renderIndex++;
          }
 
-         //O new line
+         //O // new line
          //O if ( forceNewline || char.newline || i === charCount - 1 )
          if ( forceNewline || char.newline || i === this.charCount - 1 )
          {
@@ -634,7 +635,7 @@ export class DynamicText extends UIBase
             //O lineAlignmentData[ lineIndex ] = lineAlignment;
             this.lineAlignmentData[ lineIndex ] = lineAlignment;
 
-            //O reset line vaules
+            //O // reset line vaules
             //O lineHeight = pos.x = lastSpaceLineWidth = lineFontSize = 0;
             lineHeight = pos.x = lastSpaceLineWidth = lineFontSize = 0;
             //O lineAlignment = defaultStyle.align;
@@ -681,7 +682,7 @@ export class DynamicText extends UIBase
          //O var emoji = false;
          let emoji = false;
 
-         //O Extract Tags
+         //O // Extract Tags
          //O if ( /(?:\r\n|\r|\n)/.test( c ) )
          if ( /(?:\r\n|\r|\n)/.test( c ) )
             //O newline = true;
@@ -842,8 +843,7 @@ export class DynamicText extends UIBase
          //O else
          else
          {
-            //O //detect emoji
-            //detect emoji
+            //O // detect emoji
             //O var emojiMatch = emojiRegex( ).exec( c );
             let emojiMatch = emojiRegex( ).exec( c );
             //O if ( emojiMatch !== null )
@@ -868,7 +868,7 @@ export class DynamicText extends UIBase
             }
          }
 
-         //O Prepare DynamicChar object
+         //O // Prepare DynamicChar object
          //O var char = chars[ charIndex ];
          let char:DynamicChar = this.chars[ charIndex ];
          //O if ( !char )
@@ -925,7 +925,7 @@ export class DynamicText extends UIBase
       this.context.lazyUpdate = setTimeout( () =>
       {
 
-         //O console.log("UPDATING TEXT");
+         //O // console.log("UPDATING TEXT");
          //O var dirtySize = !autoWidth && ( self._width != lastWidth || self._height != lastHeight || self.dirtyText );
          let dirtySize = ! this.autoWidth && ( this.context._width != this.lastWidth || this.context._height != this.lastHeight || this.context.dirtyText );
 
@@ -992,9 +992,9 @@ export class DynamicText extends UIBase
    };
    //O set: function( val )
    set text( val: string )
-      {
-         //O this.value = val;
-         this.value = val;
+   {
+      //O this.value = val;
+      this.value = val;
    };
    //O style:
    //O get: function( )
@@ -1005,17 +1005,17 @@ export class DynamicText extends UIBase
    };
    set style( val: DynamicTextStyle )
    {
-      //O get a clean default style
+      //O // get a clean default style
       //O var style = new DynamicTextStyle( this );
       //New Changed variable name for clarification
       var cleanStyle = new DynamicTextStyle( this );
 
-      //O //merge it with new style
+      //O // merge it with new style
       //merge it with new style
       //O style.merge( val );
       cleanStyle.merge( val );
 
-      //O merge it onto this default style
+      //O // merge it onto this default style
       //O this._style.merge( style );
       this._style.merge( cleanStyle );
 
@@ -1059,7 +1059,7 @@ class AtlasNode
       this.data = null;
 
       // New undefined
-     //this.w = w;
+      //this.w = w;
    }
 
    //O this.insert = function( width, height, obj )
@@ -1145,7 +1145,7 @@ class AtlasNode
 //O var DynamicAtlas = function( padding )
 class DynamicAtlas
 {
-   //O Atlas
+   //O // Atlas
    //O var metricsCanvas = document.createElement( "canvas" );
    //private metricsCanvas: Element;
    private metricsCanvas: HTMLCanvasElement;;
@@ -1203,7 +1203,7 @@ class DynamicAtlas
 
    constructor( padding: number)
    {
-      //O Atlas
+      //O // Atlas
       //O var metricsCanvas = document.createElement( "canvas" );
       this.metricsCanvas = document.createElement( "canvas" );
       //O var metricsContext = metricsCanvas.getContext( "2d" );
@@ -1287,7 +1287,7 @@ class DynamicAtlas
       //O objects = [ ];
       this.objects = [ ];
 
-      //O set new basetexture
+      //O // set new basetexture
       //O baseTexture = PIXI.BaseTexture.fromCanvas( canvas );
       //N BaseTexture.fromCanvas is Deprecated. Use BaseTexture.from with default options.
       this.baseTexture = PIXI.BaseTexture.from( this.canvas );
@@ -1299,7 +1299,7 @@ class DynamicAtlas
       //O baseTexture.update( );
       this.baseTexture.update( );
 
-      //O Debug Spritesheet
+      //O // Debug Spritesheet
       //O if ( DynamicText.settings.debugSpriteSheet )
       if ( DynamicText.settings.debugSpriteSheet )
       {
@@ -1356,7 +1356,7 @@ class DynamicAtlas
          this.fontFamilyCache[ font ] = familyCache;
       }
 
-      //O get char data
+      //O // get char data
       //O var key = style.ctxKey( char );
       let key = style.ctxKey( char );
       //O var obj = familyCache[ key ];
@@ -1364,7 +1364,7 @@ class DynamicAtlas
       //O if ( ! obj )
       if ( ! obj )
       {
-         //O create char object
+         //O // create char object
          //O var metrics = generateCharData( char, style );
          let metrics = this.generateCharData( char, style );
 
@@ -1382,7 +1382,7 @@ class DynamicAtlas
             }
          }
 
-         //O todo: cleanup when we know whats needed
+         //O // todo: cleanup when we know whats needed
          //O obj =
          obj =
          {
@@ -1407,16 +1407,16 @@ class DynamicAtlas
             //O _cache: metrics.canvas,
             _cache: metrics.canvas,
 
-            //O temp texture
+            //O // temp texture
             //O texture: metrics.rect ? new PIXI.Texture( baseTexture, metrics.rect ) : null
             texture: metrics.rect ? new PIXI.Texture( this.baseTexture, metrics.rect ) : null
          };
 
-         //O add to collections
+         //O // add to collections
          //O familyCache[ key ] = obj;
          familyCache[ key ] = obj;
 
-         //O add to atlas if visible char
+         //O // add to atlas if visible char
          //O if ( metrics.rect )
          if ( metrics.rect )
          {
@@ -1501,7 +1501,7 @@ class DynamicAtlas
          //O if ( node !== null )
          if ( node !== null )
          {
-            //O update basetexture if new canvas was created (temp)
+            //O // update basetexture if new canvas was created (temp)
             //O if ( _newcanvas )
             if ( _newcanvas )
             {
@@ -1514,7 +1514,7 @@ class DynamicAtlas
             continue;
          }
 
-         //O step one back (so it will be added after resize/new canvas)
+         //O // step one back (so it will be added after resize/new canvas)
          //O i--;
          i--;
 
@@ -1529,7 +1529,7 @@ class DynamicAtlas
             continue;
          }
 
-         //O close current spritesheet and make a new one
+         //O // close current spritesheet and make a new one
          //O drawObjects( objects, _resized );
          this.drawObjects( this.objects, _resized );
          //O addCanvas( );
@@ -1567,7 +1567,7 @@ class DynamicAtlas
       }
    };
 
-   //O convert shadow string to shadow data
+   //O // convert shadow string to shadow data
    //O var shadowData = function( str )
    public shadowData = ( str: string ): INameToValueMap =>
    {
@@ -1592,7 +1592,7 @@ class DynamicAtlas
       return rc;
    };
 
-   //O convert fill string to fill data
+   //O // convert fill string to fill data
    //O var fillData = function( str )
    public fillData = ( str: string ): INameToValueMap =>
    {
@@ -1618,7 +1618,7 @@ class DynamicAtlas
       return rc;
    };
 
-   //O create fill style from fill string
+   //O // create fill style from fill string
    //O var getFillStyle = function( str )
    public getFillStyle = ( str: string ): string =>
    {
@@ -1655,7 +1655,7 @@ class DynamicAtlas
             return fills[ 0 ].rgba ? fills[ 0 ].rgba : fills[ 0 ].color || "#FFFFFF";
          //O default:
          default:
-         //O make gradient
+         //O // make gradient
          //O try
          try
          {
@@ -1683,7 +1683,7 @@ class DynamicAtlas
       }
    };
 
-   //O function to draw shadows
+   //O // function to draw shadows
    //O var drawShadows = function( shadowString, stroke )
    //N Pass in char and style
    private drawShadows = ( char: string, style: DynamicTextStyle, shadowString: string, stroke: boolean ) : void =>
@@ -1742,7 +1742,7 @@ class DynamicAtlas
       //O lineHeight = fontSize * 1.25;
       this.lineHeight = this.fontSize * 1.25;
 
-      //O Start our returnobject
+      //O // Start our returnobject
       //O var data =
       var data: INameToValueMap;
       data =
@@ -1755,7 +1755,7 @@ class DynamicAtlas
          width: 0
       };
 
-      //O Return if newline
+      //O // Return if newline
       //O if ( !char || /(?:\r\n|\r|\n)/.test( char ) )
       if ( ! char || /(?:\r\n|\r|\n)/.test( char ) )
       {
@@ -1763,17 +1763,17 @@ class DynamicAtlas
          return data;
       }
 
-      //O Ctx font string
+      //O // Ctx font string
       //O var font = style.ctxFont( );
       let font = style.ctxFont( );
       //O metricsContext.font = font;
       this.metricsContext.font = font;
 
-      //O Get char width
+      //O // Get char width
       //O data.width = Math.round( metricsContext.measureText( char ).width );
       data.width = Math.round( this.metricsContext.measureText( char ).width );
 
-      //O Return if char = space
+      //O // Return if char = space
       //O if ( /(\s)/.test( char ) )
       if ( /(\s)/.test( char ) )
       {
@@ -1781,7 +1781,7 @@ class DynamicAtlas
          return data;
       }
 
-      //O set canvas size (with padding so we can messure)
+      //O // set canvas size (with padding so we can messure)
       //O var paddingY = Math.round( fontSize * 0.7 );
       this.paddingY = Math.round( this.fontSize * 0.7 );
       //O var paddingX = Math.max( 5, Math.round( fontSize * 0.7 ) );
@@ -1797,28 +1797,28 @@ class DynamicAtlas
       //O var baseline = ( h / 2 ) + ( paddingY * 0.5 );
       this.baseline = ( h / 2 ) + ( this.paddingY * 0.5 );
 
-      //O set font again after resize
+      //O // set font again after resize
       //O metricsContext.font = font;
       this.metricsContext.font = font;
 
-      //O make sure canvas is clean
+      //O // make sure canvas is clean
       //O metricsContext.clearRect( 0, 0, w, h );
       this.metricsContext.clearRect( 0, 0, w, h );
 
-      //O save clean state with font
+      //O // save clean state with font
       //O metricsContext.save( );
       this.metricsContext.save( );
 
-      //O draw text shadows
+      //O // draw text shadows
       //O if ( style.shadow.length )
       if ( style.shadow.length )
       {
          //O drawShadows( style.shadow, false );
-         //New pass in char and style
+         //NC pass in char and style
          this.drawShadows( char, style, style.shadow, false );
       }
 
-      //O draw stroke shadows
+      //O // draw stroke shadows
       //O if ( style.stroke && style.strokeShadow.length )
       if ( style.stroke && style.strokeShadow.length )
       {
@@ -1826,7 +1826,7 @@ class DynamicAtlas
          this.drawShadows( char, style, style.strokeShadow, true );
       }
 
-      //O draw text
+      //O // draw text
       //O metricsContext.fillStyle = getFillStyle( string( style.fill, "#000000" ) );
       this.metricsContext.fillStyle = this.getFillStyle( string( style.fill, "#000000" ) );
       //O metricsContext.fillText( char, paddingX, baseline );
@@ -1834,7 +1834,7 @@ class DynamicAtlas
       //O metricsContext.restore( );
       this.metricsContext.restore( );
 
-      //O draw stroke
+      //O // draw stroke
       //O if ( style.stroke )
       if ( style.stroke )
       {
@@ -1848,7 +1848,7 @@ class DynamicAtlas
          this.metricsContext.restore( );
       }
 
-      //O begin messuring
+      //O // begin messuring
       //O var pixelData = metricsContext.getImageData( 0, 0, w, h ).data;
       let pixelData = this.metricsContext.getImageData( 0, 0, w, h ).data;
 
@@ -1859,7 +1859,7 @@ class DynamicAtlas
       //O var len = pixelData.length;
       let len = pixelData.length;
 
-      //O scanline on alpha
+      //O // scanline on alpha
       //O while ( i < len && !pixelData[ i ] )
       while ( i < len && !pixelData[ i ] )
       {
@@ -1884,7 +1884,7 @@ class DynamicAtlas
          //O var descent = ( i / line ) | 0;
          let descent = ( i / line ) | 0;
 
-         //O left to right scanline on alpha
+         //O // left to right scanline on alpha
          //O for ( i = 3; i < len && !pixelData[ i ]; )
          for ( i = 3; i < len && !pixelData[ i ]; )
          {
@@ -1900,7 +1900,7 @@ class DynamicAtlas
          //O var minx = ( ( i % line ) / 4 ) | 0;
          let minx = ( ( i % line ) / 4 ) | 0;
 
-         //O right to left scanline on alpha
+         //O // right to left scanline on alpha
          //O var step = 1;
          let step = 1;
          //O for ( i = len - 1; i >= 0 && !pixelData[ i ]; )
@@ -1918,7 +1918,7 @@ class DynamicAtlas
          //O var maxx = ( ( i % line ) / 4 ) + 1 | 0;
          let maxx = ( ( i % line ) / 4 ) + 1 | 0;
 
-         //O set font metrics
+         //O // set font metrics
          //O data.ascent = Math.round( baseline - ascent );
          data.ascent = Math.round( this.baseline - ascent );
          //O data.descent = Math.round( descent - baseline );
@@ -1950,7 +1950,7 @@ class DynamicAtlas
             height: data.ascent + data.descent + 4
          };
 
-         //O cache (for fast rearrange later)
+         //O // cache (for fast rearrange later)
          //O data.canvas = document.createElement( "canvas" );
          data.canvas = document.createElement( "canvas" );
          //O data.canvas.width = data.rect.width;
@@ -1972,7 +1972,7 @@ class DynamicAtlas
    };
 };
 
-//O helper function for float or default
+//O // helper function for float or default
 //O function float( val, def )
 function float( val: any, def: number ): number
 {
@@ -1986,7 +1986,7 @@ function float( val: any, def: number ): number
    return parseFloat( val );
 }
 
-//O helper function for int or default
+//O // helper function for int or default
 //O function int( val, def )
 function int( val: any, def: number ): number
 {
@@ -2000,7 +2000,7 @@ function int( val: any, def: number ): number
    return parseInt( val );
 }
 
-//O helper function for string or default
+//O // helper function for string or default
 //O function string( val, def )
 function string( val: any, def: string ): string
 {
@@ -2014,7 +2014,7 @@ function string( val: any, def: string ): string
    return def;
 }
 
-//O helper function to convert string hex to int or default
+//O // helper function to convert string hex to int or default
 //O function hexToInt( str, def )
 function hexToInt( str: any, def: number ): number
 {
@@ -2038,7 +2038,7 @@ function hexToInt( str: any, def: number ): number
    return result;
 }
 
-//O helper function to convert hex to rgba
+//O // helper function to convert hex to rgba
 //O function hexToRgba( hex, alpha )
 function hexToRgba( hex: string, alpha: number ): string
 {

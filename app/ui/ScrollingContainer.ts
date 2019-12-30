@@ -15,7 +15,8 @@ import { DragEvent } from './Interaction/DragEvent';
 import { MouseScrollEvent } from './Interaction/MouseScrollEvent';
 
 //N ScrollBar was not previously required
-import { ScrollBar } from './ScrollBar';
+//N Including creates a circular loop
+//import { ScrollBar } from './ScrollBar';
 
 interface INameToValueMap
 {
@@ -78,7 +79,10 @@ export class ScrollingContainer extends Container
    //O this.scrolling = false;
    private scrolling: boolean;
    //O this._scrollBars = [ ];
-   public _scrollBars: Array<ScrollBar>;
+   //N this should be an Array of ScrollBar, but this creates
+   //  a circular loop.
+   //public _scrollBars: Array<ScrollBar>;
+   public _scrollBars: Array<ScrollingContainer>;
 
    //O this.boundCached = performance.now( ) - 1000;
    private boundCached = performance.now( ) - 1000;
@@ -103,7 +107,11 @@ export class ScrollingContainer extends Container
    protected context: ScrollingContainer;
 
 
-   constructor( options: INameToValueMap )
+   //N meant to be overwitten by ScrollBar
+   //  and breaks the requires loop
+   public alignToContainer: Function;
+
+   constructor( options: INameToValueMap = { "width":0, "height": 0 } )
    {
       //O Container.call( this, options.width, options.height );
       //N call super instead of UIBase constructor
@@ -151,6 +159,10 @@ export class ScrollingContainer extends Container
       this._lastHeight = this.height;
       //O this.boundCached = performance.now( ) - 1000;
       this.boundCached = performance.now( ) - 1000;
+
+      //N meant to be overwitten by ScrollBar
+      //  and breaks the requires loop
+      this.alignToContainer = null;
    }
 
    //O ScrollingContainer.prototype.initialize = function( )
@@ -257,8 +269,12 @@ export class ScrollingContainer extends Container
       //O for ( var i = 0; i < this._scrollBars.length; i++ )
       for ( var i = 0; i < this._scrollBars.length; i++ )
       {
-         //O this._scrollBars[ i ].alignToContainer( );
-         this._scrollBars[ i ].alignToContainer( );
+         //N Added check that alignToContainer has been asigned
+         if (this._scrollBars[ i ].alignToContainer )
+         {
+            //O this._scrollBars[ i ].alignToContainer( );
+            this._scrollBars[ i ].alignToContainer( );
+         }
       }
    };
 
@@ -663,6 +679,7 @@ export class ScrollingContainer extends Container
          this.targetPosition.y = this.containerStart.y + offset.y;
       }
    };
+
 };
 
 //O ScrollingContainer.prototype = Object.create( Container.prototype );

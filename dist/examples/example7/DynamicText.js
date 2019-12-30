@@ -23,7 +23,7 @@ window.addEventListener("resize", function () {
 
 
 var loadfn;
-PIXI.loader.add('UISprites.json').load(loadfn = function () {
+PIXI.Loader.shared.add('./UI/UISprites.json').load(loadfn = function () {
     var text = "<font align='center'>\n";
     text += "<i>italic</i> <b>bold</b> <font style='oblique'>oblique</font>  <font  skew='0.2'>Skew</font>\n";
     text += "<font size='100' weight='bold' shadow='#000000 0.5 5 5 5'>BIG</font> and <font rotation='-0.3' size='80' stroke='3' fill='transparent' tint='#ffffff' strokeShadow='purple 0.5 0 -2 8, yellow 0.6 0 5 2, cyan 0.6 5 0 2, red 0.6 -5 0 2' strokeFill='#0000ff, #FF0000, #0000ff'>TWISTED</font>\n";
@@ -38,7 +38,7 @@ PIXI.loader.add('UISprites.json').load(loadfn = function () {
     }
 
 
-    var box = new PIXI.UI.SliceSprite(PIXI.Texture.fromFrame("UI/cb-1-bg.png"), 10);
+    var box = new PIXI.UI.SliceSprite(PIXI.Texture.from("./UI/cb-1-bg.png"), 10);
     box.anchorBottom = box.anchorRight = box.anchorTop = 10;
     box.anchorLeft = "40%";
     box.alpha = 1;

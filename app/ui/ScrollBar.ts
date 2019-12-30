@@ -80,8 +80,12 @@ export class ScrollBar extends Slider
       //O this._onValueChanging = function( val )
       this._onValueChanging = this.onValueChanging;
 
+      //N To break the dependancy loop set the function in the
+      //  scrollingContainer to alignToContainer;
+      this.scrollingContainer.alignToContainer = this.alignToContainer;
+
       //O this.scrollingContainer._scrollBars.push( this );
-      this.scrollingContainer._scrollBars.push( this );
+      this.scrollingContainer._scrollBars.push( this as any as ScrollingContainer);
    };
 
    //O this._onValueChanging = function( val )

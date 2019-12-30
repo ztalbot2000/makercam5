@@ -106,14 +106,14 @@ export class DynamicTextStyle
       this._ellipsis = false;
 
       //O var _cachedEllipsisSize = null;
-      this._cachedEllipsisSize = NaN;
+      this._cachedEllipsisSize = null;
    }
 
    //O this.ellipsisSize = function( atlas )
    public ellipsisSize = ( atlas: any ): number =>
    {
-      //O if ( !this.ellipsis )
-      if ( !this.ellipsis )
+      //O if ( ! this.ellipsis )
+      if ( ! this.ellipsis )
       {
          //O return 0;
          return 0;
@@ -281,7 +281,10 @@ export class DynamicTextStyle
       if ( this.respectDirty )
       {
          //O if ( this._parent !== null )
-         if ( this._parent !== null )
+         if ( this._parent !== null &&
+              //N Add check that update exists  on _parent to fix
+              //  update being not defined.
+              typeof this._parent.update === 'function' )
          {
             //O this._parent.dirtyStyle = val;
             this._parent.dirtyStyle = val;
@@ -291,7 +294,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O scale:
+   //O // scale:
    //O get: function( )
    get scale( ): number
    {
@@ -311,7 +314,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O align:
+   //O // align:
    //O get: function( )
    get align( ): string
    {
@@ -331,7 +334,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O fontFamily:
+   //O // fontFamily:
    //O get: function( )
    get fontFamily( ): string
    {
@@ -351,7 +354,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O fontSize:
+   //O // fontSize:
    //O get: function( )
    get fontSize( ): number
    {
@@ -371,7 +374,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O fontWeight:
+   //O // fontWeight:
    //O get: function( )
    get fontWeight( ): string
    {
@@ -391,7 +394,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O fontStyle:
+   //O // fontStyle:
    //O get: function( )
    get fontStyle( ): string
    {
@@ -411,7 +414,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O letterSpacing:
+   //O // letterSpacing:
    //O get: function( )
    get letterSpacing( ): number
    {
@@ -431,7 +434,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O lineHeight:
+   //O // lineHeight:
    //O get: function( )
    get lineHeight( ): number
    {
@@ -451,7 +454,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O verticalAlign:
+   //O // verticalAlign:
    //O get: function( )
    get verticalAlign( ): number
    {
@@ -471,7 +474,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O rotation:
+   //O // rotation:
    //O get rotation( )
    get rotation( ): number
    {
@@ -491,7 +494,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O skew:
+   //O // skew:
    //O get: function( )
    get skew( ): number
    {
@@ -511,7 +514,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O tint:
+   //O // tint:
    //O get: function( )
    get tint ( ): string
    {
@@ -531,7 +534,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O fill:
+   //O // fill:
    //O get: function( )
    get fill( ): string
    {
@@ -551,7 +554,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O shadow:
+   //O // shadow:
    //O get: function( )
    get shadow( ): string
    {
@@ -571,7 +574,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O stroke:
+   //O // stroke:
    //O get: function( )
    get stroke( ): number
    {
@@ -591,7 +594,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O strokeFill:
+   //O // strokeFill:
    //O get: function( )
    get strokeFill( ): string
    {
@@ -611,7 +614,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O strokeShadow:
+   //O // strokeShadow:
    //O get: function( )
    get strokeShadow( ): string
    {
@@ -631,7 +634,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O wrap:
+   //O // wrap:
    //O get: function( )
    get wrap( ): boolean
    {
@@ -651,7 +654,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O breakWords:
+   //O // breakWords:
    //O get: function( )
    get breakWords( ): boolean
    {
@@ -666,12 +669,12 @@ export class DynamicTextStyle
       {
          //O this._breakWords = val;
          this._breakWords = val;
-            //O this._dirty = true;
-            this._dirty = true;
+         //O this._dirty = true;
+         this._dirty = true;
       }
    }
 
-   //O overflowX:
+   //O // overflowX:
    //O get: function( )
    get overflowX( ): string
    {
@@ -691,7 +694,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O overflowY:
+   //O // overflowY:
    //O get: function( )
    get overflowY( ): string
    {
@@ -711,7 +714,7 @@ export class DynamicTextStyle
       }
    }
 
-   //O ellipsis:
+   //O // ellipsis:
    //O get: function( )
    get ellipsis( ): boolean
    {
