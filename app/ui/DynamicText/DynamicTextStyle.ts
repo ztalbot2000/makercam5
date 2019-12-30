@@ -1,3 +1,10 @@
+export type DynamicTextStyleAttributes =
+   "_scale" | "_align" | "_fontFamily" | "_fontSize" | "_fontWeight" |
+   "_fontStyle" | "_letterSpacing" | "_lineHeight" | "_verticalAlign" |
+   "_rotation" | "_skew" | "_tint" | "_fill" | "_shadow" | "_stroke" |
+   "_strokeFill" | "_strokeShadow" | "_wrap" | "_breakWords" | "_overflowX" |
+   "_overflowY" | "_ellipsis";
+
 
 //O function DynamicTextStyle( parent )
 export class DynamicTextStyle
@@ -54,6 +61,8 @@ export class DynamicTextStyle
    //O var _cachedEllipsisSize = null;
    private _cachedEllipsisSize: number;
 
+   protected dynamicTextStyleAttributes:Array<DynamicTextStyleAttributes>;
+
    constructor ( parent?: any )
    {
       //O this.respectDirty = true;
@@ -107,6 +116,16 @@ export class DynamicTextStyle
 
       //O var _cachedEllipsisSize = null;
       this._cachedEllipsisSize = null;
+
+      //N for typescript
+      this.dynamicTextStyleAttributes =
+      [  
+         '_scale', '_align', '_fontFamily', '_fontSize', '_fontWeight',
+         '_fontStyle', '_letterSpacing', '_lineHeight', '_verticalAlign',
+         '_rotation', '_skew', '_tint', '_fill', '_shadow', '_stroke',
+         '_strokeFill', '_strokeShadow', '_wrap', '_breakWords', '_overflowX',
+         '_overflowY', '_ellipsis'
+      ];
    }
 
    //O this.ellipsisSize = function( atlas )
@@ -145,108 +164,104 @@ export class DynamicTextStyle
    };
 
    //O DynamicTextStyle.prototype.merge = function( style )
-   public merge = ( style: any ) =>
+   public merge = ( style: DynamicTextStyle ):void =>
    {
       //O if ( typeof style === 'object' )
       if ( typeof style === 'object' )
       {
          //O this.respectDirty = false;
          this.respectDirty = false;
+
          //O for ( var param in style )
-         for ( var param in style )
+         //NC  USE 'of' AS THIS IS NOW AN ARRAY OF STRINGS
+         for ( let param of this.dynamicTextStyleAttributes )
          {
             //O var val = style[ param ];
-            let val = style[ param ];
+
             //O if ( typeof val === 'function' || param === 'respectDirty' || param === '_parent' )
-            //N added _dirty and _cachedEllipsisSize
-            if ( typeof val === 'function' || param === 'respectDirty' || param === '_parent' || param === '_cachedEllipsisSize' || param === '_dirty' )
-            {
-               //O continue;
-               continue;
-            }
-            //N Adding in getter/setter triggerred same
-            //  attributes, but without underscore;
-            //  A partial fixme as this slows stuff down a lot.
-            if ( param[0] !== '_' )
-            {
-               //O continue;
-               continue;
-            }
+            //O{
+            //O   continue;
+            //O}
+
             //O this[ param ] = style[ param ];
-            // This does not compile as string is not on DynamicTextStyle
-            // Hmm - convert string to set of value ...
-            //this[ param ] = style[ param ];
+            this[ param ] = style[ param ];
+
+/*
+            console.log("Handling:" + param + " Setting to:" + style[param]);
+
+            //N Access each property individually
             switch(param)
             {
                case '_scale':
-                  this._scale = val;
+                  this._scale = style._scale;
                   break;
                case '_align':
-                  this._align = val;
+                  this._align = style._align;
                   break;
                case '_fontFamily':
-                  this._fontFamily = val;
+                  this._fontFamily = style._fontFamily;
                   break;
                case '_fontSize':
-                  this._fontSize = val;
+                  this._fontSize = style._fontSize;
                   break;
                case '_fontWeight':
-                  this._fontWeight = val;
+                  this._fontWeight = style._fontWeight;
                   break;
                case '_fontStyle':
-                  this._fontStyle = val;
+                  this._fontStyle = style._fontStyle;
                   break;
                case '_letterSpacing':
-                  this._letterSpacing = val;
+                  this._letterSpacing = style._letterSpacing;
                   break;
                case '_lineHeight':
-                  this._lineHeight = val;
+                  this._lineHeight = style._lineHeight;
                   break;
                case '_verticalAlign':
-                  this._verticalAlign = val;
+                  this._verticalAlign = style._verticalAlign;
                   break;
                case '_rotation':
-                  this._rotation = val;
+                  this._rotation = style._rotation;
                   break;
                case '_skew':
-                  this._skew = val;
+                  this._skew = style._skew;
                   break;
                case '_tint':
-                  this._tint = val;
+                  this._tint = style._tint;
                   break;
                case '_fill':
-                  this._fill = val;
+                  this._fill = style._fill;
                   break;
                case '_shadow':
-                  this._shadow = val;
+                  this._shadow = style._shadow;
                   break;
                case '_stroke':
-                  this._stroke = val;
+                  this._stroke = style._stroke;
                   break;
                case '_strokeFill':
-                  this._strokeFill = val;
+                  this._strokeFill = style._strokeFill;
                   break;
                case '_strokeShadow':
-                  this._strokeShadow = val;
+                  this._strokeShadow = style._strokeShadow;
                   break;
                case '_wrap':
-                  this._wrap = val;
+                  this._wrap = style._wrap;
                   break;
                case '_breakWords':
-                  this._breakWords = val;
+                  this._breakWords = style._breakWords;
                   break;
                case '_overflowX':
-                  this._overflowX = val;
+                  this._overflowX = style._overflowX;
                   break;
                case '_overflowY':
-                  this._overflowY = val;
+                  this._overflowY = style._overflowY;
                   break;
                case '_ellipsis':
-                  this._ellipsis = val;
+                  this._ellipsis = style._ellipsis;
                   break;
                default:
                   console.log("Fixme. UnHandled string:" + param);
             }
+*/
          }
          //O this.respectDirty = true;
          this.respectDirty = true;
