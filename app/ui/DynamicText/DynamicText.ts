@@ -768,44 +768,44 @@ export class DynamicText extends UIBase
                            case 'family':
                               //O match[ 1 ] = 'fontFamily';
                               match[ 1 ] = 'fontFamily';
-                                 //O break;
-                                 break;
-                              //O case 'size':
-                              case 'size':
+                              //O break;
+                              break;
+                           //O case 'size':
+                           case 'size':
                               //O match[ 1 ] = 'fontSize';
                               match[ 1 ] = 'fontSize';
-                                 //O break;
-                                 break;
-                              //O case 'weight':
-                              case 'weight':
+                              //O break;
+                              break;
+                           //O case 'weight':
+                           case 'weight':
                               //O match[ 1 ] = 'fontWeight';
                               match[ 1 ] = 'fontWeight';
-                                 //O break;
-                                 break;
-                              //O case 'style':
-                              case 'style':
+                              //O break;
+                              break;
+                           //O case 'style':
+                           case 'style':
                               //O match[ 1 ] = 'fontStyle';
                               match[ 1 ] = 'fontStyle';
-                                 //O break;
-                                 break;
-                              //O case 'valign':
-                              case 'valign':
+                              //O break;
+                              break;
+                           //O case 'valign':
+                           case 'valign':
                               //O match[ 1 ] = 'verticalAlign';
                               match[ 1 ] = 'verticalAlign';
-                                 //O break;
-                                 break;
-                              //O case 'spacing':
-                              case 'spacing':
+                              //O break;
+                              break;
+                           //O case 'spacing':
+                           case 'spacing':
                               //O match[ 1 ] = 'letterSpacing';
                               match[ 1 ] = 'letterSpacing';
-                                 //O break;
-                                 break;
-                              //O case 'color':
-                              case 'color':
+                              //O break;
+                              break;
+                           //O case 'color':
+                           case 'color':
                               //O match[ 1 ] = 'tint';
                               match[ 1 ] = 'tint';
-                                 //O break;
-                                 break;
+                              //O break;
+                              break;
 
                         }
                         //O style[ match[ 1 ] ] = match[ 4 ];
@@ -1145,7 +1145,8 @@ class AtlasNode
 
 
 //O var DynamicAtlas = function( padding )
-class DynamicAtlas
+//NC exported for testing purposes only !!!
+export class DynamicAtlas
 {
    //O // Atlas
    //O var metricsCanvas = document.createElement( "canvas" );
