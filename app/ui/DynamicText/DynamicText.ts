@@ -207,7 +207,7 @@ export class DynamicText extends UIBase
       this.renderCount = 0;
       //O var charCount = 0;
       this.charCount = 0;
-      //O ellipsis caches (not nessesary when no sprites)
+      //O // ellipsis caches (not nessesary when no sprites)
       //O var lineEllipsisData = [ ];
       this.lineEllipsisData = [ ];
       //O var lineHasEllipsis = [ ];
@@ -324,9 +324,9 @@ export class DynamicText extends UIBase
 
          //O // add new sprite
          //O var tex = char.data.texture;
-         var tex = char.data.texture;
+         let tex = char.data.texture;
          //O var sprite = spriteCache[ i ];
-         var sprite = this.spriteCache[ i ];
+         let sprite = this.spriteCache[ i ];
 
          //O if ( !sprite )
          if ( ! sprite )
@@ -356,8 +356,8 @@ export class DynamicText extends UIBase
          //O sprite.skew.x = float( char.style.skew, 0 );
          sprite.skew.x = float( char.style.skew, 0 );
 
-         //O if ( !sprite.parent )
-         if ( !sprite.parent )
+         //O if ( ! sprite.parent )
+         if ( ! sprite.parent )
          {
             //O charContainer.addChild( sprite );
             this.charContainer.addChild( sprite );
@@ -441,8 +441,10 @@ export class DynamicText extends UIBase
 
          //O if ( char.newline )
          if ( char.newline )
+         {
             //O lineFull = false;
             lineFull = false;
+         }
 
          //O // set word index
          //O if ( char.space || char.newline )
@@ -536,20 +538,20 @@ export class DynamicText extends UIBase
                }
             }
 
-            //O if ( style.overflowX == 'hidden' && !forceNewline )
-            if ( prepStyle.overflowX == 'hidden' && !forceNewline )
+            //O if ( style.overflowX == 'hidden' && ! forceNewline )
+            if ( prepStyle.overflowX == 'hidden' && ! forceNewline )
             {
                //O lineFull = true;
                lineFull = true;
-               //O if ( style.ellipsis && !ellipsis )
-               if ( prepStyle.ellipsis && !ellipsis )
+               //O if ( style.ellipsis && ! ellipsis )
+               if ( prepStyle.ellipsis && ! ellipsis )
                {
                   //O ellipsis = true;
                   ellipsis = true;
                   //O var ellipsisData = lineEllipsisData[ lineIndex ];
-                  var ellipsisData = this.lineEllipsisData[ lineIndex ];
-                  //O if ( !ellipsisData )
-                  if ( !ellipsisData )
+                  let ellipsisData = this.lineEllipsisData[ lineIndex ];
+                  //O if ( ! ellipsisData )
+                  if ( ! ellipsisData )
                   {
                      //O ellipsisData = this.lineEllipsisData[ lineIndex ] = [ new DynamicChar( ), new DynamicChar( ), new DynamicChar( ) ];
                      ellipsisData = this.lineEllipsisData[ lineIndex ] = [ new DynamicChar( ), new DynamicChar( ), new DynamicChar( ) ];
@@ -588,7 +590,7 @@ export class DynamicText extends UIBase
          //O if ( ! lineFull )
          if ( ! lineFull )
          {
-            //O position
+            //O // position
             //O char.x = pos.x + char.data.xOffset;
             char.x = pos.x + char.data.xOffset;
             //O char.y = parseFloat( style.verticalAlign ) + char.data.yOffset;

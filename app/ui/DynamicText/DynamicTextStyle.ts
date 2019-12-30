@@ -120,7 +120,7 @@ export class DynamicTextStyle
       }
 
       //O if ( _cachedEllipsisSize === null )
-      if ( this._cachedEllipsisSize === NaN )
+      if ( this._cachedEllipsisSize === null )
       {
          //O return 0;
          return 0;
@@ -152,13 +152,22 @@ export class DynamicTextStyle
       {
          //O this.respectDirty = false;
          this.respectDirty = false;
-         //O for ( var param:stringin style )
+         //O for ( var param in style )
          for ( var param in style )
          {
             //O var val = style[ param ];
             let val = style[ param ];
             //O if ( typeof val === 'function' || param === 'respectDirty' || param === '_parent' )
-            if ( typeof val === 'function' || param === 'respectDirty' || param === '_parent' )
+            //N added _dirty and _cachedEllipsisSize
+            if ( typeof val === 'function' || param === 'respectDirty' || param === '_parent' || param === '_cachedEllipsisSize' || param === '_dirty' )
+            {
+               //O continue;
+               continue;
+            }
+            //N Adding in getter/setter triggerred same
+            //  attributes, but without underscore;
+            //  A partial fixme as this slows stuff down a lot.
+            if ( param[0] !== '_' )
             {
                //O continue;
                continue;
@@ -169,77 +178,74 @@ export class DynamicTextStyle
             //this[ param ] = style[ param ];
             switch(param)
             {
-               case 'scale':
+               case '_scale':
                   this._scale = val;
                   break;
-               case 'align':
+               case '_align':
                   this._align = val;
                   break;
-               case 'fontFamily':
+               case '_fontFamily':
                   this._fontFamily = val;
                   break;
-               case 'fontSize':
+               case '_fontSize':
                   this._fontSize = val;
                   break;
-               case 'fontWeight':
+               case '_fontWeight':
                   this._fontWeight = val;
                   break;
-               case 'fontStyle':
+               case '_fontStyle':
                   this._fontStyle = val;
                   break;
-               case 'letterSpacing':
+               case '_letterSpacing':
                   this._letterSpacing = val;
                   break;
-               case 'lineHeight':
+               case '_lineHeight':
                   this._lineHeight = val;
                   break;
-               case 'verticalAlign':
+               case '_verticalAlign':
                   this._verticalAlign = val;
                   break;
-               case 'rotation':
+               case '_rotation':
                   this._rotation = val;
                   break;
-               case 'skew':
+               case '_skew':
                   this._skew = val;
                   break;
-               case 'tint':
+               case '_tint':
                   this._tint = val;
                   break;
-               case 'fill':
+               case '_fill':
                   this._fill = val;
                   break;
-               case 'shadow':
+               case '_shadow':
                   this._shadow = val;
                   break;
-               case 'stroke':
+               case '_stroke':
                   this._stroke = val;
                   break;
-               case 'strokeFill':
+               case '_strokeFill':
                   this._strokeFill = val;
                   break;
-               case 'stroke':
-                  this._stroke = val;
-                  break;
-               case 'strokeShadow':
+               case '_strokeShadow':
                   this._strokeShadow = val;
                   break;
-               case 'wrap':
+               case '_wrap':
                   this._wrap = val;
                   break;
-               case 'breakWords':
+               case '_breakWords':
                   this._breakWords = val;
                   break;
-               case 'overflowX':
+               case '_overflowX':
                   this._overflowX = val;
                   break;
-               case 'overflowY':
+               case '_overflowY':
                   this._overflowY = val;
                   break;
-               case 'ellipsis':
+               case '_ellipsis':
                   this._ellipsis = val;
                   break;
                default:
-                  console.log("Unknown type:" + param);
+                  console.log("Fixme. UnHandled string:" + param);
             }
          }
          //O this.respectDirty = true;
