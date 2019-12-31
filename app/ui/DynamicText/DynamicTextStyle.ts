@@ -184,10 +184,10 @@ export class DynamicTextStyle
             //O}
 
             //O this[ param ] = style[ param ];
-            this[ param ] = style[ param ];
+//            this[ param ] = style[ param ];
 
-/*
-            console.log("Handling:" + param + " Setting to:" + style[param]);
+//
+//          console.log("Handling:" + param + " Setting to:" + style[param]);
 
             //N Access each property individually
             switch(param)
@@ -261,7 +261,7 @@ export class DynamicTextStyle
                default:
                   console.log("Fixme. UnHandled string:" + param);
             }
-*/
+//
          }
          //O this.respectDirty = true;
          this.respectDirty = true;

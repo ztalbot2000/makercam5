@@ -3,7 +3,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TSLintPlugin = require('tslint-webpack-plugin');
 
-const devServerOptions =
+let devServerOptions =
 {
    stats: {
       // Enables disables colors on the console
@@ -61,8 +61,12 @@ const devServerOptions =
    open: true,
 
    // Specify a page to navigate to when opening the browser.
-   // So that all the examples work, this is symbolic linked to
-   // the relevant files.
+   // So that all the examples work.
+   //
+   // Note: We allow this to be changed via argv.openPage='<fn>'
+   //       which is stupid because we can just use --openPage.
+   //       However I confused it with devServer.index which
+   //       cannot be set via cli. Why the two is beyond me?
    openPage: 'index.html'
 };
 
@@ -74,17 +78,22 @@ module.exports = (env, argv) =>
    // The default 'mode' to use.
    Mode='production';
 
-   if ( argv && argv.mode && argv.mode == "production" )
+   if ( argv )
    {
-      // Since this is processed as a command line option (because of argv...)
-      // the mode must be set so that it can be returned as part of the big
-      // config entry.
-      Mode='production';
-   } else {
-      // Since this is processed as a command line option (because of argv...)
-      // the mode must be set so that it can be returned as part of the big
-      // config entry.
-      Mode='development';
+      if ( argv.mode )
+         if (argv.mode === 'development' )
+            // Since this is processed as a command line option
+            // (because of argv...) the mode must be set so that it
+            // can be returned as part of the big config entry.
+            Mode='development';
+         else if ( argv.mode !== 'production' )
+            throw new error('unhandled mode:' + argv.mode);
+
+      if ( argv.openPage )
+      {
+         devServerOptions.openPage = argv.openPage
+         console.log("telling devServer to open:" + devServerOptions.openPage);
+      }
    }
 
    // We have two entries. One for makercam5App and the other for the
@@ -168,7 +177,7 @@ module.exports = (env, argv) =>
 
             // Adds the given favicon path to the output HTML
             // When you touch the URL you will see the bunny
-            favicon: 'bunny.png',
+            //favicon: 'bunny.png',
 
             // Inject the following meta tags
             meta: {

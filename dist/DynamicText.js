@@ -1,7 +1,7 @@
 ﻿
 /// <reference path="pixi.js" />
-//O ../bin/pixi-ui.js
-/// <reference path="./pixi-ui.js" />
+//O ../bin/pixi_ui.js
+/// <reference path="./pixi_ui.js" />
 
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.LINEAR;
 PIXI.settings.RESOLUTION = devicePixelRatio || 1;
@@ -23,7 +23,7 @@ window.addEventListener("resize", function () {
 
 
 var loadfn;
-PIXI.Loader.shared.add('./UI/UISprites.json').load(loadfn = function () {
+PIXI.Loader.shared.add('./UISprites.json').load(loadfn = function () {
     var text = "<font align='center'>\n";
     text += "<i>italic</i> <b>bold</b> <font style='oblique'>oblique</font>  <font  skew='0.2'>Skew</font>\n";
     text += "<font size='100' weight='bold' shadow='#000000 0.5 5 5 5'>BIG</font> and <font rotation='-0.3' size='80' stroke='3' fill='transparent' tint='#ffffff' strokeShadow='purple 0.5 0 -2 8, yellow 0.6 0 5 2, cyan 0.6 5 0 2, red 0.6 -5 0 2' strokeFill='#0000ff, #FF0000, #0000ff'>TWISTED</font>\n";
@@ -83,6 +83,6 @@ PIXI.Loader.shared.add('./UI/UISprites.json').load(loadfn = function () {
     dynamicText.style.tint = '#000000';
     dynamicText.anchorLeft = dynamicText.anchorRight = 20;
     dynamicText.anchorTop = dynamicText.anchorBottom = 10;
-    
-    
+
+
 });

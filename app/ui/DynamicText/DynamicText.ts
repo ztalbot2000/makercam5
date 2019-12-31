@@ -21,6 +21,9 @@ var emojiRegex = require( 'emoji-regex' );
 //O var closeTags = [ '</i>', '</b>', '</font>', '</center>' ];
 const closeTags = [ '</i>', '</b>', '</font>', '</center>' ];
 
+//O var atlas = null;
+var atlas: DynamicAtlas = null;
+
 /*O
  * An dynamic text object with auto generated atlas
  *
@@ -36,9 +39,6 @@ const closeTags = [ '</i>', '</b>', '</font>', '</center>' ];
 //O function DynamicText( text, options )
 export class DynamicText extends UIBase
 {
-   //O atlas = null;
-   //O atlas = new DynamicAtlas( 1 );
-   private atlas: DynamicAtlas;
 
    //O options = options || {};
    //public options: Array<object>;
@@ -143,10 +143,10 @@ export class DynamicText extends UIBase
 
       //O // create atlas
       //O if ( atlas === null )
-      if ( this.atlas === null )
+      if ( atlas === null )
       {
          //O atlas = new DynamicAtlas( 1 );
-         this.atlas = new DynamicAtlas( 1 );
+         atlas = new DynamicAtlas( 1 );
       }
 
       //O var autoWidth = ! options.width;
@@ -404,7 +404,7 @@ export class DynamicText extends UIBase
       let forceNewline = false;
       //O var style;
       //New variable name change to unhide class style name
-      let prepStyle: DynamicTextStyle = null;
+      var style: DynamicTextStyle = null;
       //O var renderIndex = 0;
       let renderIndex = 0;
       //O var ellipsis = false;
@@ -422,17 +422,17 @@ export class DynamicText extends UIBase
          //O var lastChar = chars[ i - 1 ];
          let lastChar = this.chars[ i - 1 ];
          //O style = char.style;
-         prepStyle = char.style;
+         style = char.style;
 
          //O // lineheight
          //O lineHeight = Math.max( lineHeight, defaultStyle.lineHeight || style.lineHeight || char.data.lineHeight );
-         lineHeight = Math.max( lineHeight, this.defaultStyle.lineHeight || prepStyle.lineHeight || char.data.lineHeight );
+         lineHeight = Math.max( lineHeight, this.defaultStyle.lineHeight || style.lineHeight || char.data.lineHeight );
 
          //O if ( style.overflowY !== 'visible' && lineHeight + textHeight > this._height )
-         if ( prepStyle.overflowY !== 'visible' && lineHeight + textHeight > this._height )
+         if ( style.overflowY !== 'visible' && lineHeight + textHeight > this._height )
          {
             //O if ( style.overflowY === 'hidden' )
-            if ( prepStyle.overflowY === 'hidden' )
+            if ( style.overflowY === 'hidden' )
             {
                //O break;
                break;
@@ -462,7 +462,7 @@ export class DynamicText extends UIBase
 
          //O // textheight
          //O lineFontSize = Math.max( lineFontSize, style.fontSize );
-         lineFontSize = Math.max( lineFontSize, prepStyle.fontSize );
+         lineFontSize = Math.max( lineFontSize, style.fontSize );
 
          //O // lineindex
          //O char.lineIndex = lineIndex;
@@ -470,10 +470,10 @@ export class DynamicText extends UIBase
 
          //O // lineAlignment
          //O if ( style.align !== defaultStyle.align )
-         if ( prepStyle.align !== this.defaultStyle.align )
+         if ( style.align !== this.defaultStyle.align )
          {
             //O lineAlignment = style.align;
-            lineAlignment = prepStyle.align;
+            lineAlignment = style.align;
          }
 
          //O if ( char.space )
@@ -486,12 +486,12 @@ export class DynamicText extends UIBase
          }
 
          //O var size = Math.round( char.data.width ) + float( style.letterSpacing, 0 );
-         let size = Math.round( char.data.width ) + float( prepStyle.letterSpacing, 0 );
+         let size = Math.round( char.data.width ) + float( style.letterSpacing, 0 );
          //O if ( ! autoWidth && !forceNewline && !char.newline && pos.x + size > this._width )
          if ( ! this.autoWidth && ! forceNewline && ! char.newline && pos.x + size > this._width )
          {
             //O if ( style.wrap )
-            if ( prepStyle.wrap )
+            if ( style.wrap )
             {
                //O if ( char.space )
                if ( char.space )
@@ -517,7 +517,7 @@ export class DynamicText extends UIBase
 
                }
                //O else if ( style.breakWords )
-               else if ( prepStyle.breakWords )
+               else if ( style.breakWords )
                {
                   //O if ( lastChar )
                   if ( lastChar )
@@ -539,12 +539,12 @@ export class DynamicText extends UIBase
             }
 
             //O if ( style.overflowX == 'hidden' && ! forceNewline )
-            if ( prepStyle.overflowX == 'hidden' && ! forceNewline )
+            if ( style.overflowX == 'hidden' && ! forceNewline )
             {
                //O lineFull = true;
                lineFull = true;
                //O if ( style.ellipsis && ! ellipsis )
-               if ( prepStyle.ellipsis && ! ellipsis )
+               if ( style.ellipsis && ! ellipsis )
                {
                   //O ellipsis = true;
                   ellipsis = true;
@@ -565,18 +565,18 @@ export class DynamicText extends UIBase
                      //O dot.value = ".";
                      dot.value = ".";
                      //O dot.data = atlas.getCharObject( dot.value, style );
-                     dot.data = this.atlas.getCharObject( dot.value, prepStyle );
+                     dot.data = atlas.getCharObject( dot.value, style );
                      //O dot.style = style;
-                     dot.style = prepStyle;
+                     dot.style = style;
                      //O dot.x = pos.x + char.data.xOffset;
                      dot.x = pos.x + char.data.xOffset;
-                     //O dot.y = parseFloat( prepStyle.verticalAlign ) + dot.data.yOffset;
+                     //O dot.y = parseFloat( style.verticalAlign ) + dot.data.yOffset;
                      //Hmm style,vertAlign is already a number
-                     dot.y = prepStyle.verticalAlign + dot.data.yOffset;
+                     dot.y = style.verticalAlign + dot.data.yOffset;
                      //O dot.lineIndex = lineIndex;
                      dot.lineIndex = lineIndex;
                      //O pos.x += Math.round( dot.data.width ) + float( style.letterSpacing, 0 );
-                     pos.x += Math.round( dot.data.width ) + float( prepStyle.letterSpacing, 0 );
+                     pos.x += Math.round( dot.data.width ) + float( style.letterSpacing, 0 );
                      //O renderChars[ renderIndex ] = dot;
                      this.renderChars[ renderIndex ] = dot;
                      //O renderIndex++;
@@ -595,7 +595,7 @@ export class DynamicText extends UIBase
             char.x = pos.x + char.data.xOffset;
             //O char.y = parseFloat( style.verticalAlign ) + char.data.yOffset;
             //New style.verticalAlign is already a number, no need to parsefloat
-            char.y = prepStyle.verticalAlign + char.data.yOffset;
+            char.y = style.verticalAlign + char.data.yOffset;
             //O pos.x += size;
             pos.x += size;
             //O renderChars[ renderIndex ] = char;
@@ -621,7 +621,7 @@ export class DynamicText extends UIBase
                //O pos.x -= char.data.width;
                pos.x -= char.data.width;
                //O pos.x -= float( style.letterSpacing, 0 );
-               pos.x -= float( prepStyle.letterSpacing, 0 );
+               pos.x -= float( style.letterSpacing, 0 );
             }
 
             //O textHeight += lineHeight;
@@ -845,6 +845,7 @@ export class DynamicText extends UIBase
          //O else
          else
          {
+//ZARF
             //O // detect emoji
             //O var emojiMatch = emojiRegex( ).exec( c );
             let emojiMatch = emojiRegex( ).exec( c );
@@ -893,8 +894,16 @@ export class DynamicText extends UIBase
             char.style.fontFamily = DynamicText.settings.defaultEmojiFont;
          }
 
+console.log("xBefore near death");
+//for (let key in char.style)
+//{
+//   console.log("char.style[" + key + "]=" + char.style[key]);
+//}
+console.log("Before death");
+console.log("char.style='" + char.style + "'");
          //O char.data = atlas.getCharObject( c, char.style );
-         char.data = this.atlas.getCharObject( c, char.style );
+         char.data = atlas.getCharObject( c, char.style );
+console.log("After death");
          //O char.value = c;
          char.value = c;
          //O char.space = space;
@@ -928,6 +937,7 @@ export class DynamicText extends UIBase
       {
 
          //O // console.log("UPDATING TEXT");
+         console.log("UPDATING TEXT");//ZARF
          //O var dirtySize = !autoWidth && ( self._width != lastWidth || self._height != lastHeight || self.dirtyText );
          let dirtySize = ! this.autoWidth && ( this.context._width != this.lastWidth || this.context._height != this.lastHeight || this.context.dirtyText );
 
@@ -984,6 +994,7 @@ export class DynamicText extends UIBase
          //O this.update( );
          this.update( );
          //O //console.log("Updating Text to: " + val);
+         console.log("Updating Text to: " + val); //ZARF
       }
    };
    //O get: function( )
