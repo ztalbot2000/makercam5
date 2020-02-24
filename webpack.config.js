@@ -1,7 +1,9 @@
 const path = require('path');
+const webpack = require('webpack');
+
 //const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const TSLintPlugin = require('tslint-webpack-plugin');
+const ESLintPlugin = require('eslint-config-prettier');
 
 let devServerOptions =
 {
@@ -18,13 +20,25 @@ let devServerOptions =
    publicPath: '/dist/',
 
    // The filename that is considered the index file.
-   index: 'index.html',
+   index: 'makercam5.html',
 
    // Enable gzip compression for everything served:
    compress: false,
 
    // Specify a port number to listen for requests on.
    port: 9000,
+
+   // Specify a host to use. If you want your server to be
+   // accessible externally, specify it like this:
+   // Default is 'localhost'.
+   host: '192.168.2.97',
+
+   // This option allows you to whitelist services that are
+   // allowed to access the dev server.
+   allowedHosts: [
+      '192.168.2.*',
+      '192.168.2.',
+   ],
 
    // Enables/Disables colors on the console
    // Available on cli only --color
@@ -96,17 +110,7 @@ module.exports = (env, argv) =>
       }
    }
 
-   // We have two entries. One for makercam5App and the other for the
-   // library of  pixi-ui.
-   // *** IMPORTANT ***
-   // You need my patch to fix mochapack handling arrays.
-   // if (Array.isArray(config)) {
-   //    console.log("\x1b[35m Warning \x1b[30m" + 'Passing multiple webpack.configs as an Array is not fully supported.  Only the first element will be parsed');
-   //    return config[0];
-   // }
-
-   return [
-   {
+   return {
       // Since this is processed as a command line option (because of argv...)
       // the mode must be set so that it can be returned as part of the big
       // config entry.
@@ -151,6 +155,13 @@ module.exports = (env, argv) =>
          //            './app/src/*.ts'
          //           ]
          // }),
+
+         // Add a plugins section to your webpack.config.js to let
+         // know Webpack that the global PIXI variable make reference
+         // to pixi.js module. For instance:
+         new webpack.ProvidePlugin({
+            PIXI: 'pixi.js'
+         }),
 
          // The plugin will generate an HTML5 file for you that includes
          // all your webpack bundles in the body using script tags.
@@ -244,10 +255,6 @@ module.exports = (env, argv) =>
                   /node_modules/,
                   // This would be a path
                   // Omit stuff to be worked on
-                   '/app/ui/',        // We are doing partKart so omit UI
-                   '/test/ui',        // We are doing partKart so omit UI
-                   '/app/uitry/',     // Omit all uitry
-                   '/test/uitry'      // Omit all uitry
                ],
                use: {
                   loader: 'babel-loader'
@@ -265,10 +272,6 @@ module.exports = (env, argv) =>
                   /node_modules/,
                   // This would be a path
                   // Omit stuff to be worked on
-                  '/app/ui/',         // We are doing partKart so omit UI
-                  '/test/ui',         // We are doing partKart so omit Ui
-                  '/app/uitry/',      // Omit all uitry
-                  '/test/uitry'       // Omit all uitry
                ],
                use: {
                   loader: "ts-loader",
@@ -284,103 +287,5 @@ module.exports = (env, argv) =>
             }
          ]
       },
-   },
-   {
-      // Since this is processed as a command line option (because of argv...)
-      // the mode must be set so that it can be returned as part of the big
-      // config entry.
-      mode: Mode,
-
-      entry: {
-         "index.ts": './app/ui/index.ts',
-         // working on this ...
-         // "DynamicText-entry": './app/src/DynamicText.js'
-      },
-      output: {
-         path: path.resolve(__dirname, './dist'),
-         filename: 'pixi_ui.js',
-         // The library name means you would access it via pixi-ui.button.
-         library: 'pixi_ui',
-
-         // Turn off pathInfo, increasing build time
-         pathinfo: false,
-      },
-      plugins: [
-         // Too messy, deal with later
-         // new TSLintPlugin({
-         //     files: ['./app/ui//**/*.ts']
-         // })
-      ],
-      //target: 'umd',
-      //target: 'web',
-      externals: Externals,
-      resolve: {
-         // Add '.ts' as resolvable extensions.
-         extensions: [".ts", ".js"],
-         alias: {
-            $: "jquery/src/jquery",
-         }
-      },
-      optimization: {
-         minimize: false,
-      },
-
-      // Enable sourcemaps for debugging webpack's output.
-      // // devtool: "source-map" // without any, there is no sourcemap
-      //devtool: "eval"  // none
-      devtool: "source-map", // one big blob
-      //devtool: "eval-source-map"  // none
-
-      module:
-      {
-         rules: [
-            {
-               test: /\.js$/,
-               include: [path.resolve(__dirname, "app")],
-               exclude: [
-                  // This would be a regular expression
-                  /node_modules/,
-                  // This would be a path
-                  // Omit stuff to be worked on
-                  '/app/partKart',    // We are doing UI so omit partKart
-                  '/test/partKart',   // We are doing UI so omit partKart
-                  '/app/uitry',       // Omit all uitry
-                  '/test/uitry/'      // Omit all uitry
-               ],
-               use: {
-                  loader: 'babel-loader',
-                  // Note. Do not put other compile options here !!!
-                  // ts-loader or babel-loader may override them.
-                  // i.e ts-loader listFiles: true or
-                  //     ts-loader outdir: 'js'
-               }
-            },
-            {
-               test: /\.ts$/,
-               include: [path.resolve(__dirname, "app")],
-               exclude: [
-                  // This would be a regular expression
-                  /node_modules/,
-                  // This would be a path
-                  // Omit stuff to be worked on
-                  '/app/partKart',    // We are doing UI so omit partKart
-                  '/test/partKart',   // We are doing UI so omit partKart
-                  '/app/uitry',       // Omit all uitry
-                  '/test/uitry/'      // Omit all uitry
-               ],
-               use: {
-                  loader: "ts-loader",
-                  // Note. Do not other put compile options here !!!
-                  // ts-loader or babel-loader may override them.
-                  // i.e ts-loader listFiles: true or
-                  //     ts-loader outdir: 'js'
-                  options: {
-                     transpileOnly: true,
-                     experimentalWatchApi: true,
-                  },
-               }
-            }
-         ]
-      },
-   }];
+   };
 };

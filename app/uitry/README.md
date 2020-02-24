@@ -1,3 +1,0 @@
-# pixi-ui
-
-WIP

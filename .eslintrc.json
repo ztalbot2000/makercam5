@@ -1,0 +1,52 @@
+{
+    "env": {
+        "browser": true,
+        "amd": true,
+        "node": true,
+        "es6": true
+    },
+    "extends": [ "eslint:recommended" ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "rules": {
+        "indent": ["error", 4],
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "double"],
+        "semi": ["error", "always"],
+
+        "comma-dangle": ["error", "always"],
+        "no-cond-assign": ["error", "always"],
+
+        "no-console": "off",
+
+        // Recommended built-in rules
+        "no-var-keyword": true,
+        "no-parameter-reassignment": true,
+        "typedef": [true, "call-signature"],
+
+        // Immutability rules
+        "readonly-keyword": true,
+        "readonly-array": true,
+        "no-let": true,
+        "no-object-mutation": true,
+        "no-delete": true,
+        "no-method-signature": true,
+
+        // Functional style rules
+        "no-this": true,
+        "no-class": true,
+        "no-mixed-interface": true,
+        "no-expression-statement": true,
+        "no-if-statement": true,
+
+        // Doesn't check for readonly in interfaces.
+        "ignore-interface": true
+    }
+}
