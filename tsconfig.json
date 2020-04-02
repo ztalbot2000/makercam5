@@ -31,7 +31,7 @@
       "strictNullChecks": false,
 
       // Common root directories to follow
-      "rootDirs": ["app", "test"],
+      "rootDirs": ["com", "test"],
 
       // Redirect output structure to the directory
       "outDir": "js",
@@ -63,14 +63,14 @@
       "tsBuildInfoFile": "./js/tsbuildinfo",
    },
    "include": [
-      "app/partKart",
-      "app/ui",
-      "app/src",
+      "Main.ts",
+      "com/partKart",
+      "com/lorentz",
+      "com/src",
       // - Adding "test" here compiled uitry,
       //   no matter what I tried to exclude
    ],
    "exclude": [
-      "/app/uitry/",
       "/node_modules/"
    ]
 }

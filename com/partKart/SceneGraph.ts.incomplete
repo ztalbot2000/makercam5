@@ -1,0 +1,2139 @@
+﻿//O package com.partkart
+
+//O   import flash.display.*;
+//O   import flash.ui.Keyboard;
+//O   import flash.events.*;
+//O   import flash.text.*;
+//O   import flash.geom.Point;
+//O   import flash.geom.Rectangle;
+//O   import flash.utils.Timer;
+//O   import fl.controls.ComboBox;
+//O   import flash.ui.Mouse;
+//O   import flash.net.FileReference;
+//O   import fl.data.DataProvider;
+//O   import flash.filters.BlurFilter;
+//O   import flash.filters.ColorMatrixFilter;
+//O   import flash.geom.Matrix;
+//O   import flash.ui.MouseCursor;
+
+import * as PIXI from "pixi.js";
+
+import { Individual } from "./Individual";
+import { Global } from "./Global";
+
+//O   import com.tink.display.HitTest;
+
+// the scene graph is a root node containing all rendered objects
+export class SceneGraph extends PIXI.Sprite
+{
+   //O public pathlist: Array = new Array( );              // list of all paths
+   public pathlist = [];
+   //O public copylist: Array = new Array( );              // copy/paste buffer
+   public copylist = [];
+
+   //O public cutlist: Array = new Array( );               // list of all cutobjects
+   public cutlist = [];
+
+   public xstart: number = 0;
+   public ystart: number = 0;
+
+   public ctrl: boolean = false;
+
+   // only one instance of the scene graph ias allowed
+   private static singleton: SceneGraph;
+
+   private progressdialog: ProgressDialog;
+
+   public nestpath: Path = null;
+   private nest: Nest = null;
+
+   // list of cutobjects that is waiting to be processed ( use for progress bar udpates )
+   public processlist: Array;
+
+   public SceneGraph( caller: Function = null): void
+   {
+      if ( caller != SceneGraph.getInstance )
+      {
+         throw new Error ( "SceneGraph is a singleton class, use getInstance() instead" );
+      }
+      if ( SceneGraph.singleton != null )
+      {
+         throw new Error( "Only one Singleton instance should be instantiated" );
+      }
+      this.cacheAsBitmap = true;
+   }
+
+   public static getInstance( ): SceneGraph
+   {
+      if ( singleton == null )
+      {
+         singleton = new SceneGraph( arguments.callee );
+      }
+      return singleton;
+   }
+
+   public addPath( p: Path ): void
+   {
+      this.addChild( p );
+      p.render( );
+      this.pathlist.push( p );
+      p.addEventListener( "mousedown", this.pathMouseDown );
+   }
+
+   public removePath( p: Path ): boolean
+   {
+      if ( p && contains( p ) )
+      {
+         this.removeChild( p );
+      }
+      let index: number = this.pathlist.indexOf( p );
+      if ( index == -1 )
+      {
+         return false;
+      }
+      this.pathlist.splice( index, 1 );
+      return true;
+   }
+
+   public addPaths( list: Array): void
+   {
+      for( let i = 0; i < list.length; i++ )
+      {
+         this.addChild( list[ i ] );
+         this.pathlist.push( list[ i ] );
+         list[ i ].addEventListener( "mousedown", this.pathMouseDown );
+      }
+      //redraw( );
+      for( i = 0; i < list.length; i++ )
+      {
+         list[ i ].setActive( );
+      }
+   }
+
+   public setInactive( ): void
+   {
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         this.pathlist[ i ].setInactive( );
+      }
+
+      for( i = 0; i < this.cutlist.length; i++ )
+      {
+         this.cutlist[ i ].setInactive( );
+      }
+   }
+
+   public getActiveCuts( ): Array
+   {
+      let active: Array = new Array( );
+      for( let i = 0; i < this.cutlist.length; i++ )
+      {
+         if ( this.cutlist[ i ].active == true )
+         {
+            active.push( this.cutlist[ i ] );
+         }
+      }
+      return active;
+   }
+
+   // removes dots and coordinate boxes from the screen, if p is defined, exclude p from clearing
+   public clearDots( p: Path = null): void
+   {
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( p == null || ( p != null && this.pathlist[ i ] != p) )
+         {
+            this.pathlist[ i ].setSegmentsInactive( );
+            this.pathlist[ i ].setDotsInactive( );
+            this.pathlist[ i ].clearDots( );
+         }
+      }
+
+      //O let removelist: Array = new Array( );
+      let removelist = [];
+
+      for( i = 0; i < numChildren; i++ )
+      {
+         //O if ( ( getChildAt(i) is coordinates) && (p == null || (p != null && p.coord != getChildAt(i))) )
+         if ( ( typeof getChildAt(i) == coordinates) && (p == null || (p != null && p.coord != getChildAt(i))) )
+         {
+            removelist.push( getChildAt(i) );
+         }
+      }
+
+      for( i = 0; i < removelist.length; i++ )
+      {
+         this.removeChild( removelist[ i ] );
+      }
+   }
+
+   public addDots( ): void
+   {
+      //O for each( let path: Path in this.pathlist )
+      for ( let path: Path in this.pathlist )
+      {
+         path.redrawDots( );
+      }
+   }
+
+   public redraw( ): void
+   {
+      trace( "redraw!" );
+
+      // no redrawing during calculations
+      if ( Global.tool != 99 )
+      {
+         clearDots( );
+         x = Global.xorigin;
+         y = Global.yorigin;
+
+         while( numChildren > 0 )
+         {
+            this.removeChildAt( 0 );
+         }
+
+         // stack cutobjects at the bottom
+         //O for each( let cut: CutObject in this.cutlist )
+         for ( let cut: CutObject in this.cutlist )
+         {
+            this.addChild( cut );
+         }
+
+         // paths on top
+         //O for each( let path in this.pathlist )
+         for ( let path in this.pathlist )
+         {
+            this.addChild( path );
+
+            path.x = path.docx * Global.zoom;
+            path.y = path.docy * Global.zoom;
+
+            path.redraw( );
+         }
+
+         redrawCuts( );
+      }
+   }
+
+   public redrawCuts( ): void
+   {
+      //O for each( let cutobject: CutObject in this.cutlist )
+      for ( let cutobject: CutObject in this.cutlist )
+      {
+         cutobject.x = cutobject.docx * Global.zoom;
+         cutobject.y = cutobject.docy * Global.zoom;
+
+         cutobject.redraw( );
+      }
+      //O for each( cutobject in this.cutlist )
+      for ( cutobject in this.cutlist )
+      {
+         if ( cutobject.processed == false )
+         {
+            //O for each( let path: Path in cutobject.pathlist )
+            for ( let path: Path in cutobject.pathlist )
+            {
+               path.dirty = false;
+            }
+         }
+      }
+   }
+
+   public cmToInch( ): void
+   {
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         this.pathlist[ i ].cmToInch( );
+         this.pathlist[ i ].dirty = true;
+      }
+      for( i = 0; i < this.cutlist.length; i++ )
+      {
+         if ( this.cutlist[ i ].processed == true )
+         {
+            this.cutlist[ i ].cmToInch( );
+         }
+         else
+         {
+            this.cutlist[ i ].paramsCmToInch( );
+         }
+      }
+
+      Global.tolerance /= 2.54;
+   }
+
+   public inchToCm( ): void
+   {
+      for ( let i = 0; i < this.pathlist.length; i++ )
+      {
+         this.pathlist[ i ].inchToCm( );
+         this.pathlist[ i ].dirty = true;
+      }
+      for ( i = 0; i < this.cutlist.length; i++ )
+      {
+         if ( this.cutlist[ i ].processed == true )
+         {
+            this.cutlist[ i ].inchToCm( );
+         }
+         else
+         {
+            this.cutlist[ i ].paramsInchToCm( );
+         }
+      }
+
+      Global.tolerance *= 2.54;
+   }
+
+   public pathMouseDown( e: MouseEvent ): void
+   {
+
+      stage.focus = null;
+
+      if ( Global.tool == 3 && Global.space == false )
+      {
+         e.stopPropagation( );
+      }
+      else if ( Global.tool == 0 && Global.space == false )
+      {
+         e.stopPropagation( );
+
+         let path: Path;
+
+         //O if ( e.target is Segment )
+         if ( typeof e.target == Segment )
+         {
+            path = e.target.parent as Path;
+         }
+         //O else if ( e.target is Path )
+         else if ( typeof e.target ==  Path )
+         {
+            path = e.target as Path;
+         }
+
+         if ( path != null )
+         {
+            path.startDrag( );
+            path.dragging = true;
+            path.mouseChildren = false;
+
+            this.xstart = e.stageX;
+            this.ystart = e.stageY;
+
+            // put path on top of z-stack
+            this.addChild( path);
+
+            if ( this.ctrl == true )
+            {
+               if ( path.active )
+               {
+                  path.setInactive( );
+               }
+               else
+               {
+                  path.setActive( );
+               }
+            }
+            else if ( path.active == false || getPathNumActive( ) < 2 )
+            {
+               clearDots( );
+               setInactive( );
+               path.setActive( );
+            }
+
+            for( let i = 0; i < this.pathlist.length; i++ )
+            {
+               if ( this.pathlist[ i ].active && this.pathlist[ i ] != path )
+               {
+                  path.addChild( this.pathlist[ i ] );
+
+                  this.pathlist[ i ].x -= path.x;
+                  this.pathlist[ i ].y -= path.y;
+               }
+            }
+
+            for ( i = 0; i < this.cutlist.length; i++ )
+            {
+               let parents: Array = this.cutlist[ i ].pathlist;
+               let movecut: boolean = true;
+               //O for each( let p: Path in parents )
+               for ( let p: Path in parents )
+               {
+                  if ( p.active == false )
+                  {
+                     movecut = false;
+                  }
+               }
+               if ( movecut == true )
+               {
+                  path.addChild( this.cutlist[ i ] );
+
+                  this.cutlist[ i ].x -= path.x;
+                  this.cutlist[ i ].y -= path.y;
+               }
+            }
+
+            path.addEventListener( "mouseup", pathMouseUp );
+         }
+      }
+   }
+
+   public pathMouseUp( e: MouseEvent, epath: Path = null): void
+   {
+      let path: Path;
+
+      if ( epath != null )
+      {
+         path = epath;
+      }
+      //O else if ( e.target is Segment )
+      else if ( typeof e.target == Segment )
+      {
+         path = e.target.parent as Path;
+      }
+      // else if ( e.target is Path )
+      else if ( typeof e.target == Path )
+      {
+         path = e.target as Path;
+      }
+      if ( path != null )
+      {
+
+         //O while( path.parent is Path )
+         while( typeof path.parent == Path )
+         {
+            path = path.parent as Path;
+         }
+
+         path.stopDrag( );
+         path.dragging = false;
+         path.mouseChildren = true;
+
+         trace( "uppped" );
+         // don't do this stuff during sketching
+         if ( path != null && Global.tool == 0 )
+         {
+            let xdelta: number = e.stageX - this.xstart;
+            let ydelta: number = e.stageY - this.ystart;
+
+            if ( isNaN( xdelta ) )
+            {
+               xdelta = 0;
+            }
+
+            if ( isNaN( ydelta ) )
+            {
+               ydelta = 0;
+            }
+
+            path.docx += xdelta/Global.zoom;
+            path.docy += ydelta/Global.zoom;
+
+            path.x = path.docx*Global.zoom;
+            path.y = path.docy*Global.zoom;
+
+            let plist: Array = new Array( );
+
+            if ( path )
+            {
+               let p: *;
+               for( let i=0; i < path.numChildren; i++ )
+               {
+                  p = path.getChildAt( i );
+                  //O if ( p is Path || p is CutObject )
+                  if ( typeof p == Path || typeof p == CutObject )
+                  {
+                     plist.push( path.getChildAt( i ) );
+                  }
+               }
+
+               //O for each( p in plist )
+               for ( p in plist )
+               {
+                  p.docx += xdelta/Global.zoom;
+                  p.docy += ydelta/Global.zoom;
+
+                  p.x = p.docx*Global.zoom;
+                  p.y = p.docy*Global.zoom;
+                  this.addChild( p );
+               }
+            }
+
+            if ( xdelta != 0 || ydelta != 0 )
+            {
+               // setup undo
+               let undo: UndoMove = new UndoMove( this );
+               undo.xdelta = xdelta/Global.zoom;
+               undo.ydelta = ydelta/Global.zoom;
+               undo.pathlist = plist;
+               undo.pathlist.push( path );
+
+               Global.undoPush( undo );
+
+               // if the paths of a cutobject are all moved at once, they are not dirty. Otherwise the path is dirty
+               /*let clist: Array = new Array( );
+               //O for each( p in plist)
+               for ( p in plist )
+               {
+                  //O if ( p is CutObject )
+                  if ( typeof p == CutObject )
+                  {
+                     clist.push( p );
+                  }
+               }*/
+               //O for each( let c: CutObject in this.cutlist )
+               for ( let c: CutObject in this.cutlist )
+               {
+                  let moved = 0;
+                  //O for each( path in c.pathlist )
+                  for ( path in c.pathlist )
+                  {
+                     if ( plist.indexOf( path ) != -1 )
+                     {
+                        moved++;
+                     }
+                  }
+                  if ( moved > 0 && moved < c.pathlist.length )
+                  {
+                     //O for each( path in c.pathlist )
+                     for ( path in c.pathlist )
+                     {
+                        if ( plist.indexOf( path ) != -1 )
+                        {
+                           path.dirty = true;
+                           path.camdirty = true;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+
+         // paths on top
+         for ( i = 0; i < this.pathlist.length; i++ )
+         {
+            this.addChild( this.pathlist[ i ] );
+         }
+
+         this.path.removeEventListener( "mouseup", this.pathMouseUp );
+      }
+
+      this.redrawCuts( );
+   }
+
+   // fires mouseup events when mouse leaves stage
+   public mouseLeave( ): void
+   {
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].dragging == true )
+         {
+            this.pathMouseUp( new MouseEvent( "mouseup" ), this.pathlist[ i ] );
+         }
+         this.pathlist[ i ].pubPointUpAction( );
+      }
+   }
+
+   public select( selectbox: PIXI.Sprite): void
+   {
+      // set selected paths to active
+
+      let perfect: boolean = true;
+
+      // when you're selecting more than 1000 elements,
+      // you're probably not going for accuracy
+      if ( this.pathlist.length > 1000 )
+      {
+         perfect = false;
+      }
+
+      selectbox.alpha = 1;
+
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( HitTest.complexHitTestObject( selectbox, this.pathlist[ i ]) )
+         {
+            if ( this.pathlist[ i ].active )
+            {
+               this.pathlist[ i ].setInactive( );
+            }
+            else
+            {
+               this.pathlist[ i ].setActive( );
+            }
+         }
+      }
+
+      for( i = 0; i < this.cutlist.length; i++ )
+      {
+         if ( HitTest.complexHitTestObject( selectbox, this.cutlist[ i ]) )
+         {
+            if ( this.cutlist[ i ].active )
+            {
+               this.cutlist[ i ].setInactive( );
+            }
+            else
+            {
+               this.cutlist[ i ].setActive( );
+            }
+         }
+      }
+   }
+
+   public deleteSelected( ): void
+   {
+      // keep track of removed cuts/paths
+      let removedcuts: Array = new Array( );
+      let removedpaths: Array = new Array( );
+      // keeps track of parent relationships between cuts and paths
+      let cutparent: Array = new Array( );
+
+      let i: number;
+
+      // remove selected paths from this.cutlist
+      for( i = 0; i < this.cutlist.length; i++ )
+      {
+         for( let j = 0; j < this.pathlist.length; j++ )
+         {
+            let dirty: boolean = false;
+
+            if ( this.pathlist[ i ].active == true )
+            {
+               cutparent.push( {cut: this.cutlist[ i ], path: this.pathlist[ i ]}
+                );
+               let index = this.cutlist[ i ].pathlist.indexOf( this.pathlist[ i ] );
+               if ( index != -1 )
+               {
+                  this.cutlist[ i ].pathlist.splice( index, 1 );
+                  dirty = true;
+               }
+            }
+            // delete the cutobject if it has no paths left
+            if ( this.cutlist[ i ].pathlist.length == 0 )
+            {
+               let cut: CutObject = this.cutlist[ i ];
+               if ( this.removeCut( cut) )
+               {
+                  removedcuts.push( cut );
+                  i--;
+                  break;
+               }
+            }
+            else if ( dirty )
+            {
+               this.cutlist[ i ].pathlist[ 0 ].dirty = true;
+               this.cutlist[ i ].pathlist[ 0 ].camdirty = true;
+            }
+         }
+      }
+
+      i = 0;
+
+      let path: Path;
+
+      // remove selected paths from this.pathlist, remove selected segments
+      while( i < this.pathlist.length )
+      {
+         path = this.pathlist[ i ];
+
+         if ( path.active == true )
+         {
+            removedpaths.push( path );
+            if ( removePath( path) )
+            {
+               i--;
+            }
+         }
+         else
+         {
+            if ( path.deleteActive( ) == true )
+            {
+               if ( removePath( path ) )
+               {
+                  i--;
+               }
+            }
+         }
+         i++;
+      }
+
+      for( i=0; i<this.cutlist.length; i++ )
+      {
+         cut = this.cutlist[ i ];
+         if ( this.cutlist[ i ].active == true )
+         {
+            if ( this.removeCut( cut) )
+            {
+               removedcuts.push( cut );
+               i--;
+            }
+         }
+      }
+
+      if ( removedpaths.length > 0 || removedcuts.length > 0 )
+      {
+         // set up undo
+         let undo: UndoDelete = new UndoDelete( this );
+         undo.pathlist = removedpaths;
+         undo.cutlist = removedcuts;
+         undo.cutparent = cutparent;
+
+         Global.undoPush( undo );
+      }
+
+      // remove tabs
+      for( i = 0; i < this.cutlist.length; i++ )
+      {
+         this.cutlist[ i ].removeActiveTabs( );
+      }
+
+      clearDots( );
+   }
+
+   public getPathNumActive( ): number
+   {
+      let n: number = 0;
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            n++;
+         }
+      }
+
+      return n;
+   }
+
+   public startCopy( ): void
+   {
+      this.copylist = new Array( );
+
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            let p: Path = this.pathlist[ i ].clone( );
+            //p.redrawDots( );
+            this.copylist.push( p );
+         }
+      }
+   }
+
+   public startPaste( p: Point = null): void
+   {
+      // if given a point, align pasted paths to that point
+
+      setInactive( );
+
+      if ( p != null && this.copylist.length > 0 )
+      {
+         let min: PIXI.Point = this.copylist[ 0 ].getMin( ).clone( );
+         for( let j = 0; j < this.copylist.length; j++ )
+         {
+            let m: Point = this.copylist[ i ].getMin( );
+            if ( m.x < min.x )
+            {
+               min.x = m.x;
+            }
+            if ( m.y < min.y )
+            {
+               min.y = m.y;
+            }
+         }
+
+         let diff: Point = new Point( p.x-min.x, p.y-min.y );
+
+         for( j = 0; j < this.copylist.length; j++ )
+         {
+            this.copylist[ i ].docx += diff.x;
+            this.copylist[ i ].docy -= diff.y;
+
+            this.copylist[ i ].x = this.copylist[ i ].docx * Global.zoom + Global.xorigin;
+            this.copylist[ i ].y = -this.copylist[ i ].docy * Global.zoom + Global.yorigin;
+         }
+      }
+
+      addPaths( this.copylist );
+      redraw( );
+
+      let newlist: Array = new Array( );
+      for( let i = 0; i < this.copylist.length; i++ )
+      {
+         newlist.push( this.copylist[ i ].clone( ) );
+      }
+
+      this.copylist = newlist;
+   }
+
+   // applies the given matrix as a local transform on selected paths
+   public applyMatrixLocal( m: Matrix): void
+   {
+      // applies the given matrix transform to all active paths
+
+      // now we normalize the result so that the middle point of the previous and current spaces are identical
+
+      let average: Point = new Point( 0, 0 );
+      let len = 0;
+
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            let pathav: PIXI.Point = this.pathlist[ i ].getAverage( );
+            average.x += pathav.x;
+            average.y += pathav.y;
+
+            len++;
+         }
+      }
+
+      average.x = average.x/len;
+      average.y = average.y/len;
+
+      let newaverage: PIXI.Point = m.transformPoint( average );
+
+      let dis: PIXI.Point = new PIXI.Point( newaverage.x-average.x, newaverage.y-average.y );
+
+      // apply the matrix now
+      for( i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            this.pathlist[ i ].matrixTransform( m );
+            let newdoc: Point = m.transformPoint( new Point(this.pathlist[ i ].docx, -this.pathlist[ i ].docy) );
+            this.pathlist[ i ].docx = newdoc.x;
+            this.pathlist[ i ].docy = -newdoc.y;
+         }
+      }
+
+      // normalize
+      for( i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            this.pathlist[ i ].docx -= dis.x;
+            this.pathlist[ i ].docy += dis.y;
+         }
+      }
+
+      redraw( );
+   }
+
+   public closeLoop( dot: Dot): Point
+   {
+      let snappoint: Point;
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         snappoint = this.pathlist[ i ].snapPoint( dot );
+         if ( snappoint != null )
+         {
+            if ( dot )
+            {
+               dot.looppath = this.pathlist[ i ];
+            }
+            return snappoint;
+         }
+      }
+
+      return null;
+   }
+
+   // CAM operations start here
+
+   public profile( flist: Array): void
+   {
+
+      // filter input
+      let cutname: string = String( flist[ 0 ].input.text );
+      let tooldiameter: number = Math.abs( Number(flist[ 1 ].input.text) );
+      let targetdepth: number = Number( flist[ 2 ].input.text );
+      let outside: boolean = flist[ 3 ].input.selectedItem.data;
+      let safetyheight: number = Number( flist[ 4 ].input.text );
+      let stocksurface: number = Number( flist[ 5 ].input.text );
+      let stepdown: number = Math.abs( Number(flist[ 6 ].input.text) );
+      let feedrate: number = Math.abs( Number(flist[ 7 ].input.text) );
+      let plungerate: number = Math.abs( Number(flist[ 8 ].input.text) );
+      let dir: number = flist[ 9 ].input.selectedItem.data;
+
+      if ( Global.unit == "cm" )
+      {
+         // internal units are cm whereas machining units are given in mm
+         tooldiameter /= 10;
+      }
+
+      if ( isNaN( safetyheight) || isNaN(stocksurface) || isNaN(targetdepth) || isNaN(tooldiameter) || tooldiameter == 0 || isNaN(stepdown) || stepdown == 0 || isNaN(feedrate) || feedrate == 0 || isNaN(plungerate) || plungerate == 0 )
+      {
+         return;
+      }
+
+      let selectedpaths: Array = new Array( );
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            selectedpaths.push( this.pathlist[ i ] );
+         }
+      }
+
+      let cut: ProfileCutObject = new ProfileCutObject( );
+
+      cut.name = cutname;
+      cut.outside = outside;
+      cut.safetyheight = safetyheight;
+      cut.stocksurface = stocksurface;
+      cut.targetdepth = targetdepth;
+      cut.tooldiameter = tooldiameter;
+      cut.stepdown = stepdown;
+      cut.feedrate = feedrate;
+      cut.plungerate = plungerate;
+      cut.dir = dir;
+
+      cut.pathlist = selectedpaths;
+
+      addCut( cut );
+
+      //let result: Array = cut.process( selectedpaths );
+
+      /*if ( result == null || result.length == 0){
+         this.removeChild( cut );
+         this.cutlist.splice( this.cutlist.indexOf( cut ), 1 );
+      }*/
+
+      redraw( );
+   }
+
+   public editprofile( flist: Array): void
+   {
+      // filter input
+      let cutname: string = String( flist[ 0 ].input.text );
+      let tooldiameter: number = Math.abs( Number(flist[ 1 ].input.text) );
+      let targetdepth: number = Number( flist[ 2 ].input.text );
+      let outside: boolean = flist[ 3 ].input.selectedItem.data;
+      let safetyheight: number = Number( flist[ 4 ].input.text );
+      let stocksurface: number = Number( flist[ 5 ].input.text );
+      let stepdown: number = Math.abs( Number(flist[ 6 ].input.text) );
+      let feedrate: number = Math.abs( Number(flist[ 7 ].input.text) );
+      let plungerate: number = Math.abs( Number(flist[ 8 ].input.text) );
+      let dir: number = flist[ 9 ].input.selectedItem.data;
+
+      if ( Global.unit == "cm" )
+      {
+         // internal units are cm whereas machining units are given in mm
+         tooldiameter /= 10;
+      }
+
+      let main: * = this.parent;
+
+      let cut: ProfileCutObject = main.tools.dToolpaths.selectedItem.data;
+
+      let redrawcut: boolean = false;
+      if ( cut.tooldiameter != tooldiameter || cut.outside != outside || cut.dir != dir )
+      {
+         redrawcut = true;
+      }
+
+      cut.name = cutname;
+      main.tools.dToolpaths.selectedItem.label = cutname;
+      cut.outside = outside;
+      cut.safetyheight = isNaN( safetyheight ) ? cut.safetyheight : safetyheight;
+      cut.stocksurface = isNaN( stocksurface ) ? cut.stocksurface : stocksurface;
+      cut.targetdepth = isNaN( targetdepth ) ? cut.targetdepth : targetdepth;
+      cut.tooldiameter = ( isNaN(tooldiameter ) || tooldiameter == 0 ) ? cut.tooldiameter : tooldiameter;
+      cut.stepdown = ( isNaN(stepdown) || stepdown == 0) ? cut.stepdown : stepdown;
+      cut.feedrate = ( isNaN(feedrate) || feedrate == 0) ? cut.feedrate : feedrate;
+      cut.plungerate = ( isNaN(plungerate ) || plungerate == 0 ) ? cut.plungerate : plungerate;
+      cut.dir = dir;
+
+      if ( redrawcut )
+      {
+         cut.pathlist[ 0 ].dirty = true;
+         cut.pathlist[ 0 ].camdirty = true;
+         cut.processed = false;
+         redraw( );
+      }
+   }
+
+   public pocket( flist: Array): void
+   {
+
+      // filter input
+      let cutname: string = String( flist[ 0 ].input.text );
+      let tooldiameter: number = Math.abs( Number(flist[ 1 ].input.text ) );
+      let targetdepth: number = Number( flist[ 2 ].input.text );
+      let safetyheight: number = Number( flist[ 3 ].input.text );
+      let stocksurface: number = Number( flist[ 4 ].input.text );
+      let stepover: number = 0.01*Math.abs( Number(flist[ 5 ].input.text ) );
+      let stepdown: number = Math.abs( Number(flist[ 6 ].input.text) );
+      let roughingclearance: number = Math.abs( Number( flist[ 7 ].input.text) );
+      let feedrate: number = Math.abs( Number( flist[ 8 ].input.text ) );
+      let plungerate: number = Math.abs( Number( flist[ 9 ].input.text ) );
+      let dir: number = flist[ 10 ].input.selectedItem.data;
+
+      if ( Global.unit == "cm" )
+      {
+         // internal units are cm whereas machining units are given in mm
+         tooldiameter /= 10;
+         roughingclearance /= 10;
+      }
+
+      if ( isNaN( safetyheight) || isNaN( stocksurface ) || isNaN( targetdepth ) || isNaN(tooldiameter ) || isNaN( stepdown ) || stepdown == 0 || isNaN(stepover) || stepover == 0 || isNaN( feedrate ) || feedrate == 0 || isNaN( plungerate ) || plungerate == 0 || isNaN(roughingclearance) )
+      {
+         return;
+      }
+
+      let selectedpaths: Array = new Array( );
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            selectedpaths.push( this.pathlist[ i ] );
+         }
+      }
+
+      let cut: PocketCutObject = new PocketCutObject( );
+
+      cut.name = cutname;
+      cut.safetyheight = safetyheight;
+      cut.stocksurface = stocksurface;
+      cut.targetdepth = targetdepth;
+      cut.tooldiameter = tooldiameter;
+      cut.stepover = stepover;
+      cut.stepdown = stepdown;
+      cut.roughingclearance = roughingclearance;
+      cut.feedrate = feedrate;
+      cut.plungerate = plungerate;
+      cut.dir = dir;
+
+      cut.pathlist = selectedpaths;
+
+      addCut( cut );
+
+      //let result: Array = cut.process( selectedpaths );
+
+      /*if ( result == null || result.length == 0){
+         this.removeChild( cut );
+         this.cutlist.splice( this.cutlist.indexOf( cut ), 1 );
+      }*/
+
+      redraw( );
+   }
+
+   public editpocket( flist: Array): void
+   {
+      // filter input
+      let cutname: string = String( flist[ 0 ].input.text );
+      let tooldiameter: number = Math.abs( Number(flist[ 1 ].input.text ) );
+      let targetdepth: number = Number( flist[ 2 ].input.text );
+      let safetyheight: number = Number( flist[ 3 ].input.text );
+      let stocksurface: number = Number( flist[ 4 ].input.text );
+      let stepover: number = 0.01*Math.abs( Number( flist[ 5 ].input.text ) );
+      let stepdown: number = Math.abs( Number( flist[ 6 ].input.text ) );
+      let roughingclearance: number = Math.abs( Number( flist[ 7 ].input.text ) );
+      let feedrate: number = Math.abs( Number( flist[ 8 ].input.text ) );
+      let plungerate: number = Math.abs( Number( flist[ 9 ].input.text ) );
+      let dir: number = flist[ 10 ].input.selectedItem.data;
+
+      if ( Global.unit == "cm" )
+      {
+         // internal units are cm whereas machining units are given in mm
+         tooldiameter /= 10;
+         roughingclearance /= 10;
+      }
+
+      let main: * = this.parent;
+      let cut: PocketCutObject = main.tools.dToolpaths.selectedItem.data;
+
+      let redrawcut: boolean = false;
+      if ( tooldiameter != cut.tooldiameter || roughingclearance != cut.roughingclearance || stepover != cut.stepover || dir != cut.dir )
+      {
+         redrawcut = true;
+      }
+
+      cut.name = cutname;
+      main.tools.dToolpaths.selectedItem.label = cutname;
+      cut.safetyheight = isNaN( safetyheight) ? cut.safetyheight : safetyheight;
+      cut.stocksurface = isNaN( stocksurface) ? cut.stocksurface : stocksurface;
+      cut.targetdepth = isNaN( targetdepth) ? cut.targetdepth : targetdepth;
+      cut.tooldiameter = ( isNaN( tooldiameter ) || tooldiameter == 0) ? cut.tooldiameter : tooldiameter;
+      cut.stepover = ( isNaN(stepover) || stepover == 0) ? cut.stepover : stepover;
+      cut.stepdown = ( isNaN(stepdown) || stepdown == 0) ? cut.stepdown : stepdown;
+      cut.roughingclearance = isNaN( roughingclearance) ? cut.roughingclearance : roughingclearance;
+      cut.feedrate = ( isNaN( feedrate ) || feedrate == 0 ) ? cut.feedrate : feedrate;
+      cut.plungerate = ( isNaN( plungerate ) || plungerate == 0 ) ? cut.plungerate : plungerate;
+      cut.dir = dir;
+
+      if ( redrawcut )
+      {
+         cut.pathlist[ 0 ].dirty = true;
+         cut.pathlist[ 0 ].camdirty = true;
+         cut.processed = false;
+         redraw( );
+      }
+   }
+
+   public followpath( flist: Array): void
+   {
+
+      // filter input
+      let cutname: string = String( flist[ 0 ].input.text );
+      let tooldiameter: number = Math.abs( Number( flist[ 1 ].input.text) );
+      let targetdepth: number = Number( flist[ 2 ].input.text );
+      let safetyheight: number = Number( flist[ 3 ].input.text );
+      let stocksurface: number = Number( flist[ 4 ].input.text );
+      let stepdown: number = Math.abs( Number( flist[ 5 ].input.text) );
+      let feedrate: number = Math.abs( Number( flist[ 6 ].input.text) );
+      let plungerate: number = Math.abs( Number( flist[ 7 ].input.text) );
+
+      if ( isNaN( tooldiameter) || isNaN(safetyheight) || isNaN( stocksurface ) || isNaN( targetdepth) || isNaN( stepdown ) || stepdown == 0 || isNaN( feedrate ) || feedrate == 0 || isNaN( plungerate ) || plungerate == 0 )
+      {
+         return;
+      }
+
+      if ( Global.unit == "cm" )
+      {
+         // internal units are cm whereas machining units are given in mm
+         tooldiameter /= 10;
+      }
+
+      let selectedpaths: Array = new Array( );
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            selectedpaths.push( this.pathlist[ i ] );
+         }
+      }
+
+      let cut: FollowPathCutObject = new FollowPathCutObject( );
+
+      cut.name = cutname;
+      cut.tooldiameter = tooldiameter;
+      cut.targetdepth = targetdepth;
+      cut.safetyheight = safetyheight;
+      cut.stocksurface = stocksurface;
+      cut.stepdown = stepdown;
+      cut.feedrate = feedrate;
+      cut.plungerate = plungerate;
+
+      cut.pathlist = selectedpaths;
+
+      addCut( cut );
+
+      /*let result: Array = cut.process( selectedpaths );
+
+      if ( result == null || result.length == 0){
+         this.removeChild( cut );
+         this.cutlist.splice( this.cutlist.indexOf( cut ), 1 );
+      }*/
+
+      redraw( );
+   }
+
+   public editfollowpath( flist: Array): void
+   {
+      // filter input
+      let cutname: string = String( flist[ 0 ].input.text );
+      let tooldiameter: number = Math.abs( Number( flist[ 1 ].input.text ) );
+      let targetdepth: number = Number( flist[ 2 ].input.text );
+      let safetyheight: number = Number( flist[ 3 ].input.text );
+      let stocksurface: number = Number( flist[ 4 ].input.text );
+      let stepdown: number = Math.abs( Number( flist[ 5 ].input.text ) );
+      let feedrate: number = Math.abs( Number( flist[ 6 ].input.text ) );
+      let plungerate: number = Math.abs( Number( flist[ 7 ].input.text ) );
+
+      if ( Global.unit == "cm" )
+      {
+         // internal units are cm whereas machining units are given in mm
+         tooldiameter /= 10;
+      }
+
+      let main: * = this.parent;
+      let cut: FollowPathCutObject = main.tools.dToolpaths.selectedItem.data;
+
+      cut.name = cutname;
+      main.tools.dToolpaths.selectedItem.label = cutname;
+      cut.tooldiameter = ( isNaN( tooldiameter ) || tooldiameter == 0 ) ? cut.tooldiameter : tooldiameter;
+      cut.safetyheight = isNaN( safetyheight) ? cut.safetyheight : safetyheight;
+      cut.stocksurface = isNaN( stocksurface) ? cut.stocksurface : stocksurface;
+      cut.targetdepth = isNaN( targetdepth) ? cut.targetdepth : targetdepth;
+      cut.stepdown = ( isNaN( stepdown) || stepdown == 0 ) ? cut.stepdown : stepdown;
+      cut.feedrate = ( isNaN( feedrate) || feedrate == 0 ) ? cut.feedrate : feedrate;
+      cut.plungerate = ( isNaN( plungerate) || plungerate == 0 ) ? cut.plungerate : plungerate;
+
+      redraw( );
+   }
+
+   public drill( flist: Array): void
+   {
+
+      // filter input
+      let cutname: string = String( flist[ 0 ].input.text );
+      let tooldiameter: number = Math.abs( Number(flist[ 1 ].input.text ) );
+      let targetdepth: number = Number( flist[ 2 ].input.text );
+      let center: boolean = flist[ 3 ].input.selectedItem.data;
+      let spacing: number = Number( flist[ 4 ].input.text );
+      let safetyheight: number = Number( flist[ 5 ].input.text );
+      let stocksurface: number = Number( flist[ 6 ].input.text );
+      let stepdown: number = Math.abs( Number( flist[ 7 ].input.text ) );
+      let plungerate: number = Math.abs( Number( flist[ 8 ].input.text ) );
+
+      if ( isNaN( tooldiameter) || isNaN( safetyheight ) || isNaN( stocksurface ) || isNaN( targetdepth ) || isNaN( stepdown ) || stepdown == 0 || isNaN( plungerate ) || plungerate == 0 || isNaN( spacing ) || spacing == 0 )
+      {
+         return;
+      }
+
+      if ( Global.unit == "cm" )
+      {
+         // internal units are cm whereas machining units are given in mm
+         tooldiameter /= 10;
+         spacing /= 10;
+      }
+
+      let selectedpaths: Array = new Array( );
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            selectedpaths.push( this.pathlist[ i ] );
+         }
+      }
+
+      let cut: DrillCutObject = new DrillCutObject( );
+
+      cut.name = cutname;
+      cut.tooldiameter = tooldiameter;
+      cut.targetdepth = targetdepth;
+      cut.center = center;
+      cut.spacing = spacing;
+      cut.safetyheight = safetyheight;
+      cut.stocksurface = stocksurface;
+      cut.stepdown = stepdown;
+      cut.plungerate = plungerate;
+
+      cut.pathlist = selectedpaths;
+
+      addCut( cut );
+
+      /*let result: Array = cut.process( selectedpaths );
+
+      if ( result == null || result.length == 0){
+         this.removeChild( cut );
+         this.cutlist.splice( this.cutlist.indexOf( cut ), 1 );
+      }*/
+
+      redraw( );
+   }
+
+   public editdrill( flist: Array): void
+   {
+
+      // filter input
+      let cutname: string = String( flist[ 0 ].input.text );
+      let tooldiameter: number = Math.abs( Number( flist[ 1 ].input.text ) );
+      let targetdepth: number = Number( flist[ 2 ].input.text );
+      let center: boolean = flist[ 3 ].input.selectedItem.data;
+      let spacing: number = Number( flist[ 4 ].input.text );
+      let safetyheight: number = Number( flist[ 5 ].input.text );
+      let stocksurface: number = Number( flist[ 6 ].input.text );
+      let stepdown: number = Math.abs( Number( flist[ 7 ].input.text ) );
+      let plungerate: number = Math.abs( Number( flist[ 8 ].input.text ) );
+
+      if ( Global.unit == "cm" )
+      {
+         // internal units are cm whereas machining units are given in mm
+         tooldiameter /= 10;
+         spacing /= 10;
+      }
+
+      let main: * = this.parent;
+      let cut: DrillCutObject = main.tools.dToolpaths.selectedItem.data;
+
+      let redrawcut: boolean = false;
+      if ( center != cut.center )
+      {
+         redrawcut = true;
+      }
+
+      cut.name = cutname;
+      main.tools.dToolpaths.selectedItem.label = cutname;
+      cut.tooldiameter = ( isNaN( tooldiameter ) || tooldiameter == 0 ) ? cut.tooldiameter : tooldiameter;
+      cut.center = center;
+      cut.spacing = ( isNaN( spacing ) || spacing == 0) ? cut.spacing : spacing;
+      cut.safetyheight = isNaN( safetyheight ) ? cut.safetyheight : safetyheight;
+      cut.stocksurface = isNaN( stocksurface ) ? cut.stocksurface : stocksurface;
+      cut.targetdepth = isNaN( targetdepth ) ? cut.targetdepth : targetdepth;
+      cut.stepdown = ( isNaN( stepdown ) || stepdown == 0) ? cut.stepdown : stepdown;
+      cut.plungerate = ( isNaN( plungerate ) || plungerate == 0) ? cut.plungerate : plungerate;
+
+      if ( redrawcut )
+      {
+         cut.pathlist[ 0 ].dirty = true;
+         cut.pathlist[ 0 ].camdirty = true;
+         cut.processed = false;
+      }
+
+      redraw( );
+   }
+
+   public batch( flist: Array): void
+   {
+      // filter input
+      let tooldiameter: number = Math.abs( Number( flist[ 0 ].input.text ) );
+      let targetdepth: number = Number( flist[ 1 ].input.text );
+      let outside: boolean = flist[ 2 ].input.selectedItem.data;
+      let safetyheight: number = Number( flist[ 3 ].input.text );
+      let stocksurface: number = Number( flist[ 4 ].input.text );
+      let stepover: number = 0.01*Math.abs( Number( flist[ 5 ].input.text ) );
+      let stepdown: number = Math.abs( Number( flist[ 6 ].input.text ) );
+      let roughingclearance: number = Math.abs( Number( flist[ 7 ].input.text ) );
+      let feedrate: number = Math.abs( Number( flist[ 8 ].input.text ) );
+      let plungerate: number = Math.abs( Number( flist[ 9 ].input.text ) );
+      let dir: number = flist[ 10 ].input.selectedItem.data;
+      let center: boolean = flist[ 11 ].input.selectedItem.data;
+      let spacing: number = Number( flist[ 12 ].input.text );
+
+      if ( Global.unit == "cm" )
+      {
+         // internal units are cm whereas machining units are given in mm
+         tooldiameter /= 10;
+         roughingclearance /= 10;
+      }
+
+      if ( isNaN( safetyheight) || isNaN(stocksurface) || isNaN(targetdepth) || isNaN(tooldiameter) || isNaN(stepdown) || stepdown == 0 || isNaN(feedrate) || feedrate == 0 || isNaN(plungerate) || plungerate == 0 )
+      {
+         return;
+      }
+
+      let selectedcuts: Array = new Array( );
+      for( let i = 0; i < this.cutlist.length; i++ )
+      {
+         if ( this.cutlist[ i ].active == true )
+         {
+            selectedcuts.push( this.cutlist[ i ] );
+         }
+      }
+
+      //O for each( let cut: * in selectedcuts )
+      for ( let cut: * in selectedcuts )
+      {
+         cut.pathlist[ 0 ].dirty = true;
+         cut.pathlist[ 0 ].camdirty = true;
+         cut.processed = false;
+
+         cut.safetyheight = safetyheight;
+         cut.stocksurface = stocksurface;
+         cut.outside = outside;
+         cut.targetdepth = targetdepth;
+         cut.tooldiameter = tooldiameter;
+         cut.stepover = stepover;
+         cut.stepdown = stepdown;
+         cut.roughingclearance = roughingclearance;
+         cut.feedrate = feedrate;
+         cut.plungerate = plungerate;
+         cut.dir = dir;
+
+         cut.center = center;
+         cut.spacing = spacing;
+      }
+
+      this.redraw( );
+   }
+
+   public zeroSelected( ): void
+   {
+      for( let i = 0; i < this.pathlist.length; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            this.pathlist[ i ].zeroOrigin( );
+         }
+      }
+   }
+
+   public getProcessedCuts( ): Array
+   {
+      let processed: Array = new Array( );
+      for( let i = 0; i < this.cutlist.length; i++ )
+      {
+         if ( this.cutlist[ i ].processed == true )
+         {
+            processed.push( this.cutlist[ i ] );
+         }
+      }
+
+      return processed;
+   }
+
+   public addCut( cut: CutObject): void
+   {
+      let cutgroup: Array = new Array( cut );
+
+      if ( Global.separatetoolpaths )
+      {
+         cutgroup = cut.group( );
+      }
+
+      //O for each( cut in cutgroup )
+      for ( cut in cutgroup )
+      {
+         this.cutlist.push( cut );
+         this.addChild( cut );
+
+         // all paths of the cutobject are dirty to start with
+         //O for each( let path: Path in cut.pathlist )
+         for ( let path: Path in cut.pathlist )
+         {
+            path.dirty = true;
+            path.camdirty = true;
+         }
+
+         let main: * = this.parent;
+         main.tools.dToolpaths.addItem( {label: cut.name, data: cut}
+          );
+         main.tools.dToolpaths.height = Math.max( this.cutlist.length * 20, 20 );
+         cut.setActive( );
+      }
+   }
+
+   public removeCut( cut: CutObject): boolean
+   {
+      if ( cut == null )
+      {
+         return false;
+      }
+      if ( this.contains( cut) )
+      {
+         this.removeChild( cut );
+      }
+      let index = this.cutlist.indexOf( cut );
+      if ( index != -1 )
+      {
+         this.cutlist.splice( index, 1 );
+         let main: * = this.parent;
+         main.tools.dToolpaths.removeItemAt( index );
+         main.tools.dToolpaths.height = Math.max( this.cutlist.length * 20, 20 );
+         return true;
+      }
+      else
+      {
+         return false;
+      }
+   }
+
+   public reprocessCuts( pd: ProgressDialog, activeonly: boolean = false, cut: CutObject=null): void
+   {
+      progressdialog = pd;
+      this.processlist = new Array( );
+
+      if ( cut != null )
+      {
+         this.processlist.push( cut );
+      }
+      else
+      {
+         //O for each( let cut: CutObject in this.cutlist )
+         for ( let cut: CutObject in this.cutlist )
+         {
+            if ( activeonly && cut.active == false )
+            {
+               continue;
+            }
+            let reprocess: boolean = false;
+            //O for each( let path: Path in cut.pathlist )
+            for ( let path: Path in cut.pathlist )
+            {
+               path.zeroOrigin( );
+               path.redraw( );
+               if ( path.camdirty == true )
+               {
+                  path.camdirty = false;
+                  reprocess = true;
+               }
+            }
+            if ( reprocess || cut.processed == false )
+            {
+               this.processlist.push( cut );
+            }
+         }
+      }
+
+      progressdialog.init( this.processlist.length );
+
+      this.processNext( );
+
+      this.redraw( );
+   }
+
+   protected processNext( ): void
+   {
+      if ( this.processlist.length > 0 )
+      {
+         let cut: CutObject = this.processlist[ 0 ];
+         cut.addEventListener( ProgressEvent.PROGRESS, this.cutProgress );
+         cut.addEventListener( Event.COMPLETE, this.cutComplete );
+         cut.start( );
+         //this.processlist.shift( );
+      }
+      else
+      {
+         // cleanup
+         progressdialog.stopDialog( );
+      }
+   }
+
+   protected cutProgress( e: ProgressEvent): void
+   {
+      let cutprogress: number = Math.min( e.bytesLoaded/e.bytesTotal, 1 );
+      let totalprogress: number = progressdialog.total - this.processlist.length + cutprogress;
+      progressdialog.setProgress( totalprogress );
+   }
+
+   protected cutComplete( e: Event )
+   {
+      //O if ( e.target is CutObject )
+      if ( typeof e.target ==  CutObject )
+      {
+         let cut: CutObject = e.target as CutObject;
+         cut.removeEventListener( ProgressEvent.PROGRESS, this.cutProgress );
+         cut.removeEventListener( Event.COMPLETE, this.cutComplete );
+
+         if ( this.processlist.length > 0 )
+         {
+            this.processlist.shift( );
+         }
+
+         this.processNext( );
+      }
+   }
+
+   public cutCancel( ): void
+   {
+      let main: * = this.parent;
+
+      if ( this.processlist.length > 0 )
+      {
+         let current: CutObject = this.processlist.shift( );
+         current.stop( );
+         current.processed = false;
+      }
+
+      current.pathlist[ 0 ].dirty = true;
+      current.pathlist[ 0 ].camdirty = true;
+
+      this.processlist = new Array( );
+   }
+
+   public processFile( pd: ProgressDialog, svgxml: XML): void
+   {
+      progressdialog = pd;
+      pd.init( 1 );
+
+      let processor: ProcessFile = new ProcessFile( this, this.pathlist, svgxml );
+      processor.addEventListener( ProgressEvent.PROGRESS, this.processProgress );
+      processor.addEventListener( Event.COMPLETE, this.processComplete );
+      this.addChild( processor );
+      processor.start( );
+   }
+
+   public processProgress( e: ProgressEvent): void
+   {
+      progressdialog.setProgress( e.bytesLoaded/e.bytesTotal );
+   }
+
+   public processComplete( e: Event): void
+   {
+      //O for each( let path: Path in this.pathlist )
+      for ( let path: Path in this.pathlist )
+      {
+         // check for self-overlap ( beginning and end points are within tolerances )
+         if ( path.active == true )
+         {
+            if ( Global.withinTolerance( path.seglist[ 0 ].p1, path.seglist[path.seglist.length-1].p2) )
+            {
+               path.seglist[ 0 ].p1 = path.seglist[ path.seglist.length -1 ].p2;
+            }
+         }
+      }
+
+      let processor: ProcessFile = e.target as ProcessFile;
+      processor.removeEventListener( ProgressEvent.PROGRESS, this.processProgress );
+      processor.removeEventListener( Event.COMPLETE, this.processComplete );
+
+      loadCuts( processor.svgxml );
+
+      progressdialog.stopDialog( );
+      this.removeChild( processor );
+
+      redraw( );
+   }
+
+   // add cutobjects from the raw svg xml file
+   public loadCuts( svg: XML ): void
+   {
+      let metadata: XML;
+
+      //O for each( let child: XML in svg.* )
+      for ( let child: XML in svg.* )
+      {
+         if ( child.localName( ) == "metadata" )
+         {
+            metadata = child;
+         }
+      }
+
+      if ( metadata == null )
+      {
+         return;
+      }
+
+      //O for each( child in metadata.* )
+      for ( child in metadata.* )
+      {
+         if ( child.localName( ) == "cutobject" )
+         {
+            loadCutObject( child );
+         }
+      }
+
+      // remove path names after they have been used ( they will interfere with future load operations )
+      //O for each( let path: Path in this.pathlist )
+      for ( let path: Path in this.pathlist )
+      {
+         path.name = '';
+      }
+   }
+
+   protected loadCutObject( cutobject: XML): void
+   {
+      let children: Array = new Array( );
+
+      // parse children first
+      //O for each( let child: XML in cutobject.* )
+      for ( let child: XML in cutobject.* )
+      {
+         if ( child.localName( ) == "path" )
+         {
+            let id: string = String( child.text() );
+            //O for each( let path: Path in this.pathlist )
+            for ( let path: Path in this.pathlist )
+            {
+               if ( path.name == id )
+               {
+                  children.push( path );
+               }
+            }
+         }
+      }
+
+      if ( children.length == 0 )
+      {
+         return;
+      }
+
+      let cut: CutObject;
+      let type: string = cutobject.@type;
+
+      if ( type == "profile" )
+      {
+         cut = new ProfileCutObject( );
+      }
+      else if ( type == "pocket" )
+      {
+         cut = new PocketCutObject( );
+      }
+      else if ( type == "followpath" )
+      {
+         cut = new FollowPathCutObject( );
+      }
+      else if ( type == "drill" )
+      {
+         cut = new DrillCutObject( );
+      }
+
+      let cutname: string = unescape( cutobject.@name );
+
+      if ( cutname == "" )
+      {
+         cutname = "unnamed operation";
+      }
+
+      cut.name = cutname;
+      cut.safetyheight = cutobject.@safetyheight;
+      cut.stocksurface = cutobject.@stocksurface;
+      cut.targetdepth = cutobject.@targetdepth;
+      cut.stepover = cutobject.@stepover;
+      cut.stepdown = cutobject.@stepdown;
+      cut.feedrate = cutobject.@feedrate;
+      cut.plungerate = cutobject.@plungerate;
+
+      cut.outside = ( cutobject.@outside == "true" ? true : false );
+      cut.dir = ( cutobject.@direction == "2" ? 2 : 1 );
+
+      cut.center = ( cutobject.@center == "true" ? true : false );
+      cut.spacing = cutobject.@spacing;
+
+      cut.tooldiameter = cutobject.@tooldiameter;
+      cut.roughingclearance = cutobject.@roughingclearance;
+
+      if ( Global.unit == "in" && cutobject.@unit == "metric" )
+      {
+         // mm to inch
+         cut.safetyheight /= 25.4;
+         cut.stocksurface /= 25.4;
+         cut.targetdepth /= 25.4;
+         cut.stepdown /= 25.4;
+         cut.feedrate /= 25.4;
+         cut.plungerate /= 25.4;
+
+         // cm to inch
+         cut.tooldiameter /= 2.54;
+         cut.roughingclearance /= 2.54;
+
+         cut.spacing /= 2.54;
+      }
+      else if ( Global.unit == "cm" && cutobject.@unit == "imperial" )
+      {
+         // inch to mm
+         cut.safetyheight *= 25.4;
+         cut.stocksurface *= 25.4;
+         cut.targetdepth *= 25.4;
+         cut.stepdown *= 25.4;
+         cut.feedrate *= 25.4;
+         cut.plungerate *= 25.4;
+
+         // inch to cm
+         cut.tooldiameter *= 2.54;
+         cut.roughingclearance *= 2.54;
+
+         cut.spacing *= 2.54;
+      }
+
+      //O for each( path in children )
+      for ( path in children )
+      {
+         path.zeroOrigin( );
+      }
+
+      cut.pathlist = children;
+
+      this.addCut( cut );
+   }
+
+   // do a separate operation on each selected path
+   public separateSelected( ): void
+   {
+      let len = this.pathlist.length;
+
+      for( let i =0; i < len; i++ )
+      {
+         if ( this.pathlist[ i ].active == true )
+         {
+            let paths: Array = this.pathlist[ i ].separate( );
+            if ( paths.length > 0 )
+            {
+               // check this.cutlist ( we must replace the path in the cutobject )
+               for( let j = 0; j < this.cutlist.length; j++ )
+               {
+                  let index = this.cutlist.pathlist.indexOf( this.pathlist[ i ] );
+                  if ( index != -1 )
+                  {
+                     this.cutlist.pathlist.splice( index, 1, paths );
+                  }
+               }
+               //O for each( let p: Path in paths )
+               for ( let p: Path in paths )
+               {
+                  p.name = this.pathlist[ i ].name;
+               }
+               this.pathlist.splice( i, 1 );
+               addPaths( paths );
+               i--;
+               len--;
+            }
+         }
+      }
+   }
+
+   /*public mergeSelected( ): void
+   {
+
+      for ( let i =0; i < this.pathlist.length; i++ )
+      {
+         let path: Path = this.pathlist[ i ];
+         // check for overlapping points between this and every other path
+         for( let j = i+1; j < this.pathlist.length; j++)
+         {
+            let path2: Path = this.pathlist[ i ];
+            if ( path != path2 && path.active == true && path2.active == true)
+            {
+               if ( Global.withinTolerance( path.seglist[ 0 ].p1, path2.seglist[ 0 ].p1, 0.1))
+               {
+                  path.reversePath( );
+                  path.resetSegments( );
+                  path.mergePath( path2, path.seglist[path.seglist.length -1 ].p2, false );
+                  j = i;
+               }
+               else if ( Global.withinTolerance( path.seglist[ 0 ].p1, path2.seglist[ path2.seglist.length-1].p2, 0.1)){
+                  path2.mergePath( path, path2.seglist[path2.seglist.length -1 ].p2, false );
+                  i--;
+                  break;
+               }
+               else if ( Global.withinTolerance( path.seglist[path.seglist.length -1 ].p2, path2.seglist[ 0 ].p1, 0.1)){
+                  path.mergePath( path2, path.seglist[path.seglist.length -1 ].p2, false );
+                  j = i;
+               }
+               else if ( Global.withinTolerance( path.seglist[path.seglist.length-1].p2, path2.seglist[path2.seglist.length-1].p2, 0.1)){
+                  path2.reversePath( );
+                  path.mergePath( path2, path.seglist[path.seglist.length -1 ].p2, false );
+                  j = i;
+               }
+            }
+         }
+      }
+
+      //O for each( path in this.pathlist)
+      for ( path in this.pathlist)
+      {
+         // first check for self-overlap ( beginning and end points are within tolerances )
+         if ( path.active == true )
+         {
+            if ( Global.withinTolerance( path.seglist[ 0 ].p1, path.seglist[path.seglist.length-1].p2)){
+               path.seglist[ 0 ].p1 = path.seglist[path.seglist.length-1].p2;
+            }
+            //path.joinDoubles( 1, true );
+         }
+      }
+   }*/
+
+   public pathsOnTop( ): void
+   {
+      //O for each( let path: Path in this.pathlist )
+      for ( let path: Path in this.pathlist )
+      {
+         this.addChild( path );
+      }
+   }
+
+   // nesting functions start here
+   public startNest( pd: ProgressDialog, directions: number, gap: number, group: boolean, groupprofile: boolean): boolean
+   {
+      progressdialog = pd;
+
+      if ( this.nestpath == null )
+      {
+         return false;
+      }
+
+      if ( this.cutlist.length < 2 )
+      {
+         this.return false;
+      }
+
+      if ( this.nest != null && contains( this.nest) )
+      {
+         this.removeChild( this.nest );
+      }
+
+      this.nest = new Nest( this.nestpath, this.cutlist.slice( ), directions, gap, group, groupprofile );
+      this.addChild( this.nest );
+
+      for( let i = 0; i < this.cutlist.length; i++ )
+      {
+         this.addChild( this.cutlist[ i ] );
+      }
+
+      this.nest.addEventListener( ProgressEvent.PROGRESS, nestProgress );
+
+      this.nest.start( );
+
+      if ( this.nest.underlimit == true )
+      {
+         finishNest( );
+         return false;
+      }
+
+      progressdialog.init( 1 );
+
+      return true;
+   }
+
+   private nestProgress( e: ProgressEvent): void
+   {
+      let nestprogress: number = Math.min( e.bytesLoaded/e.bytesTotal, 1 );
+      progressdialog.setProgress( nestprogress );
+   }
+
+   // stop this.nest and apply transformations
+   public finishNest( ): void
+   {
+      this.nest.stop( );
+      this.nest.removeEventListener( ProgressEvent.PROGRESS, nestProgress );
+
+      let fittest: Individual = this.nest.fittest;
+
+      if ( fittest )
+      {
+         // apply transformation
+         let data: Array = fittest.data;
+
+         let region: PIXI.Rectangle = this.nest.blank.getBounds( this.nest );
+
+         //O let processed: Array = new Array( );
+         let processed = [];
+
+         for( let i = 0; i < data.length; i++ )
+         {
+            if ( !data[ i ].failed )
+            {
+               let cutobject: * = this.nest.cutlist[data[ i ].index];
+
+               // the clumped nest object ( cutobject) is represented as a tree using the displayobject dom
+               // we have to flatten it into an array
+               //O let cutarray: Array = new Array( cutobject );
+               let cutarray = [];
+               let index = 0;
+               while( index < cutarray.length )
+               {
+                  while( cutarray[index].numChildren > 0 )
+                  {
+                     let childobject: * = cutarray[ index ].getChildAt( 0 );
+                     //O if ( childobject is CutObject )
+                     if ( typeof childobject == CutObject )
+                     {
+                        cutarray.push( childobject );
+                     }
+                     cutarray[ index ].removeChildAt( 0 );
+                  }
+                  index++;
+               }
+
+               // gather all associated paths, and ensure that there are no repeats
+               //O let nestarray: Array = new Array( );
+               let nestarray = [];
+
+               for( let j = 0; j < cutarray.length; j++ )
+               {
+                  for( let k =0; k < cutarray[ j ].pathlist.length; k++ )
+                  {
+                     if ( nestarray.indexOf( cutarray[ j ].pathlist[ k ] ) == -1 && processed.indexOf(cutarray[ i ].pathlist[ i ]) == -1 )
+                     {
+                        nestarray.push( cutarray[ j ].pathlist[ k ] );
+                        processed.push( cutarray[ j ].pathlist[ k ] );
+                     }
+                  }
+               }
+
+               // apply a matrix transform to each path in this.nest array
+               let matrix: Matrix = new Matrix( );
+               matrix.rotate( -data[ i ].rotation * ( Math.PI/180 ) );
+
+               // account for translation caused by rotation
+               matrix.translate( -data[ i ].x/Global.zoom, data[ i ].y/Global.zoom );
+
+               // account for bounding box of blank
+               matrix.translate( region.x/Global.zoom, -( region.y + region.height -1 )/Global.zoom );
+
+               // position within blank
+               matrix.translate( data[ i ].i/( Global.zoom*nest.scale ), ( -data[ i ].j+this.nest.blankbitmap.height )/( Global.zoom*nest.scale ) );
+               for( j = 0; j < nestarray.length; j++ )
+               {
+                  nestarray[ i ].matrixTransform( matrix );
+               }
+            }
+         }
+      }
+      this.nest.finish( );
+      this.removeChild( this.nest );
+
+      for( i = 0; i < this.cutlist.length; i++ )
+      {
+         while( this.cutlist[ i ].numChildren > 0 )
+         {
+            this.cutlist[ i ].removeChildAt( 0 );
+         }
+         this.addChild( this.cutlist[ i ] );
+
+         /*this.cutlist[ i ].docx = 0;
+         this.cutlist[ i ].docy = 0;
+         this.cutlist[ i ].x = 0;
+         this.cutlist[ i ].y = 0;*/
+
+         this.cutlist[ i ].processed = false;
+         this.cutlist[ i ].rotation = 0;
+         this.cutlist[ i ].pathlist[ 0 ].dirty = true;
+         this.cutlist[ i ].pathlist[ 0 ].camdirty = true;
+         this.cutlist[ i ].graphics.clear( );
+      }
+
+      redraw( );
+   }
+
+   // adds tabs to selected ( and calculated) profile operations
+   public addTabsSelected( spacing: number, tabwidth: number, tabheight: number ): void
+   {
+      for( let i =0; i < this.cutlist.length; i++ )
+      {
+         //O if ( this.cutlist[ i ].active == true && this.cutlist[ i ] is ProfileCutObject && this.cutlist[ i ].processed == true )
+         if ( this.cutlist[ i ].active == true && typeof this.cutlist[ i ] == ProfileCutObject && this.cutlist[ i ].processed == true )
+         {
+            this.cutlist[ i ].addTabs( spacing, tabwidth, tabheight );
+         }
+      }
+   }
+
+   // move the selected cutobjects outside of the bounding box of the deselected cutobjects
+   public shiftActive( ): void
+   {
+      //O let inactive: Array = new Array( );
+      let inactive = [];
+      //O let active: Array = new Array( );
+      let active = [];
+
+      for( let i = 0; i < this.cutlist.length; i++ )
+      {
+         if ( this.cutlist[ i ].active == true )
+         {
+            active.push( this.cutlist[ i ] );
+         }
+         else
+         {
+            inactive.push( this.cutlist[ i ] );
+         }
+         // some problems with accounting for docx/y, for now just reset all to zero
+         this.cutlist[ i ].zeroOrigin( );
+         this.cutlist[ i ].pathlist[ 0 ].dirty = true;
+         this.cutlist[ i ].pathlist[ 0 ].camdirty = true;
+      }
+
+      let irect: PIXI.Rectangle = getExactBounds( inactive );
+      let arect: PIXI.Rectangle = getExactBounds( active );
+
+      /*let p: Path = new Path( );
+      let seg1: Segment = new Segment( new Point( irect.x, irect.y ), new Point( irect.x, irect.y+irect.height ) );
+      let seg2: Segment = new Segment( seg1.p2, new Point( irect.x + irect.width, irect.y+irect.height ) );
+      let seg3: Segment = new Segment( seg2.p2, new Point( irect.x + irect.width, irect.y ) );
+      let seg4: Segment = new Segment( seg3.p2, new Point( irect.x, irect.y ) );
+
+      p.addSegment( seg1 );
+      p.addSegment( seg2 );
+      p.addSegment( seg3 );
+      p.addSegment( seg4 );
+
+      addPath( p);*/
+
+      let diff: number = 0;
+
+      if ( arect.x >= irect.x && arect.x <= irect.x + irect.width )
+      {
+         diff = irect.x + irect.width - arect.x;
+      }
+      else if ( irect.x >= arect.x && irect.x <= arect.x + arect.width )
+      {
+         diff = arect.x + arect.width - irect.x;
+         diff = -diff;
+      }
+
+      let processed: Array = new Array( );
+
+      for( i = 0; i < active.length; i++ )
+      {
+         for( let j = 0; j < active[ i ].pathlist.length; j++ )
+         {
+            let path: Path = active[ i ].pathlist[ j ];
+            if ( processed.indexOf( path ) == -1 )
+            {
+               path.docx += diff;
+               path.dirty = true;
+               path.camdirty = true;
+               processed.push( path );
+            }
+         }
+      }
+
+      this.redraw( );
+   }
+
+   // get exact bounds of the list of cutobjects, taking into account whether they are processed
+   private getExactBounds( list: Array ): PIXI.Rectangle
+   {
+      let minx: number;
+      let miny: number;
+      let maxx: number;
+      let maxy: number;
+
+      // find bounding box of deselected cutpaths
+      for( let i = 0; i < list.length; i++ )
+      {
+         let lminx: number = NaN;
+         let lminy: number = NaN;
+         let lmaxx: number = NaN;
+         let lmaxy: number = NaN;
+
+         let children: Array = list[ i ].rootpath.getChildren( );
+         for( let j = 0; j <  children.length; j++ )
+         {
+            let rect: PIXI.Rectangle = children[ i ].getExactBounds( );
+            if ( isNaN( lminx) || rect.x < lminx )
+            {
+               lminx = rect.x;
+            }
+            if ( isNaN( lmaxx ) || rect.x + rect.width > lmaxx )
+            {
+               lmaxx = rect.x + rect.width;
+            }
+            if ( isNaN( lminy ) || rect.y < lminy )
+            {
+               lminy = rect.y;
+            }
+            if ( isNaN( lmaxy ) || rect.y + rect.height > lmaxy )
+            {
+               lmaxy = rect.y + rect.height;
+            }
+         }
+
+         //O if ( list[ i ] is ProfileCutObject )
+         if ( typeof list[ i ] == ProfileCutObject )
+         {
+            if ( list[ i ].processed == true )
+            {
+               lmaxx += 0.5 * list[ i ].tooldiameter;
+               lmaxy += 0.5 * list[ i ].tooldiameter;
+               lminx -= 0.5 * list[ i ].tooldiameter;
+               lminy -= 0.5 * list[ i ].tooldiameter;
+            }
+            else
+            {
+               lmaxx += list[ i ].tooldiameter;
+               lmaxy += list[ i ].tooldiameter;
+               lminx -= list[ i ].tooldiameter;
+               lminy -= list[ i ].tooldiameter;
+            }
+         }
+         //O else if ( list[ i ] is FollowPathCutObject )
+         else if ( typeof list[ i ] == FollowPathCutObject )
+         {
+            lmaxx += 0.5 * list[ i ].tooldiameter;
+            lmaxy += 0.5 * list[ i ].tooldiameter;
+            lminx -= 0.5 * list[ i ].tooldiameter;
+            lminy -= 0.5 * list[ i ].tooldiameter;
+         }
+
+         if ( isNaN( minx ) || lminx < minx )
+         {
+            minx = lminx;
+         }
+         if ( isNaN( maxx) || lmaxx > maxx )
+         {
+            maxx = lmaxx;
+         }
+         if ( isNaN( miny ) || lminy < miny )
+         {
+            miny = lminy;
+         }
+         if ( isNaN( maxy ) || lmaxy > maxy )
+         {
+            maxy = lmaxy ;
+         }
+      }
+
+      return new PIXI.Rectangle( minx, miny, maxx - minx, maxy - miny );
+   }
+}

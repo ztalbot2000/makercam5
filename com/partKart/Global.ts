@@ -93,6 +93,58 @@ export class Global
      return point;
    }
 
+   //N As this method does not exist on PIXI Point
+   static distance (pointA: PIXI.Point, pointB: PIXI.Point ): number
+   {
+      return Math.hypot(pointB.x - pointA.x, pointB.y - pointA.y)
+   }
+   //N As this method does not exist on PIXI Point
+   static subtract (pointA: PIXI.Point, pointB: PIXI.Point ): PIXI.Point
+   {
+      return new PIXI.Point(pointA.x - pointB.x, pointA.y - pointB.y)
+   }
+   //N As this method does not exist on PIXI Point
+   static add (pointA: PIXI.Point, pointB: PIXI.Point ): PIXI.Point
+   {
+      return new PIXI.Point(pointA.x + pointB.x, pointA.y + pointB.y)
+   }
+   static interpolate(pt1: PIXI.Point, pt2: PIXI.Point, f: number): PIXI.Point
+   {
+      let x: number = f * pt1.x + (1 - f) * pt2.x;
+      let y: number = f * pt1.y + (1 - f) * pt2.y;
+
+      return new PIXI.Point(x, y);
+   }
+   // Quadratic roots
+   // Calculate where the parabola crosses th X-axis. ( X Intercepts )
+   // Solve for my grade 12 math. Thank-you Mr. Mcleod
+   // b2 −4ac < 0 There are no real roots.
+   // b2 −4ac = 0 There is one real root.
+   // b2 −4ac > 0 There are two real roots.
+   static getQuadraticRoots( x: number, y: number, z: number ): Array < number >
+   {
+      let a = z
+      let b = y / a
+      let c = x / a
+      let discriminant = b * b - 4 * c
+      let roots: Array< number > = new Array( )
+
+      if ( discriminant > 0 )
+      {
+         // Parabola crosses the X-Axis at two points
+         let s = Math.sqrt( discriminant )
+         roots.push ( .5 * ( -b + s) )
+         roots.push ( .5 * ( -b - s) )
+      }
+      else if ( discriminant == 0 )
+      {
+         // Parabola just touches the X-Axis, thus only one real root
+         roots.push( 0.5 * -b )
+      }
+      // return the result, which could be 1,2 or no X intercepts.
+      return roots
+   }
+
    //O public static function undoPush(u:Undo):void
    static undoPush(u: Undo): void
    {

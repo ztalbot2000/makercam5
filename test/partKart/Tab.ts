@@ -2,7 +2,7 @@
 
 var assert = require('chai').assert;
 
-import Tab  from '../../app/partKart/Tab';
+import Tab  from '../../com/partKart/Tab';
 
 var tloc = 15;
 let twidth = 480;

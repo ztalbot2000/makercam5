@@ -4,7 +4,7 @@ var assert = require('chai').assert;
 
 import * as PIXI from 'pixi.js';
 
-import { Global }  from '../../app/partKart/Global';
+import { Global }  from '../../com/partKart/Global';
 
 describe('Testing Global.js', function ()
 {

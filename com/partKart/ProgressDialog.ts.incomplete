@@ -15,10 +15,12 @@
 import * as PIXI from 'pixi.js';
 import { Graphics } from 'pixi.js';
 import { Sprite } from 'pixi.js';
-import Button from '../ui/Button';
-import Text from '../ui/Text.js';
-import TextInput from '../ui/TextInput.js';
-import { ProgressBar } from '../ui/ProgressBar.js';
+//import Button from '../ui/Button';
+import Button from '../ui/button';
+//import Text from '../ui/Text.js';
+//import TextInput from '../ui/TextInput.js';
+//O import { ProgressBar } from '../ui/ProgressBar.js';
+import { Progress } from '../ui/progress';
 
 //O public class ProgressDialog extends Sprite
 export default class ProgressDialog extends Sprite
@@ -36,7 +38,7 @@ export default class ProgressDialog extends Sprite
    private back:Graphics; // background box
 
    //O private var progressbar:pBar;
-   private progressbar:PIXI.ProgressBar;
+   private progressbar:Progress;
 
    //O private var oncancel:Function = null; // callback function for when the user cancels
    private oncancel:Function = null; // callback function for when the user cancels
@@ -96,10 +98,10 @@ export default class ProgressDialog extends Sprite
       let shadowfilter:DropShadowFilter = new DropShadowFilter(2,45,0,0.65,3,3);
 
       //O var format:TextFormat = new TextFormat("Arial", 11);
-      let format:TextFormat = new TextFormat("Arial", 11);
+      let format:TextFormat = new PIXI.TextStyle({fontFamily:"Arial", fontSize:11});
 
       //O titlelabel = new TextField();
-      this.titlelabel = new TextInput();
+      this.titlelabel = new PIXI.Text();
 
       //O titlelabel.defaultTextFormat = format;
       this.titlelabel.defaultTextFormat = format;
@@ -127,7 +129,7 @@ export default class ProgressDialog extends Sprite
 
       //O draw progress bar
       //O progressbar = new pBar();
-      this.progressbar = new pBar();
+      this.progressbar = new progress();
       //O progressbar.width = dwidth-20;
       this.progressbar.width = this.dwidth-20;
 

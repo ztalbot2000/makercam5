@@ -81,7 +81,8 @@ let devServerOptions =
    //       which is stupid because we can just use --openPage.
    //       However I confused it with devServer.index which
    //       cannot be set via cli. Why the two is beyond me?
-   openPage: 'index.html'
+   //openPage: 'index.html'
+   openPage: 'makercam5.html'
 };
 
 module.exports = (env, argv) =>
@@ -116,7 +117,7 @@ module.exports = (env, argv) =>
       // config entry.
       mode: Mode,
 
-      entry: './app/src/makercam5-entry.ts',
+      entry: './com/src/makercam5-entry.ts',
       output: {
          path: path.resolve(__dirname, './dist'),
          filename: 'makercam5App.js',
@@ -140,9 +141,7 @@ module.exports = (env, argv) =>
 
          // Check for changes every 3 seconds
          poll: 3000,
-         ignored: ['app/uitry',
-                   'test/uitry',
-                   /node_modules/
+         ignored: [/node_modules/
                   ]
       },
 
@@ -177,7 +176,7 @@ module.exports = (env, argv) =>
 
             // Instead of the default template that would be created
             // Use ours.
-            template: 'app/src/makercam5.html.template',
+            template: 'com/src/makercam5.html.template',
 
             // Allows to overwrite the parameters used in the template
             // templateParameters: {Boolean|Pbjects|Function}
@@ -249,7 +248,7 @@ module.exports = (env, argv) =>
          rules: [
             {
                test: /\.js$/,
-               include: [path.resolve(__dirname, "app")],
+               include: [path.resolve(__dirname, "com")],
                exclude: [
                   // This would be a regular expression
                   /node_modules/,
@@ -266,7 +265,7 @@ module.exports = (env, argv) =>
             },
             {
                test: /\.ts$/,
-               include: [path.resolve(__dirname, "app")],
+               include: [path.resolve(__dirname, "com")],
                exclude: [
                   // This would be a regular expression
                   /node_modules/,
