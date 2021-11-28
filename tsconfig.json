@@ -66,6 +66,7 @@
       "Main.ts",
       "com/partKart",
       "com/lorentz",
+      "com/tink",
       "com/src",
       // - Adding "test" here compiled uitry,
       //   no matter what I tried to exclude

@@ -1,0 +1,131 @@
+﻿//O package com.partkart
+//O {
+
+//O    import flash.display.Sprite
+//O    import com.greenthreads.*
+//O    import flash.geom.Point
+
+import { Global } from './Global'
+
+export class ProcessFile extends GreenThread
+{
+   private pathlist: Array
+   private separated: boolean = false
+   private current: number = 0
+   private scene: SceneGraph
+   private len: number
+
+   // we'll need to preserve this for cutobject loading
+   public svgxml: XML
+
+   public ProcessFile( inputscene: SceneGraph, inputpaths: Array, inputsvgxml: XML ): void
+   {
+      this.scene = inputscene
+      this.pathlist = inputpaths
+      this.svgxml = inputsvgxml
+   }
+
+   //O protected override function initialize( ): void
+   protected initialize( ): void
+   {
+      _progress = 0
+      _maximum = 0
+      for ( let path: Path in this.pathlist )
+      {
+         if ( path.active == true )
+         {
+            _maximum += 2
+         }
+      }
+      this.len = this.pathlist.length
+   }
+
+   //O protected override function run( ): boolean
+   protected run( ): boolean
+   {
+      // separate
+      if ( !this.separated )
+      {
+         if ( this.current == this.len )
+         {
+            this.current = 0
+            this.separated = true
+            return true
+         }
+         else
+         {
+            if ( this.pathlist[ this.current ].active == true )
+            {
+               let paths: Array = this.pathlist[ this.current ].separate( )
+               if ( paths.length > 0 )
+               {
+                  for ( let p: Path in paths )
+                  {
+                     p.name = this.pathlist[ this.current ].name
+                     p.active = true
+                  }
+                  _maximum += paths.length - 1
+
+                  this.pathlist.splice( this.current, 1 )
+                  this.scene.addPaths( paths )
+                  this.current--
+                  this.len--
+               }
+               _progress++
+            }
+         }
+      }
+      // merge
+      else
+      {
+         if ( this.current == this.pathlist.length )
+         {
+            return false
+         }
+         let path: Path = this.pathlist[ this.current ]
+         if ( path.active == true )
+         {
+            _progress++
+
+            // cleanup short segments
+            path.cleanup( 0.0001, true )
+            path.resetSegments( )
+
+            // check for overlapping points between this and every other path
+            for( let j: number = this.current + 1; j < this.pathlist.length; j++ )
+            {
+               let path2: Path = this.pathlist[ j ]
+               if ( path != path2 && path.active == true && path2.active == true )
+               {
+                  if ( Global.withinTolerance( path.seglist[ 0 ].p1, path2.seglist[ 0 ].p1, 0.1 ) )
+                  {
+                     path.reversePath( )
+                     path.resetSegments( )
+                     path.mergePath( path2, path.seglist[ path.seglist.length - 1 ].p2, false )
+                     j = this.current
+                  }
+                  else if ( Global.withinTolerance( path.seglist[ 0 ].p1, path2.seglist[ path2.seglist.length - 1 ].p2,0.1 ) )
+                  {
+                     path2.mergePath( path, path2.seglist[path2.seglist.length-1].p2, false )
+                     this.current--
+                     break
+                  }
+                  else if ( Global.withinTolerance( path.seglist[path.seglist.length-1].p2, path2.seglist[0].p1, 0.1 ) )
+                  {
+                     path.mergePath( path2, path.seglist[ path.seglist.length - 1 ].p2, false )
+                     j = this.current
+                  }
+                  else if ( Global.withinTolerance( path.seglist[ path.seglist.length - 1 ].p2, path2.seglist[path2.seglist.length-1].p2, 0.1 ) )
+                  {
+                     path2.reversePath( )
+                     path.mergePath( path2, path.seglist[ path.seglist.length - 1 ].p2, false )
+                     j = this.current
+                  }
+               }
+            }
+         }
+      }
+      this.current++
+      return true
+   }
+}

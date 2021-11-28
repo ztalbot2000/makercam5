@@ -1,0 +1,871 @@
+﻿//package com.lorentz.SVG
+
+//import flash.display.GradientType;
+//import flash.display.SpreadMethod;
+//import flash.geom.Matrix;
+//import flash.geom.Rectangle;
+
+import { StringUtil } from "./StringUtil";
+import { SVGUtil } from "./SVGUtil";
+import { PathCommand } from "./PathCommand";
+
+interface INameToValueMap
+{
+   [ key: string ]: any
+}
+
+interface XML
+{
+   [ key: string ]: any
+}
+
+export class SVGParser
+{
+   private svg_original: XML;
+   private svg: XML;
+   //O private svg_object: Object;
+   private svg_object: INameToValueMap;
+   //O private defs: Object = new Object( );
+   private defs: INameToValueMap = {};
+
+   constructor( svg: XML )
+   {
+      this.svg_original = svg;
+   }
+
+   //O public parse( ): Object
+   public parse( ): INameToValueMap
+   {
+      this.processUses( );
+      this.svg_object = this.visit( this.svg );
+
+      if ( this.svg_object != null )
+      {
+         this.svg_object.defs = this.defs;
+         this.parseGradients( );
+      }
+
+      return this.svg_object;
+   }
+
+   private processUses( ): void
+   {
+      this.svg = this.svg_original.copy( );
+
+      //Finish to implement, http://www.w3.org/TR/SVG/struct.html#UseElement
+      //O for each( let useNode:XML in this.svg..*.(localName() == "use" ) )
+      for ( let useNode in this.svg )
+      {
+         //ONU let xlink: Namespace = new Namespace( "http://www.w3.org/1999/xlink" );
+         //O let link: string = useNode.@xlink::href;
+         let link: string = useNode["@xlink::href"];
+         link = StringUtil.ltrim( link, "#" );
+
+         //O let targetNode: XML = svg..*.( attribute( "id" ) == link )[ 0 ];
+         let targetNode: XML = 'svg..*.( attribute( "id" ) == link )[ 0 ]';
+
+         useNode.setLocalName( "g" );
+         //O useNode.@xlink::href = null;
+         useNode["@xlink::href"] = null;
+         useNode.appendChild( targetNode.copy( ) );
+      }
+   }
+
+   //O private visit( elt: XML ): Object
+   private visit( elt: XML ): INameToValueMap
+   {
+      //O let obj: Object;
+      let obj: INameToValueMap;
+
+      switch( elt.localName( ) )
+      {
+         case 'svg':
+            obj = this.visitSvg( elt );
+            break;
+
+         case 'rect':
+            obj = this.visitRect( elt );
+            break;
+
+         case 'path':
+            obj = this.visitPath( elt );
+            break;
+
+         case 'polygon':
+            obj = this.visitPolygon( elt );
+            break;
+
+         case 'polyline':
+            obj = this.visitPolyline( elt );
+            break;
+
+         case 'line':
+            obj = this.visitLine( elt );
+            break;
+
+         case 'circle':
+            obj = this.visitCircle( elt );
+            break;
+
+         case 'ellipse':
+            obj = this.visitEllipse( elt );
+            break;
+
+         case 'g':
+            obj = this.visitG( elt );
+            break;
+
+         case 'defs':
+            obj = this.visitDefs( elt );
+            break;
+
+         case 'clipPath':
+            obj = this.visitClipPath( elt );
+            break;
+
+         case 'text':
+            obj = this.visitText( elt );
+            break;
+
+         case 'tspan':
+            obj = this.visitTspan( elt );
+            break;
+
+         case 'image':
+            obj = this.visitImage( elt );
+            break;
+      }
+
+      if ( obj == null )
+         return null;
+
+      if ( obj.type == null )
+         obj.type = elt.localName( );
+
+      //O obj.id = elt.@id;
+      obj.id = elt["@id"];
+
+      obj.style = SVGUtil.presentationStyleToObject( elt );
+      //O if ( "@style" in elt )
+      if ( "@style" in elt )
+      {
+         //O obj.style = SVGUtil.mergeObjectStyles( obj.style, SVGUtil.styleToObject( elt.@style ) );
+         obj.style = SVGUtil.mergeObjectStyles( obj.style, SVGUtil.styleToObject( elt["@style"] ) );
+      }
+
+      //O if ( "@class" in elt )
+      if ( "@class" in elt )
+      {
+         //O obj[ "class" ] = String( elt.@[ "class" ] );
+         obj[ "class" ] = String( elt[ "@class" ] );
+      }
+
+      //O if ( "@transform" in elt )
+      if ( "@transform" in elt )
+         //O obj.transform = this.parseTransformation( elt.@transform );
+         obj.transform = this.parseTransformation( elt["@transform"] );
+
+      //O if ( "@clip-path" in elt )
+      if ( "@clip-path" in elt )
+         //O obj.clipPath = String( elt[ "@clip-path" ] );
+         obj.clipPath = String( elt[ "@clip-path" ] );
+
+      return obj;
+   }
+
+   //O private visitSvg( elt: XML ): Object
+   private visitSvg( elt: XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+      //O obj.viewBox = this.parseViewBox( elt.@viewBox );
+      obj.viewBox = this.parseViewBox( elt["@viewBox"] );
+
+      obj.styles = this.parseStyles( elt );
+
+      //O if ( "@width" in elt )
+      if ( "@width" in elt )
+         //O obj.width =  elt.@width;
+         obj.width =  elt["@width"];
+      else
+         obj.width = "100%";
+
+      //O if ( "@height" in elt )
+      if ( "@height" in elt )
+         //O obj.height = elt.@height;
+         obj.height = elt["@height"];
+      else
+         obj.height = "100%";
+
+      //O obj.children = new Array( );
+      obj.children = [];
+
+      //O for each( let childElt: XML in elt.* )
+      for ( let childElt: XML in elt )
+      {
+         //O let child: Object = this.visit( childElt );
+         let child: Object = this.visit( childElt );
+         if ( child )
+         {
+            child.parent = obj;
+            obj.children.push( child );
+         }
+      }
+
+      return obj;
+   }
+
+   //O private visitRect( elt: XML ): Object
+   private visitRect( elt: XML ): PIXI.Rectangle
+   {
+      //O let obj:Object = new Object( );
+      let obj:PIXI.Rectangle = new PIXI.Rectangle( );
+
+      //O obj.x = elt.@x;
+      obj.x = elt["@x"];
+      //O obj.y =  elt.@y;
+      obj.y =  elt["@y"];
+      //O obj.width =  elt.@width;
+      obj.width =  elt["@width"];
+      //O obj.height =  elt.@height;
+      obj.height =  elt["@height"];
+      //O obj.rx =  elt.@rx;
+      obj.rx =  elt["@rx"];
+      //O obj.ry =  elt.@ry;
+      obj.ry =  elt["@ry"];
+
+      //obj.isRound = ( obj.rx != null || obj.ry != null );
+      //if (obj.isRound )
+      if ( obj.rx != null || obj.ry != null )
+      {
+         // fixme,  Should this return PIXI.RoundedRectangle ?
+         obj.rx = ( obj.ry != 0 && obj.rx == 0 ) ? obj.ry:obj.rx;
+         obj.ry = ( obj.rx != 0 && obj.ry == 0 ) ? obj.rx:obj.ry;
+      }
+
+      return obj;
+   }
+
+   //O private visitPath( elt: XML ): Object
+   private visitPath( elt: XML ): INameToValueMap
+   {
+      let obj:Object = new Object( );
+
+      //O obj.d = this.parsePathData( elt.@d );
+      obj.d = this.parsePathData( elt["@d"] );
+
+      return obj;
+   }
+
+   //O private visitPolygon( elt:XML ): Object
+   private visitPolygon( elt:XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+      //O obj.points = this.parseArgsData( elt.@points );
+      obj.points = this.parseArgsData( elt["@points"] );
+
+      return obj;
+   };
+   //O private visitPolyline( elt: XML ): Object
+   private visitPolyline( elt: XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+      //O obj.points = this.parseArgsData( elt.@points );
+      obj.points = this.parseArgsData( elt["@points"] );
+
+      return obj;
+   };
+   //O private visitLine( elt: XML ): Object
+   private visitLine( elt: XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+
+      //O obj.x1 = elt.@x1;
+      obj.x1 = elt["@x1"];
+      //O obj.y1 = elt.@y1;
+      obj.y1 = elt["@y1"];
+
+      //O obj.x2 = elt.@x2;
+      obj.x2 = elt["@x2"];
+      //O obj.y2 = elt.@y2;
+      obj.y2 = elt["@y2"];
+
+      return obj;
+   }
+   //O private visitCircle( elt: XML ): Object
+   private visitCircle( elt: XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+
+      //O obj.cx = elt.@cx;
+      obj.cx = elt["@cx"];
+      //O obj.cy = elt.@cy;
+      obj.cy = elt["@cy"];
+
+      //O obj.r = elt.@r;
+      obj.r = elt["@r"];
+
+      return obj;
+   }
+   //O private visitEllipse( elt: XML ): Object
+   private visitEllipse( elt: XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+
+      //O obj.cx = elt.@cx;
+      obj.cx = elt["@cx"];
+      //O obj.cx = elt.@cx;
+      obj.cx = elt["@cx"];
+      //O obj.cy = elt.@cy;
+      obj.cy = elt["@cy"];
+      //O obj.rx = elt.@rx;
+      obj.rx = elt["@rx"];
+      //O obj.rx = elt.@rx;
+      obj.rx = elt["@rx"];
+      //O obj.ry = elt.@ry;
+      obj.ry = elt["@ry"];
+
+      return obj;
+   }
+   //O private visitG( elt: XML ): Object
+   private visitG( elt: XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+
+      obj.children = new Array( );
+      //O for each( let childElt: XML in elt.* )
+      for ( let childElt in elt )
+      {
+         let child: Object = this.visit( childElt );
+         if ( child )
+         {
+            child.parent = obj;
+            obj.children.push( child );
+         }
+      }
+
+      return obj;
+   }
+
+   //O private visitDefs( elt: XML ): Object
+   private visitDefs( elt: XML ): INameToValueMap
+   {
+      //O for each( let childElt:XML in elt.* )
+      for ( let childElt in elt )
+      {
+         let child: Object = this.visit( childElt );
+         if ( child )
+         {
+            this.defs[ child.id ] = child;
+         }
+      }
+
+      return null;
+   }
+
+   //O private visitClipPath( elt: XML ): Object
+   private visitClipPath( elt: XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+
+      obj.children = new Array( );
+      //O for each( let childElt: XML in elt.* )
+      for ( let childElt in elt )
+      {
+         let child:Object = this.visit( childElt );
+         if ( child )
+         {
+            child.parent = obj;
+            obj.children.push( child );
+         }
+      }
+
+      return obj;
+   }
+
+   //O private visitText( elt:this.XML ): Object
+   private visitText( elt: INameToValueMap ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+
+      //O obj.x = ( "@x" in elt ) ? elt.@x : 0;
+      obj.x = ( "@x" in elt ) ? elt["@x"] : 0;
+      //O obj.y = ( "@y" in elt ) ? elt.@y : 0;
+      obj.y = ( "@y" in elt ) ? elt["@y"] : 0;
+      //O obj.children = new Array( );
+      obj.children = [];
+      //O for each( let childElt:XML in elt.* )
+      for ( let childElt in elt )
+      {
+         if ( childElt.nodeKind() == "text" )
+         {
+            obj.children.push( this.CleanUp( childElt.toString( ) ) );
+         }
+         else if ( childElt.nodeKind( ) == "element" )
+         {
+            let child: Object = this.visit( childElt );
+            if ( child != null )
+            {
+               child.parent = obj;
+               obj.children.push( child );
+            }
+         }
+      }
+      return obj;
+   }
+   //O private visitTspan( elt: XML ): Object
+   private visitTspan( elt: XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+
+      obj.text = this.CleanUp( elt.text( ).toString( ) );
+      //O obj.x = ( "@x" in elt ) ? elt.@x : null;
+      obj.x = ( "@x" in elt ) ? elt["@x"] : null;
+      //O obj.y = ( "@y" in elt ) ? elt.@y : null;
+      obj.y = ( "@y" in elt ) ? elt["@y"] : null;
+      //O obj.dx = ( "@dx" in elt ) ? elt.@dx : 0;
+      obj.dx = ( "@dx" in elt ) ? elt["@dx"] : 0;
+      //O obj.dy = ( "@dy" in elt ) ? elt.@dy : 0;
+      obj.dy = ( "@dy" in elt ) ? elt["@dy"] : 0;
+
+      return obj;
+   }
+
+   //O private visitImage( elt:XML ): Object
+   private visitImage( elt:XML ): INameToValueMap
+   {
+      //O let obj: Object = new Object( );
+      let obj: INameToValueMap = {};
+
+      //O obj.x = ( "@x" in elt ) ? elt.@x : null;
+      obj.x = ( "@x" in elt ) ? elt["@x"] : null;
+      //O obj.y = ( "@y" in elt ) ? elt.@y : null;
+      obj.y = ( "@y" in elt ) ? elt["@y"] : null;
+      //O obj.width = ( "@width" in elt ) ? elt.@width : 0;
+      obj.width = ( "@width" in elt ) ? elt["@width"] : 0;
+      //O obj.height = ( "@height" in elt ) ? elt.@height : 0;
+      obj.height = ( "@height" in elt ) ? elt["@height"] : 0;
+      //O obj.preserveAspectRatio = ( "@preserveAspectRatio" in elt ) ? elt.@preserveAspectRatio : 0;
+      obj.preserveAspectRatio = ( "@preserveAspectRatio" in elt ) ? elt["@preserveAspectRatio"] : 0;
+
+      //O let xlink: Namespace = new Namespace( "http://www.w3.org/1999/xlink" );
+      let xlink: Namespace = new Namespace( "http://www.w3.org/1999/xlink" );
+      //O let href: string = elt.@xlink::href;
+      let href: string = elt["@xlink::href"];
+      obj.href = StringUtil.trim( href );
+
+      return obj;
+   }
+
+   //O public parsePathData( input: string ): Array
+   public parsePathData( input: string ): Array
+   {
+      let returnData: Array = new Array( );
+      //O let pointString: string = new String( );
+      let pointString: string = "";
+      let array_position = -1;
+      input = this.CleanUp( input );
+
+      for ( let count = 0; count < input.length; count++ )
+      {
+         let code: number = input.charCodeAt( count );
+         if ( code >= 65 && code != 69 && code != 101 )      //is a letter (note: E and e are used as exponents and should not be interpreted as a command!
+         {
+            //update the points of last inserted pathObject
+            if ( array_position >= 0 )
+            {
+               let args: Array = this.parseArgsData( pointString );
+               if ( ( returnData[ array_position ].type == 'M' || returnData[ array_position ].type == 'm' ) && args.length > 2 )
+               {
+                  let type:string = returnData[ array_position ].type;
+
+                  returnData[ array_position ].args = args.slice( 0,2 );
+                  args.shift( );
+                  args.shift( );
+                  while( args.length > 0 )
+                  {
+                     let largs: Array = new Array( );
+                     let arg: string = args.shift( );
+                     if ( arg == null )
+                     {
+                        break;
+                     }
+                     largs.push( arg );
+                     arg = args.shift( );
+                     if ( arg == null )
+                     {
+                        break;
+                     }
+                     largs.push( arg );
+
+                     let line: PathCommand = new PathCommand( );
+                     line.type = ( type == 'M' ? 'L' : 'l' );
+                     line.args = largs;
+                     returnData.push( line );
+                     array_position++;
+                  }
+               }
+               else
+               {
+                  returnData[ array_position ].args = args;
+               }
+            }
+
+            let pathObject: PathCommand = new PathCommand( );
+            pathObject.type = input.charAt( count );
+            returnData.push( pathObject );
+            array_position++;
+
+            pointString = '';
+            //console.log( 'creating type: ' + pathObject.type )
+         }
+         else
+         {
+            pointString += input.charAt( count );
+         }
+      }
+
+      if ( array_position >= 0 )
+                                                         //update the last pathObject
+         returnData[ array_position ].args = this.parseArgsData( pointString );
+
+      return( returnData );
+   }
+
+   //O public static parseArgsData( input: string ): Array
+   public static parseArgsData( input: string ): Array
+   {
+      //O let returnData: Array = new Array( );
+      let returnData: Array< string > = [];
+
+      let last_char: string = null;
+      let cur_char: string = null;
+      let cur_arg: string = "";
+      let i = 0;
+      while( i < input.length )
+      {
+         cur_char = input.charAt(i );
+         if ( cur_char == "-" && last_char != "e" )
+         {
+            if ( cur_arg != "" )
+               returnData.push( cur_arg );
+            cur_arg = cur_char;
+         }
+         else if ( cur_char == "," || cur_char == " " || cur_char == "\t" || cur_char == "\r" || cur_char == "\n" )
+         {
+            if ( cur_arg != "" )
+               returnData.push( cur_arg );
+            cur_arg = "";
+         }
+         else
+         {
+            cur_arg += cur_char;
+         }
+         last_char = cur_char;
+         i++;
+      }
+      if ( cur_arg !== "" )
+         returnData.push( cur_arg );
+
+      return (returnData );
+   }
+
+   //O public parseStyles( elt: XML ): Object
+   public parseStyles( elt: XML ): INameToValueMap
+   {
+      //O let result: Object = new Object( );
+      let result: INameToValueMap = {};
+
+      //O for each( let style_str:string in elt..*::style.text() )
+      for ( let style_str in elt )
+      {
+         //O let content: string = this.CleanUp( style_str );
+         let content = this.CleanUp( style_str );
+
+         //O let parts: Array = content.split( "}" );
+         let parts = content.split( "}" );
+         //O for each ( let s: string in parts )
+         for ( let s in parts )
+         {
+            s = StringUtil.trim( s );
+            if ( s.indexOf( "{" ) > -1 )
+            {
+               //O let subparts: Array = s.split( "{" );
+               let subparts = s.split( "{" );
+
+               //O let names: Array = StringUtil.trim( subparts[ 0 ]).split( " " );
+               let names = StringUtil.trim( subparts[ 0 ]).split( " " );
+               //O for each(let n: string in names )
+               for ( let n in names )
+               {
+                  //O let style_text: string = StringUtil.trim( subparts[ 1 ] );
+                  let style_text = StringUtil.trim( subparts[ 1 ] );
+                  result[ n ] = SVGUtil.styleToObject( style_text );
+               }
+            }
+         }
+      }
+      return result;
+   }
+
+   private CleanUp( s: string ): string
+   {
+      let temp:string = StringUtil.replace( s, "\r", " " );
+      temp = StringUtil.replace( temp, "\t", " " );
+      temp = StringUtil.replace( temp, "\n", " " );
+      temp = StringUtil.replace( temp, "&#xA", "" );
+      temp = StringUtil.replace( temp, "&nbsp;", " " );
+      temp = StringUtil.shrinkSequencesOf( temp, " " );
+      return temp;
+   }
+
+   public parseTransformation( m: string ): PIXI.Matrix
+   {
+      if ( m.length == 0 )
+      {
+         return new PIXI.Matrix( );
+      }
+
+      let fix_m: string = StringUtil.rtrim( m, ")" );
+      //O let att_array: Array = fix_m.split( ")" );
+      let att_array = fix_m.split( ")" );
+
+      let mat: PIXI.Matrix = new PIXI.Matrix( );
+      mat.identity( );
+      //O for each( let att:string in att_array )
+      for ( let att in att_array )
+      {
+         //O let name: string = StringUtil.trim(att.split( "(" )[ 0 ] ).toLowerCase( );
+         let name = StringUtil.trim(att.split( "(" )[ 0 ] ).toLowerCase( );
+
+         let args: Array< string > = SVGParser.parseArgsData( att.split( "(" )[1] );
+
+         if ( name == "matrix" )
+         {
+            return new PIXI.Matrix( Number( args[ 0 ] ), Number( args[ 1 ] ), Number( args[ 2 ] ), Number( args[ 3 ] ), Number( args[ 4 ] ), Number( args[ 5 ]) );
+         }
+
+         switch( name )
+         {
+            case "translate": mat.translate( Number( args[ 0 ] ), args[ 1 ] != null ? Number( args[ 1 ] ) : Number( args[0] ) ); break;
+            case "scale"    : mat.scale( Number( args[ 0 ]),args[ 1 ] != null ? Number( args[ 1 ] ) : Number( args[ 0 ] ) ); break;
+            case "rotate"   : MatrixTransformer.rotateAroundInternalPoint( mat, args[1]!=null?Number(args[1]) : 0 ,args[ 2 ] != null ? Number( args[ 2 ] ): 0, Number( args[ 0 ] ) ); break;
+            case "skewx"    : MatrixTransformer.setSkewX(mat, args[ 0 ] ); break;
+            case "skewy"    : MatrixTransformer.setSkewY(mat, args[ 0 ] ); break;
+         }
+      }
+      return mat;
+   }
+
+   public parseViewBox( viewBox: string ): PIXI.Rectangle
+   {
+      if ( viewBox == null || viewBox == "" )
+      {
+         //return new Rectangle( 0, 0, 500, 500 );
+         return null;                                    // we do not want default viewboxes!!
+      }
+      let params:Object = viewBox.split( /\s/ );
+      return new PIXI.Rectangle( params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ] );
+   }
+
+   private parseGradients( ): void
+   {
+      //O svg_object.gradients = new Object( );
+      this.svg_object.gradients = {};
+
+      //O let nodes: XMLList = svg..*::*.(localName( ).toLowerCase( ) == "lineargradient" || localName().toLowerCase() == "radialgradient" );
+      let nodes: Array<INameToValueMap> = [];
+      //O for each( let node: XML in nodes )
+      for ( let node in nodes )
+      {
+         //O this.parseGradient( node.@id );
+         this.parseGradient( node["@id"] );
+      }
+   }
+   //O private parseGradient( id: string ): Object
+   private parseGradient( id: string ): INameToValueMap
+   {
+      id = StringUtil.ltrim( id, "#" );
+
+      if ( this.svg_object.gradients[ id ] != null )
+         return this.svg_object.gradients[ id ];
+
+      //O let grad: Object;
+      let grad: INameToValueMap = {};
+
+      //O let xml_grad: XML = svg..*.( attribute( "id" ) == id )[ 0 ];
+      let xml_grad: XML = 'svg..*.( attribute( "id" ) == id )[ 0 ]';
+
+      //inherits the href reference
+      let xlink: Namespace = new Namespace( "http://www.w3.org/1999/xlink" );
+      //O if ( xml_grad.@xlink::href.length( ) > 0 )
+      if ( xml_grad["@xlink::href"].length( ) > 0 )
+      {
+         //O grad = this.parseGradient( xml_grad.@xlink::href );
+         grad = this.parseGradient( xml_grad["@xlink::href"] );
+      }
+      //
+
+      if ( grad == null )
+         grad = new Object( );
+
+      //O if ( "@gradientUnits" in xml_grad )
+      if ( "@gradientUnits" in xml_grad )
+         //O grad.gradientUnits = xml_grad.@gradientUnits;
+         grad.gradientUnits = xml_grad["@gradientUnits"];
+      else
+         grad.gradientUnits = "objectBoundingBox";
+
+      switch(xml_grad.localName( ).toLowerCase() )
+      {
+         case "lineargradient":
+         {
+            //O if ( "@x1" in xml_grad )
+            if ( "@x1" in xml_grad )
+               //O grad.x1 = xml_grad.@x1;
+               grad.x1 = xml_grad["@x1"];
+            else if ( grad.x1 == null )
+               grad.x1 = "0%";
+
+            //O if ( "@y1" in xml_grad )
+            if ( "@y1" in xml_grad )
+               //O grad.y1 = xml_grad.@y1;
+               grad.y1 = xml_grad["@y1"];
+            else if ( grad.y1 == null )
+               grad.y1 = "0%";
+
+            //O if ( "@x2" in xml_grad )
+            if ( "@x2" in xml_grad )
+               //O grad.x2 = xml_grad.@x2;
+               grad.x2 = xml_grad["@x2"];
+            else if ( grad.x2 == null )
+               grad.x2 = "100%";
+
+            //O if ( "@y2" in xml_grad )
+            if ( "@y2" in xml_grad )
+               //O grad.y2 = xml_grad.@y2;
+               grad.y2 = xml_grad["@y2"];
+            else if ( grad.y2 == null )
+               grad.y2 = "0%";
+
+            grad.type = GradientType.LINEAR;
+            break;
+         }
+         case "radialgradient":
+         {
+            //O if ( "@cx" in xml_grad )
+            if ( "@cx" in xml_grad )
+               //O grad.cx = xml_grad.@cx;
+               grad.cx = xml_grad["@cx"];
+            else if ( grad.cx==null )
+               grad.cx = "50%";
+
+            //O if ( "@cy" in xml_grad )
+            if ( "@cy" in xml_grad )
+               //O grad.cy = xml_grad.@cy;
+               grad.cy = xml_grad["@cy"];
+            else if ( grad.cy == null )
+               grad.cy = "50%";
+
+            //O if ( "@r" in xml_grad )
+            if ( "@r" in xml_grad )
+               //O grad.r = xml_grad.@r;
+               grad.r = xml_grad["@r"];
+            else if ( grad.r == null )
+               grad.r = "50%";
+
+            //O if ( "@fx" in xml_grad )
+            if ( "@fx" in xml_grad )
+               //O grad.fx = xml_grad.@fx;
+               grad.fx = xml_grad["@fx"];
+            else if ( grad.fx == null )
+               grad.fx = grad.cx;
+
+            //O if ( "@fy" in xml_grad )
+            if ( "@fy" in xml_grad )
+               //O grad.fy = xml_grad.@fy;
+               grad.fy = xml_grad["@fy"];
+            else if ( grad.fy == null )
+               grad.fy = grad.cy;
+
+            grad.type = GradientType.RADIAL;
+
+            break;
+         }
+      }
+
+      //O switch( xml_grad.@spreadMethod )
+      switch( xml_grad["@spreadMethod"] )
+      {
+         case "pad" : grad.spreadMethod = SpreadMethod.PAD;
+            break;
+         case "reflect" : grad.spreadMethod = SpreadMethod.REFLECT;
+            break;
+         case "repeat" : grad.spreadMethod = SpreadMethod.REPEAT;
+            break;
+         default: grad.spreadMethod = SpreadMethod.PAD;
+            break
+      }
+
+      if ( grad.colors == null )
+         //O grad.colors = new Array( );
+         grad.colors = [];
+
+      if ( grad.alphas == null )
+         //O grad.alphas = new Array( );
+         grad.alphas = [];
+ 
+      if ( grad.ratios == null )
+         //O grad.ratios = new Array( );
+         grad.ratios = [];
+
+      //O for each(let stop: XML in xml_grad.*::stop )
+      for ( let stop in xml_grad )
+      {
+         //O let stop_style:Object = new Object( );
+         let stop_style: INameToValueMap = {};
+
+         //O if ( "@stop-opacity" in stop )
+         if ( "@stop-opacity" in stop )
+            //O stop_style["stop-opacity"] = stop.@["stop-opacity"];
+            stop_style["stop-opacity"] = stop["@stop-opacity"];  // Way diff
+
+         //O if ( "@stop-color" in stop )
+         if ( "@stop-color" in stop )
+            //O stop_style["stop-color"] = stop.@["stop-color"];
+            stop_style["stop-color"] = stop["@stop-color"];  // Way diff
+
+         //O if ( "@style" in stop )
+         if ( "@style" in stop )
+            //O stop_style = SVGUtil.mergeObjectStyles( stop_style, SVGUtil.styleToObject( stop.@style ) );
+            stop_style = SVGUtil.mergeObjectStyles( stop_style, SVGUtil.styleToObject( stop[".@style"] ) );
+
+         grad.colors.push( SVGColor.parseToInt( stop_style[ "stop-color" ] ) );
+         grad.alphas.push( stop_style[ "stop-opacity" ] != null ? Number( stop_style[ "stop-opacity" ] ) : 1 );
+
+         //O let offset: number = Number( StringUtil.rtrim( stop.@offset, "%" ) );
+         let offset: number = Number( StringUtil.rtrim( stop["@offset"], "%" ) );
+         //O if ( String( stop.@offset ).indexOf( "%" ) > -1 )
+         if ( String( stop["@offset"] ).indexOf( "%" ) > -1 )
+         {
+            offset /= 100;
+         }
+         grad.ratios.push( offset * 255 );
+      }
+
+      //Save the gradient definition
+      this.svg_object.gradients[ id ] = grad;
+      //
+
+      return grad;
+   }
+}

@@ -45,6 +45,8 @@
   "xpre-commit": [
     "lintfix"
   ],
+  "pre-commit": [
+  ],
   "author": "John Talbot",
   "license": "MIT",
   "dependencies": {

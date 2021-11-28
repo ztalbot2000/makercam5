@@ -1,0 +1,2793 @@
+﻿import * as PIXI from 'pixi.js'
+import { Global } from "./Global"
+import { Bezier } from "../lorentz/SVG/Bezier"
+import { Undo } from "./Undo"
+import { Dot } from "./Dot"
+import { Segment } from "./Segment"
+import { ArcSegment } from "./ArcSegment"
+import { ArcObject } from "./ArcSegment"
+import { QuadBezierSegment } from "./QuadBezierSegment"
+import { CubicBezierSegment } from "./CubicBezierSegment"
+import { CircularArc } from "./CircularArc"
+
+//O package com.partkart{
+//O 
+//O    import flash.display.*
+//O    import flash.events.*
+//O    import flash.geom.Point
+//O    import flash.geom.Matrix
+//O    import flash.geom.Transform
+
+//O    import com.lorentz.SVG.*
+
+type SACCQ = ArcSegment | CircularArc | CubicBezierSegment | QuadBezierSegment
+
+export class Path extends PIXI.Graphics
+{
+   public seglist: Array< SACCQ >
+   public dotlist: Array< Dot >
+   public docx: number
+   public docy: number
+   protected xstart: number
+   protected ystart: number
+   protected startpoint: PIXI.Point
+   //O protected startdot: PIXI.Shape
+   protected startdot: PIXI.Graphics
+
+   public dragging: boolean
+
+   protected linestyle: number
+
+   public active: boolean
+
+   public coord: coordinates
+
+   public dirty: boolean
+   public camdirty: boolean
+
+   constructor(  )
+   {
+      super(  )
+
+      // a path is a list of individual segment
+      this.seglist = new Array( )
+      this.dotlist = new Array( )
+
+      // document position of path ( in user units )
+      this.docx = 0
+      this.docy = 0
+
+      // helper let used for detecting mouse movement, used for multiple functions
+      this.xstart = 0
+      this.ystart = 0
+
+      // note: startpoint does not change throughout the dragging operation, it is also in local coordinates
+      this.startpoint = null
+      this.startdot = null
+
+      this.dragging = false
+
+      this.linestyle = 0
+
+      this.active = false
+
+      this.coord = null
+
+      // this flag is activated when the path is moved or one of its points is moved
+      // it means that the associated cam operations must be redrawn ( only used for unprocessed pockets! )
+      this.dirty = true
+
+      // same as the dirty flag, except for processed cutobjects
+      this.camdirty = true
+   }
+
+   public Path( )
+   {
+      this.cacheAsBitmap = true
+
+      this.setLineStyle( 0 )
+
+      this.attachActions( )
+   }
+
+   public addSegment( seg: SACCQ ): void
+   {
+      this.seglist.push( seg )
+      this.addChild( seg )
+      if ( Global.tool == 1 )
+      {
+         this.addDots( seg )
+
+         // place all dots on top
+         //O for( let i = 0; i < numChildren; i++ )
+         for( let i = 0; i < this.children.length; i++ )
+         {
+            let dot: PIXI.DisplayObject = this.getChildAt( i )
+            //O if ( dot is Dot )
+            if ( dot instanceof Dot )
+            {
+               this.dotlist.push( dot )
+            }
+         }
+      }
+   }
+
+   public getSegments( ): Array< Segment >
+   {
+      let list: Array< Segment > = new Array( )
+      list = list.concat( this.seglist )
+      return list
+   }
+
+   // clears all segments and repopulate from the seglist
+   public resetSegments( ): void
+   {
+      let removelist: Array< SACCQ > = new Array( )
+      //O for( let i = 0; i < numChildren; i++ )
+      for( let i = 0; i < this.children.length; i++ )
+      {
+         //O if ( this.getChildAt( i ) is Segment )
+         if ( this.getChildAt( i ) instanceof Segment )
+         {
+            removelist.push( this.getChildAt( i ) )
+         }
+      }
+
+      while( removelist.length > 0 )
+      {
+         this.removeChild( removelist.shift( ) )
+      }
+
+      //O for each( let seg: * in seglist )
+      for ( let seg of this.seglist )
+      {
+         this.addChild( seg )
+      }
+   }
+
+   // if a sprite is given, we will render on to that sprite
+   //O public render( sprite: Sprite = null ): void
+   //NC Changed name to not overwrite that of PIXI
+   //NUnused param sprite seems unused in this file. (Maybe elsewhere ?)
+   public renderSACCQ( sprite: PIXI.Graphics = null ): void
+   {
+      this.setLineStyle( this.linestyle )
+      //this.beginFill( 0xcccccc )
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         if ( this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            this.renderCubic( < CubicBezierSegment > this.seglist[ i ], sprite )
+         }
+         else if ( this.seglist[ i ] instanceof QuadBezierSegment )
+         {
+            this.renderQuad( < QuadBezierSegment > this.seglist[ i ], sprite )
+         }
+         else if ( this.seglist[ i ] instanceof ArcSegment )
+         {
+            this.renderArc( < ArcSegment > this.seglist[ i ], sprite )
+         }
+         else
+         {
+            this.renderLine( this.seglist[ i ], sprite )
+         }
+      }
+      //O this.endFill( )
+      //O this.renderCollisionArea( )
+   }
+
+   /* Originally commented out ( OCO )
+   protected renderCollisionArea( ): void
+   {
+      // just going to render it again, but with an invisible stroke for "collision detection"
+      this.setLineStyle( 3 )
+      //graphics.lineStyle( 16, 0xff0000, 0, false, LineScaleMode.NONE, CapsStyle.ROUND )
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         //O,if ( seglist[ i ] is CubicBezierSegment )
+         if ( this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            this.renderCubic( this.seglist[ i ] )
+         }
+         //O else if ( seglist[ i ] is QuadBezierSegment )
+         else if ( this.seglist[ i ] instanceof QuadBezierSegment )
+         {
+            this.renderQuad( < QuadBezierSegment > this.seglist[ i ] )
+         }
+         //O else if ( seglist[ i ] is ArcSegment )
+         else if ( this.seglist[ i ] instanceof ArcSegment )
+         {
+            this.renderArc( < ArcSegment > this.seglist[ i ] )
+         }
+         else
+         {
+            this.renderLine( this.seglist[ i ] )
+         }
+      }
+   }
+   */
+
+   protected attachActions( ): void
+   {
+      addEventListener( 'pointerover', this.overAction )
+      addEventListener( 'pointerdown', this.downAction )
+      addEventListener( 'mousemove', this.moveAction )
+      addEventListener( 'pointerup', this.upAction )
+   }
+
+   protected getDot( point: PIXI.Point ): Dot
+   {
+      /* Originally commented out ( OCO )
+      for( let i = 0; i < numChildren; i++ )
+      {
+         //O if ( this.getChildAt( i ) is Dot )
+         if ( this.getChildAt( i ) instanceof Dot )
+         {
+            let dot: Dot = < Dot > this.getChildAt( i )
+            if ( dot.point == point )
+            {
+               return dot
+            }
+         }
+      }
+      */
+
+      //O for each( let dot in dotlist )
+      for ( let dot of this.dotlist )
+      {
+         if ( dot && dot.point == point )
+         {
+            return dot
+         }
+      }
+      return null
+   }
+
+   protected getAttachedSegment( seg1: Segment, point: number ): Segment
+   {
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         let s: Segment = this.seglist[ i ]
+         if ( s != seg1 && ( (s.p2.equals( seg1.p1 ) && point == 1 ) || ( s.p1.equals( seg1.p2 ) && point == 2 ) ) )
+         {
+            return s
+         }
+      }
+
+      return null
+   }
+
+   public isClosed( ): boolean
+   {
+      let s: Segment
+      let found1 = false
+      let found2 = false
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         s = this.seglist[ i ]
+         found1 = false
+         found2 = false
+         for( let j = 0; j < this.seglist.length; j++ )
+         {
+            if ( i != j && found1 == false && ( s.p1 == this.seglist[ j ].p1 || s.p1 == this.seglist[ j ].p2 ) )
+            {
+               found1 = true
+            }
+            if ( i != j && found2 == false && ( s.p2 == this.seglist[ j ].p1 || s.p2 == this.seglist[ j ].p2 ) )
+            {
+               found2 = true
+            }
+         }
+         if ( !found1 || !found2 )
+         {
+            return false
+         }
+      }
+      return true
+   }
+
+   // add control dots for segment endpoints and control handles
+   protected addDots( seg: Segment | ArcSegment | QuadBezierSegment | CubicBezierSegment ): void
+   {
+      let dot: Dot
+
+      dot = this.addDot( seg.p1 )
+      if ( dot.s1 == null && dot.s2 != seg )
+      {
+         dot.s1 = seg
+      }
+      else if ( dot.s2 == null && dot.s1 != seg )
+      {
+         dot.s2 = seg
+      }
+
+      dot = this.addDot( seg.p2 )
+      if ( dot.s1 == null && dot.s2 != seg )
+      {
+         dot.s1 = seg
+      }
+      else if ( dot.s2 == null && dot.s1 != seg )
+      {
+         dot.s2 = seg
+      }
+
+      //O if ( seg is QuadBezierSegment )
+      if ( seg instanceof QuadBezierSegment )
+      {
+         let quad: QuadBezierSegment = < QuadBezierSegment > seg
+
+         dot = this.addDot( quad.c1 )
+         dot.c1 = quad
+      }
+      //O if ( seg is CubicBezierSegment )
+      if ( seg instanceof CubicBezierSegment )
+      {
+         let cub: CubicBezierSegment = < CubicBezierSegment > seg
+
+         dot = this.addDot( cub.c1 )
+         dot.c1 = cub
+
+         dot = this.addDot( cub.c2 )
+         dot.c2 = cub
+      }
+   }
+
+   protected addDot( point: PIXI.Point ): Dot
+   {
+      let dot: Dot = this.getDot( point )
+      if ( dot == null )
+      {
+         dot = new Dot( )
+         dot.addEventListener( 'mouseout', this.pointOutAction )
+         dot.addEventListener( 'pointerdown', this.pointDownAction )
+         dot.addEventListener( 'pointerover', this.pointOverAction )
+         dot.x = point.x * Global.zoom
+         dot.y = -point.y * Global.zoom
+         dot.point = point
+
+         this.dotlist.push( dot )
+         return dot
+      }
+      return dot
+   }
+
+   // we check whether a dot should be added based on local mouse position
+   // this is much faster than adding all dots beforehand and using visible = true/false
+   protected checkDot( lx: number, ly: number ): void
+   {
+      // check whether we are over a point on the path, and if we are, add a dot to show it
+      let sx = 0
+      let sy = 0
+
+      let dot: Dot
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         dot = null
+
+         sx = this.seglist[ i ].p1.x * Global.zoom
+         sy = -this.seglist[ i ].p1.y * Global.zoom
+         if ( ( lx > sx - 8 && lx < sx + 8 ) && ( ly > sy - 8 && ly < sy + 8 ) )
+         {
+            dot = this.getDot( this.seglist[ i ].p1 )
+         }
+
+         sx = this.seglist[ i ].p2.x * Global.zoom
+         sy = -this.seglist[ i ].p2.y * Global.zoom
+         if ( ( lx > sx - 8 && lx < sx + 8 ) && ( ly > sy - 8 && ly < sy + 8 ) )
+         {
+            dot = this.getDot( this.seglist[ i ].p2 )
+         }
+         if ( dot != null )
+         {
+            this.addChild( dot )
+         }
+
+      }
+      /*let sx: number
+      let sy = 0
+
+      let dot: Dot
+
+      // add a dot whenever we hover over a point
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         sx = this.seglist[ i ].p1.x * Global.zoom
+         sy = this.seglist[ i ].p1.y * Global.zoom
+         if ( ( lx > sx - 8 && lx < sx + 8 ) && ( ly > sy - 8 && ly < sy + 8 ) )
+         {
+
+            dot = checkDotExists( this.seglist[ i ].p1 )
+            if ( dot == null )
+            {
+               dot = new Dot( )
+               dot.addEventListener( 'mouseout', this.pointOutAction )
+               dot.addEventListener( 'pointerdown', this.pointDownAction )
+               //dot.addEventListener( 'pointerup', this.pointUpAction )
+               dot.addEventListener( 'pointerover', this.pointOverAction )
+               dot.x = sx
+               dot.y = sy
+               dot.point = this.seglist[ i ].p1
+               this.addChild( dot )
+            }
+            dot.point = this.seglist[ i ].p1
+
+            if ( !dot.s1 )
+            {
+               dot.s1 = this.seglist[ i ]
+            }
+            else if ( !dot.s2 && this.seglist[ i ] != dot.s1 )
+            {
+               dot.s2 = this.seglist[ i ]
+            }
+         }
+
+         sx = this.seglist[ i ].p2.x * Global.zoom
+         sy = this.seglist[ i ].p2.y * Global.zoom
+         if ( ( lx > sx - 8 && lx < sx + 8 ) && ( ly > sy - 8 && ly < sy + 8 ) )
+         {
+
+            dot = checkDotExists( this.seglist[ i ].p2 )
+            if ( dot == null )
+            {
+               dot = new Dot( )
+               dot.addEventListener( 'mouseout', this.pointOutAction )
+               dot.addEventListener( 'pointerdown', this.pointDownAction )
+               //dot.addEventListener( 'pointerup', this.pointUpAction )
+               dot.addEventListener( 'pointerover', this.pointOverAction )
+               dot.x = sx
+               dot.y = sy
+               dot.point = this.seglist[ i ].p2
+               this.addChild( dot )
+            }
+
+            dot.point = this.seglist[ i ].p2
+            if ( !dot.s2 )
+            {
+               dot.s2 = this.seglist[ i ]
+            }
+            else if ( !dot.s1 && this.seglist[ i ] != dot.s2 )
+            {
+               dot.s1 = this.seglist[ i ]
+            }
+         }
+
+      }*/
+   }
+
+   // same function as checkdot, but only for sketch dots
+   protected checkDotSketch( lx: number, ly: number ): void
+   {
+      let sx = 0
+      let sy = 0
+
+      let dot: Dot
+
+      let op: Array< PIXI.Point > = this.openArray( )
+
+      for( let i = 0; i < op.length; i++ )
+      {
+         sx = op[ i ].x * Global.zoom
+         sy = -op[ i ].y * Global.zoom
+
+         if ( ( lx > sx -8 && lx < sx + 8 ) && ( ly > sy - 8 && ly < sy + 8 ) )
+         {
+            dot = this.getDot( op[ i ] )
+
+            //if ( dot == null )
+            //{
+               //dot = new Dot( )
+               dot.setSketch( )
+               dot.addEventListener( 'pointerdown', this.sketchPointDown )
+               dot.addEventListener( 'mouseout', this.sketchPointOut )
+
+               //dot.x = sx
+               //dot.y = sy
+               //dot.point = op[ i ]
+               dot.looppath = this
+
+               this.addChild( dot )
+            //}
+         }
+      }
+
+   }
+
+   protected sketchPointDown( e: PIXI.interaction.InteractionEvent ): void
+   {
+      e.stopPropagation( )
+
+      let main: * = this.parent.parent
+      main.startSketch( e )
+
+      let sketchdot: Dot = < Dot > e.target
+      if ( sketchdot != null && contains( sketchdot ) )
+      {
+         this.removeChild( sketchdot )
+      }
+   }
+
+   protected sketchPointOut( e: PIXI.interaction.InteractionEvent ): void
+   {
+      let sketchdot: Dot = < Dot > e.target
+      if ( sketchdot != null )
+      {
+         sketchdot.setInactive( )
+         sketchdot.removeEventListener( 'pointerdown', this.sketchPointDown )
+         sketchdot.removeEventListener( 'mouseout', this.sketchPointOut )
+      }
+      if ( sketchdot != null && contains( sketchdot ) )
+      {
+         this.removeChild( sketchdot )
+      }
+   }
+
+   protected setLineStyle( style: number ): void
+   {
+      this.linestyle = style
+      //O for each( let seg in this.seglist )
+      for ( let seg of this.seglist )
+      {
+         seg.setLineStyle( style )
+      }
+   }
+
+   // @ts-ignore  TS6133: 'e' is declared but its value
+   protected overAction( e: Event ): void
+   {
+      if ( Global.tool == 3 && Global.dragging == false && Global.space == false )
+      {
+         this.checkDot( this.mouseX, this.mouseY )
+      }
+      else if ( Global.tool == 1 && Global.dragging == false && Global.space == false )
+      {
+         this.checkDotSketch( this.mouseX, this.mouseY )
+      }
+   }
+
+   // @ts-ignore  TS6133: 'e' is declared but its value
+   protected downAction( e: Event ): void
+   {
+      if ( ( Global.tool == 0 || Global.tool == 3 ) && Global.space == false )
+      {
+         //OCO // e.stopPropagation( )
+
+         //dragging = true
+         Global.dragging = true
+
+         //OCO //xstart = e.stageX
+         //OCO //ystart = e.stageY
+
+         //OCO //this.parent.addChild( this ) // add to top of z-stack
+      }
+   }
+
+   protected moveAction( e: Event ): void
+   {
+      if ( Global.tool == 3 && Global.dragging == false && Global.space == false && e.target == this )
+      {
+         this.checkDot( this.mouseX, this.mouseY )
+      }
+      else if ( Global.tool == 1 && Global.dragging == false && Global.space == false )
+      {
+         this.checkDotSketch( this.mouseX, this.mouseY )
+      }
+   }
+
+   // @ts-ignore  TS6133: 'e' is declared but its value
+   protected upAction( e: Event ): void
+   {
+      if ( Global.tool == 0 || Global.tool == 3 )
+      {
+         //dragging = false
+         Global.dragging = false
+         this.clearInactive( )
+      }
+   }
+
+   public setActive( ): void
+   {
+      this.active = true
+      this.redraw( )
+   }
+
+   public setInactive( ): void
+   {
+      this.active = false
+      this.redraw( )
+   }
+
+   // if segment is given, only redraw given segment
+   public redraw( seg: Segment = null ): void
+   {
+      //ONO //let i = 0
+      //ONO //let dot: Dot
+
+      if ( seg == null )
+      {
+         this.renderClear( )
+         if ( this.active == false )
+         {
+            this.setLineStyle( 0 )
+         }
+         else
+         {
+            this.setLineStyle( 1 )
+         }
+
+         // update control dot positions
+         if ( Global.tool == 3 )
+         {
+            //O  for each( dot in dotlist )
+            for ( let dot of this.dotlist )
+            {
+               dot.x = dot.point.x * Global.zoom
+               dot.y = -dot.point.y * Global.zoom
+            }
+         }
+         this.renderSACCQ( )
+      }
+      else
+      {
+         seg.clear( )
+
+         let cub: CubicBezierSegment
+         let quad: QuadBezierSegment
+
+         if ( this.active == false )
+         {
+            seg.setLineStyle( 0 )
+         }
+         else
+         {
+            seg.setLineStyle( 1 )
+         }
+         //O if ( seg is CubicBezierSegment )
+         if ( seg instanceof CubicBezierSegment )
+         {
+            cub = seg as CubicBezierSegment
+            this.renderCubic( cub )
+         }
+         //O jelse if ( seg is QuadBezierSegment )
+         else if ( seg instanceof QuadBezierSegment )
+         {
+            quad = < QuadBezierSegment > seg
+            this.renderQuad( quad )
+         }
+         //O else if ( seg is ArcSegment )
+         else if ( seg instanceof ArcSegment )
+         {
+            let arc: ArcSegment = < ArcSegment > seg
+            this.renderArc( arc )
+         }
+         else
+         {
+            this.renderLine( seg )
+         }
+         if ( Global.tool == 3 )
+         {
+            //O for each( dot in dotlist )
+            for ( let dot of this.dotlist )
+            {
+               if ( dot != null && ( dot.point == seg.p1 || dot.point == seg.p2 || (quad && dot.point == quad.c1 ) || (cub && (dot.point == cub.c1 || dot.point == cub.c2 ) ) ) )
+               {
+                  dot.x = dot.point.x * Global.zoom
+                  dot.y = -dot.point.y * Global.zoom
+               }
+            }
+         }
+      }
+   }
+
+   public renderClear( ): void
+   {
+      //O for each( let seg in this.seglist )
+      for ( let seg of this.seglist )
+      {
+         seg.clear( )
+      }
+   }
+
+   public clearDots( ): void
+   {
+      // remove all helper objects ( dots, etc )
+      let removelist: Array< Segment > = new Array( )
+
+      //O for( let i = 0; i < numChildren; i++ )
+      for( let i = 0; i < this.children.length; i++ )
+      {
+         let obj: Object = this.getChildAt( i )
+         //O if ( !( obj is Segment ) )
+         if ( !( obj instanceof Segment ) )
+         {
+            removelist.push( obj )
+         }
+      }
+
+      //O for each( let item in removelist )
+      for ( let item of removelist )
+      {
+         this.removeChild( item )
+      }
+   }
+
+   protected clearInactive( ): void
+   {
+      // remove inactive helper objects ( dots, etc )
+      let removelist: Array< Dot > = new Array( )
+
+      //O for( let i = 0; i < numChildren; i++ )
+      for( let i = 0; i < this.children.length; i++ )
+      {
+         //O if ( this.getChildAt( i ) is Dot )
+         if ( this.getChildAt( i ) instanceof Dot )
+         {
+            let dot: Dot = < Dot > this.getChildAt( i )
+            if ( dot.active == false )
+            {
+               removelist.push( dot )
+            }
+            else if ( dot.c1 && dot.c1.active == false )
+            {
+               removelist.push( dot )
+            }
+            else if ( dot.c2 && dot.c2.active == false )
+            {
+               removelist.push( dot )
+            }
+         }
+      }
+
+      for( let i = 0; i < removelist.length; i++ )
+      {
+         this.removeChild( removelist[ i ] )
+      }
+   }
+
+   public setDotsInactive( ): void
+   {
+      // make all dots inactive
+      /* Originally commented out ( OCO )
+      for( let i = 0; i<numChildren; i++ )
+      {
+         //O if ( this.getChildAt( i ) is Dot )
+         if ( this.getChildAt( i ) instanceof Dot )
+         {
+            let dot: Dot = < Dot > this.getChildAt( i )
+            dot.setInactive( )
+         }
+      }
+      // also make all segments inactive
+      this.setSegmentsInactive( );
+      */
+
+      // set dots with inactive segments as inactive
+      //O for each( let dot in dotlist )
+      for ( let dot of this.dotlist )
+      {
+         if ( ( !dot.s1 || dot.s1.active == false ) && (!dot.s2 || dot.s2.active == false ) && (!dot.c1 || dot.c1.active == false ) && (!dot.c2 || dot.c2.active == false ) )
+         {
+            dot.setInactive( )
+         }
+      }
+   }
+
+   public redrawDots( ): void
+   {
+      // remove all dots and add new dots
+      while( this.dotlist.length > 0 )
+      {
+         let dot = this.dotlist.shift( )
+         if ( contains( dot ) )
+         {
+            this.removeChild( dot )
+         }
+      }
+
+      //O for each( let seg in seglist )
+      for ( let seg of this.seglist )
+      {
+         this.addDots( seg )
+      }
+   }
+
+   protected deleteDots( seg: Segment ): void
+   {
+      let dot: Dot
+
+      dot = this.getDot( seg.p1 )
+      if ( dot.s2 == null )
+      {
+         this.deleteDot( dot )
+      }
+      else
+      {
+         dot.s1 = null
+      }
+
+      dot = this.getDot( seg.p2 )
+      if ( dot.s1 == null )
+      {
+         this.deleteDot( dot )
+      }
+      else
+      {
+         dot.s2 = null
+      }
+
+      if ( seg instanceof QuadBezierSegment )
+      {
+         let quad: QuadBezierSegment = < QuadBezierSegment > seg
+         this.deleteDot( this.getDot( quad.c1 ) )
+      }
+      if ( seg instanceof CubicBezierSegment )
+      {
+         let cub: CubicBezierSegment = < CubicBezierSegment > seg
+         this.deleteDot( this.getDot( cub.c1 ) )
+         this.deleteDot( this.getDot( cub.c2 ) )
+      }
+   }
+
+   protected deleteDot( dot: Dot ): void
+   {
+      if ( dot != null && contains( dot ) )
+      {
+         this.removeChild( dot )
+      }
+
+      let index = this.dotlist.indexOf( dot )
+
+      if ( index != -1 )
+      {
+         this.dotlist.splice( index, 1 )
+      }
+   }
+
+   public setSegmentsInactive( ): void
+   {
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         this.seglist[ i ].active = false
+      }
+   }
+
+   protected addQuadControls( seg: QuadBezierSegment ): void
+   {
+      if ( seg.active == true )
+      {
+         let dot: Dot = this.getDot( seg.c1 )
+         /*if ( dot == null )
+         {
+            dot = new Dot( )
+            dot.x = seg.c1.x * Global.zoom
+            dot.y = seg.c1.y * Global.zoom
+            dot.setActive( )
+            dot.c1 = seg
+            dot.point = seg.c1
+            this.renderQuadGuides( < QuadBezierSegment > seg )
+            this.addChild( dot )
+            dot.addEventListener( 'pointerdown', this.pointDownAction )
+            //dot.addEventListener( 'pointerup', this.pointUpAction )
+         }
+         else{*/
+            dot.c1.active = true
+            dot.setActive( )
+            this.addChild( dot )
+         //}
+      }
+   }
+
+   protected renderQuadGuides( seg: QuadBezierSegment ): void
+   {
+      let tempstyle = seg.linestyle
+      seg.setLineStyle( 2 )
+      seg.moveTo( seg.p1.x * Global.zoom, -seg.p1.y * Global.zoom )
+      seg.lineTo( seg.c1.x * Global.zoom, -seg.c1.y * Global.zoom )
+      //graphics.lineTo( seg.p2.x * Global.zoom, seg.p2.y * Global.zoom )
+      seg.setLineStyle( tempstyle )
+   }
+
+   protected addCubicControls( seg: CubicBezierSegment ): void
+   {
+      if ( seg.active == true )
+      {
+         let dot: Dot = this.getDot( seg.c1 )
+         /*if ( dot == null )
+         {
+            dot = new Dot( )
+            dot.x = seg.c1.x * Global.zoom
+            dot.y = seg.c1.y * Global.zoom
+            dot.setActive( )
+            dot.c1 = seg
+            dot.point = seg.c1
+            this.renderCubicGuides( seg )
+            this.addChild( dot )
+            dot.addEventListener( 'pointerdown', this.pointDownAction )
+            //dot.addEventListener( 'pointerup', this.pointUpAction )
+         }
+         else{*/
+            dot.c1.active = true
+            dot.setActive( )
+            this.addChild( dot )
+         //}
+
+         dot = this.getDot( seg.c2 )
+         /*if ( dot == null )
+         {
+            dot = new Dot( )
+            dot.x = seg.c2.x * Global.zoom
+            dot.y = seg.c2.y * Global.zoom
+            dot.setActive( )
+            dot.c2 = seg
+            dot.point = seg.c2
+            this.renderCubicGuides( seg )
+            this.addChild( dot )
+            dot.addEventListener( 'pointerdown', this.pointDownAction )
+            //dot.addEventListener( 'pointerup', this.pointUpAction )
+         }
+         else{*/
+            dot.c2.active = true
+            dot.setActive( )
+            this.addChild( dot )
+         //}
+      }
+   }
+
+   protected renderCubicGuides( cub: CubicBezierSegment ): void
+   {
+      let tempstyle = cub.linestyle
+      cub.setLineStyle( 2 )
+      cub.moveTo( cub.p1.x * Global.zoom, -cub.p1.y * Global.zoom )
+      cub.lineTo( cub.c1.x * Global.zoom, -cub.c1.y * Global.zoom )
+
+      cub.moveTo( cub.p2.x * Global.zoom, -cub.p2.y * Global.zoom )
+      cub.lineTo( cub.c2.x * Global.zoom, -cub.c2.y * Global.zoom )
+      cub.setLineStyle( tempstyle )
+   }
+
+   //O protected clearControls( dot: Dot ): void
+   protected clearControls( dot: Dot ): void
+   {
+      //NC solve unread and expected 0 args and got 1, if you comment it out
+      dot = dot
+      // remove extraneous inactive controls
+
+      /* Originally commented out ( OCO )
+      let removelist: Array< Segment > = new Array( )
+      for( let i = 0; i < numChildren; i++ )
+      {
+         //O if ( this.getChildAt( i ) is Dot )
+         if ( this.getChildAt( i ) instanceof Dot )
+         {
+            removelist.push( this.getChildAt(i ) )
+         }
+      }
+
+      //O for each( let item in removelist )
+      for ( let item of removelist )
+      {
+         this.removeChild( item )
+      }
+      */
+   }
+
+   protected unsetDotsCurrent( ): void
+   {
+      //O for( let i = 0; i < numChildren; i++ )
+      for( let i = 0; i < this.children.length; i++ )
+      {
+         //O if ( this.getChildAt( i ) is Dot )
+         if ( this.getChildAt( i ) instanceof Dot )
+         {
+            let dot: Dot = < Dot > this.getChildAt( i )
+            dot.unsetCurrent( )
+         }
+      }
+
+      if ( this.coord != null && this.parent.contains( this.coord ) )
+      {
+         this.parent.removeChild( this.coord )
+      }
+   }
+
+   // @ts-ignore  TS6133: 'e' is declared but its value
+   protected pointOutAction( e: Event ): void
+   {
+      this.clearInactive( )
+   }
+
+   protected pointOverAction( e: Event ): void
+   {
+      if ( Global.tool == 3 && Global.dragging == false )
+      {
+         e.stopPropagation( )
+
+         let dot: Dot = < Dot > < unknown > e.target
+         if ( this.dragging && dot.current )
+         {
+            this.pointManipulatorUpdate( dot )
+         }
+      }
+   }
+
+   protected pointDownAction( e: Event ): void
+   {
+      if ( Global.tool == 3 )
+      {
+         this.cacheAsBitmap = false
+
+         e.target.addEventListener( 'mousemove', this.pointMoveAction )
+         e.target.addEventListener( 'pointerup', this.pointUpAction )
+         e.target.removeEventListener( 'mouseout', this.pointOutAction )
+
+         let dot: Dot = < Dot > < unknown > e.target
+
+         this.xstart = this.mouseX
+         this.ystart = this.mouseY
+
+         this.addChild( dot ); // put on top of z-index
+
+         // add marker of the start point, so we can go back if necessary
+         this.startpoint = dot.point.clone( )
+
+         this.dragging = true
+         Global.dragging = true
+
+         //O e.target.startDrag( )
+         dot.startDrag( )
+
+         this.setSegmentsInactive( )
+         this.setInactive( )
+
+         if ( dot.s1 != null ){ dot.s1.active = true;}
+         if ( dot.s2 != null ){ dot.s2.active = true;}
+         if ( dot.c1 != null ){ dot.c1.active = true;}
+         if ( dot.c2 != null ){ dot.c2.active = true;}
+
+         this.setDotsInactive( )
+
+         //O e.target.setActive( )
+         dot.setActive( )
+         //O e.target.setDragging( )
+         dot.setDragging( )
+
+         this.clearInactive( )
+
+         //O if ( e.target.c1 == null && e.target.c2 == null )
+         if ( dot.c1 == null && dot.c2 == null )
+         {
+            this.clearControls( dot )
+         }
+
+         this.addCoord( dot )
+
+         //O if ( e.target.s1 is QuadBezierSegment )
+         if ( dot.s1 instanceof QuadBezierSegment )
+         {
+            //O e.target.s1.active = true
+            dot.s1.active = true
+            //O this.addQuadControls( < QuadBezierSegment > e.target.s1 )
+            this.addQuadControls( < QuadBezierSegment > dot.s1 )
+         }
+         //O if ( e.target.s2 is QuadBezierSegment )
+         if ( dot.s2 instanceof QuadBezierSegment )
+         {
+            //O e.target.s2.active = true
+            dot.s2.active = true
+            //O this.addQuadControls( < QuadBezierSegment > e.target.s2 )
+            this.addQuadControls( < QuadBezierSegment > dot.s2 )
+         }
+
+         //O if ( e.target.s1 is CubicBezierSegment )
+         if ( dot.s1 instanceof CubicBezierSegment )
+         {
+            //O e.target.s1.active = true
+            dot.s1.active = true
+            //O this.addCubicControls( < CubicBezierSegment > e.target.s1 )
+            this.addCubicControls( < CubicBezierSegment > dot.s1 )
+         }
+         //O if ( e.target.s2 is CubicBezierSegment )
+         if ( dot.s2 instanceof CubicBezierSegment )
+         {
+            //O e.target.s2.active = true
+            dot.s2.active = true
+            //O this.addCubicControls( < CubicBezierSegment > e.target.s2 )
+            this.addCubicControls( < CubicBezierSegment > dot.s2 )
+         }
+
+         this.pointManipulatorUpdate( dot )
+
+         //O let main: * = this.parent
+         let main: * = this.parent
+         main.clearDots( this )
+         main.addChild( this ); // path should be on top while dragging
+
+         //O this.startdot = new Shape( )
+         this.startdot = new PIXI.Graphics( )
+         //O this.startdot.graphics.beginFill( 0x000000 )
+         this.startdot.beginFill( 0x000000 )
+         //O this.startdot.graphics.drawRect( 0,-6,1,13 )
+         this.startdot.drawRect( 0,-6,1,13 )
+         //O this.startdot.graphics.drawRect( -6,0,13,1 )
+         this.startdot.drawRect( -6,0,13,1 )
+         //O this.startdot.graphics.endFill( )
+         this.startdot.endFill( )
+         //O this.startdot.graphics.x = this.startpoint.x * Global.zoom
+         this.startdot.x = this.startpoint.x * Global.zoom
+         //O this.startdot.graphics.y = -this.startpoint.y * Global.zoom
+         this.startdot.y = -this.startpoint.y * Global.zoom
+
+         this.addChild( this.startdot )
+      }
+
+   }
+
+   protected pointUpAction( e: Event ): void
+   {
+      e.stopPropagation( )
+      e.target.stopDrag( )
+
+      this.dragging = false
+      Global.dragging = false
+      e.target.unsetDragging( )
+
+      // remove initial point marker
+
+      if ( contains( this.startdot ) )
+      {
+         this.removeChild( this.startdot )
+      }
+
+      e.target.removeEventListener( 'mousemove', this.pointMoveAction )
+      e.target.removeEventListener( 'pointerup', this.pointUpAction )
+      e.target.addEventListener( 'mouseout', this.pointOutAction )
+
+      let dot: Dot = < Dot > < unknown > e.target
+
+      if ( dot && dot.loop == true && dot.looppath != null && dot.looppath != this )
+      {
+         this.mergePath( dot.looppath )
+         dot.active = false
+         this.setInactive( )
+         this.clearInactive( )
+      }
+      else if ( dot && dot.loop == true )
+      {
+         dot.active = false
+         this.setInactive( )
+         this.clearInactive( )
+      }
+      else
+      {
+         this.pointManipulatorUpdate( dot )
+      }
+
+      // merge points
+      if ( dot && dot.loop == true && dot.looppoint )
+      {
+         if ( dot.s1 && Global.withinTolerance( dot.s1.p1,dot.looppoint, 0.01 ) )
+         {
+            dot.s1.p1 = dot.looppoint
+         }
+         else if ( dot.s1 && Global.withinTolerance( dot.s1.p2,dot.looppoint, 0.01 ) )
+         {
+            dot.s1.p2 = dot.looppoint
+         }
+         if ( dot.s2 && Global.withinTolerance( dot.s2.p1,dot.looppoint, 0.01 ) )
+         {
+            dot.s2.p1 = dot.looppoint
+         }
+         else if ( dot.s2 && Global.withinTolerance( dot.s2.p2,dot.looppoint, 0.01 ) )
+         {
+            dot.s2.p2 = dot.looppoint
+         }
+         this.redrawDots( )
+      }
+
+      // set undo point
+      if ( !dot.point.equals( this.startpoint ) )
+      {
+         let scene: SceneGraph = this.parent as SceneGraph
+         if ( scene != null )
+         {
+            let undo: UndoPointMove = new UndoPointMove( scene )
+            undo.point = dot.point
+            undo.path = this
+            undo.undopoint = this.startpoint.clone( )
+            undo.redopoint = dot.point.clone( )
+            Global.undoPush( undo )
+
+            // update cutpaths
+            scene.redrawCuts( )
+         }
+
+         // set dirty flag for cam operations
+         this.dirty = true
+         this.camdirty = true
+
+
+      }
+
+      this.cacheAsBitmap = true
+
+   }
+
+   public pubPointUpAction( ): void
+   {
+      // handle an event where the mouse leaves the stage
+      //O for( let i = 0; i < numChildren; i++ )
+      for( let i = 0; i < this.children.length; i++ )
+      {
+         //O if ( this.getChildAt( i ) is Dot )
+         if ( this.getChildAt( i ) instanceof Dot )
+         {
+            let dot: Dot = < Dot > this.getChildAt( i )
+            dot.stopDrag( )
+            dot.removeEventListener( 'mousemove', this.pointMoveAction )
+            //this.clearInactive( )
+            this.dragging = false
+            Global.dragging = false
+         }
+      }
+
+   }
+
+   protected pointMoveAction( e: Event ): void
+   {
+      e.stopPropagation( )
+
+      let dot: Dot = < Dot > < unknown > e.target
+
+      if ( dot.current == true && dot.active == true )
+      {
+         this.pointManipulatorUpdate( dot )
+      }
+      /*let sx: number
+      let sy: number
+
+      let lx: number = e.stageX
+      let ly: number = e.stageY
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         sx = this.seglist[ i ].p1.x * Global.zoom
+         sy = this.seglist[ i ].p1.y * Global.zoom
+         if ( ( lx > sx - 5 && lx < sx + 5 ) && ( ly > sy - 5 && ly < sy + 5 ) )
+         {
+            this.seglist[ i ].p1.x += xdelta
+            this.seglist[ i ].p1.y += ydelta
+         }
+
+         sx = this.seglist[ i ].p2.x * Global.zoom
+         sy = this.seglist[ i ].p2.y * Global.zoom
+         if ( ( lx > sx - 5 && lx < sx + 5 ) && (ly > sy -5 && ly < sy + 5 ) )
+         {
+            this.seglist[ i ].p2.x += xdelta
+            this.seglist[ i ].p2.y += ydelta
+         }
+      }*/
+
+   }
+
+   protected pointManipulatorUpdate( dot: Dot ): void
+   {
+      //NUnused let xdelta: number = ( dot.x - this.xstart ) / Global.zoom
+      //NUnused let ydelta: number = ( dot.y - this.ystart ) / Global.zoom
+
+      // x/y coordinates to snap to, in local coordinates
+      let xsnap: number
+      let ysnap: number
+
+      let xerror: number = 12
+      let yerror: number = 12
+
+      /* Originally commented out ( OCO )
+      if ( Global.snap == true )
+      {
+         let xstartfixed: number
+         let ystartfixed: number
+
+         for( let i: number = 0; i < this.seglist.length; i++ )
+         {
+            if ( this.seglist[ i ].p2 != dot.point )
+            {
+               xstartfixed = ( this.seglist[ i ].p2.x + this.docx ) * Global.zoom
+               ystartfixed = ( this.seglist[ i ].p2.y + this.docy ) * Global.zoom
+               if ( Math.abs( this.mouseX - xstartfixed ) < xerror )
+               {
+                  xerror = Math.abs( this.mouseX - xstartfixed )
+                  xpoint = this.seglist[ i ].p2
+               }
+               if ( Math.abs( this.mouseY - ystartfixed ) < yerror )
+               {
+                  yerror = Math.abs( this.mouseY - ystartfixed )
+                  ypoint = this.seglist[ i ].p2
+               }
+            }
+         }
+
+         if ( Math.abs( this.mouseX - this.xstart ) < xerror && Math.abs(e.stageY - this.ystart ) < yerror )
+         {
+            snap = true
+            snappos = new PIXI.Point( this.startpoint.x + this.docx,this.startpoint.y + this.docy )
+         }
+         else if ( Math.abs( this.mouseX - this.xstart ) < xerror )
+         {
+            snap = true
+            //snappos = new PIXI.Point( this.startpoint.x + this.docx, ( ( e.stageY - Global.yorigin ) / Global.zoom ) )
+            xerror = Math.abs( this.mouseX - this.xstart )
+            xpoint = this.startpoint
+         }
+         else if ( Math.abs( e.stageY - this.ystart ) < yerror )
+         {
+            snap = true
+            //snappos = new PIXI.Point( ( ( e.stageX - Global.xorigin ) / Global.zoom ), this.startpoint.y + this.docy )
+            yerror = Math.abs( e.stageY - this.ystart )
+            ypoint = this.startpoint
+         }
+
+         if ( xerror < 12 && yerror < 12 )
+         {
+            snap = true
+            snappos = new PIXI.Point( xpoint.x + this.docx, ypoint.y + this.docy )
+         }
+         else if ( xerror < 12 )
+         {
+            snap = true
+            snappos = new PIXI.Point( xpoint.x + this.docx, ( this.mouseY / Global.zoom ) )
+         }
+         else if ( yerror < 12 )
+         {
+            snap = true
+            snappos = new PIXI.Point( ( this.mouseX / Global.zoom ), ypoint.y + this.docy )
+         }
+
+         let globalpos: PIXI.Point = new PIXI.Point( this.mouseX / Global.zoom,this.mouseY / Global.zoom )
+         let tempsnappos: PIXI.Point = new PIXI.Point( Math.round( globalpos.x ), Math.round( globalpos.y ) )
+
+         let currenterror: number = PIXI.Point.distance( globalpos, tempsnappos )
+         if ( currenterror < 0.15 )
+         {
+            snap = true
+            snappos = tempsnappos
+         }
+      }
+      */
+
+      let xstartfixed: number
+      let ystartfixed: number
+
+
+      // snap to starting point
+      if ( Math.abs( this.mouseX - this.xstart ) < xerror )
+      {
+         xerror = Math.abs( this.mouseX - this.xstart )
+         xsnap = this.startpoint.x
+      }
+
+      if ( Math.abs( this.mouseY - this.ystart ) < yerror )
+      {
+         yerror = Math.abs( this.mouseY - this.ystart )
+         ysnap = this.startpoint.y
+      }
+
+      // snap to local points
+      if ( Global.localsnap == true )
+      {
+         for( let i: number = 0; i < this.seglist.length; i++ )
+         {
+            if ( this.seglist[ i ].p2 != dot.point )
+            {
+               xstartfixed =  this.seglist[ i ].p2.x * Global.zoom
+               ystartfixed = -this.seglist[ i ].p2.y * Global.zoom
+               if ( Math.abs( this.mouseX - xstartfixed ) < xerror )
+               {
+                  xerror = Math.abs( this.mouseX - xstartfixed )
+                  xsnap = this.seglist[ i ].p2.x
+               }
+               if ( Math.abs( this.mouseY - ystartfixed ) < yerror )
+               {
+                  yerror = Math.abs( this.mouseY - ystartfixed )
+                  ysnap = this.seglist[ i ].p2.y
+               }
+               //trace( Math.abs( this.mouseX - xstartfixed ), Math.abs( -this.mouseY - ystartfixed ) )
+            }
+         }
+      }
+
+      // snap to global grid
+      if ( Global.snap == true )
+      {
+         let globalx: number =  this.mouseX / Global.zoom + this.docx
+         let globaly: number = -this.mouseY / Global.zoom - this.docy
+
+         let residualx: number = Math.abs( globalx - Math.round( globalx ) ) * Global.zoom
+         let residualy: number = Math.abs( globaly - Math.round( globaly ) ) * Global.zoom
+
+//            trace( residualx, residualy )
+
+         if ( residualx < xerror )
+         {
+            xerror = residualx
+            xsnap = Math.round( globalx ) - this.docx
+         }
+         if ( residualy < yerror )
+         {
+            yerror = residualy
+            ysnap = Math.round( globaly ) + this.docy
+         }
+      }
+
+      // snap/join open points
+      if ( dot && ( ( dot.s1 && !dot.s2 ) || ( dot.s2 && !dot.s1 ) ) )
+      { // only open end points can snap to other open end points
+
+         let scene: * = this.parent
+         let looppoint: PIXI.Point = scene.closeLoop( dot )
+
+         if ( looppoint != null )
+         {
+            xerror = 0
+            yerror = 0
+
+            xsnap = looppoint.x
+            ysnap = looppoint.y
+
+            xsnap -= this.docx
+            ysnap += this.docy
+
+            dot.setLoop( )
+         }
+         else
+         {
+            dot.unsetLoop( )
+         }
+      }
+
+      let pos: PIXI.Point
+
+      if ( xerror < 12 )
+      {
+         dot.x = xsnap * Global.zoom
+         dot.point.x = xsnap
+      }
+      else
+      {
+         dot.x = this.mouseX
+         dot.point.x = this.mouseX / Global.zoom
+      }
+
+      if ( yerror < 12 )
+      {
+         dot.y = ysnap * Global.zoom
+         dot.point.y = ysnap
+      }
+      else
+      {
+         dot.y = this.mouseY
+         dot.point.y = -this.mouseY / Global.zoom
+      }
+
+      pos = new PIXI.Point( dot.point.x, dot.point.y )
+
+      // redraw nearby paths only
+      if ( dot.s1 != null )
+      {
+         this.redraw( dot.s1 )
+      }
+      if ( dot.s2 != null )
+      {
+         this.redraw( dot.s2 )
+      }
+      if ( dot.c1 != null )
+      {
+         this.redraw( dot.c1 )
+      }
+      if ( dot.c2 != null )
+      {
+         this.redraw( dot.c2 )
+      }
+
+      this.coordSetPos( pos )
+   }
+
+   protected addCoord( dot: Dot ): void
+   {
+      this.unsetDotsCurrent( )
+      // note: "active" dots are related to the currently selected segment
+      // ( all start/end, and curve control points ). While the "current" is
+      // the single dot editable by the coordinate box
+      dot.setCurrent( )
+      this.coord = new coordinates( )
+      this.coord.x = this.xstart
+      this.coord.y = -this.ystart
+      this.coord.dot = dot
+
+      this.coord.xbox.restrict = "0-9."
+      this.coord.ybox.restrict = "0-9."
+
+      this.parent.addChild( this.coord )
+      this.coord.addEventListener( 'pointerdown', this.coordDown )
+      this.coord.addEventListener( 'mousemove', this.coordMove )
+      this.coord.addEventListener( 'pointerup', this.coordUp )
+      this.coord.xbox.addEventListener( Event.CHANGE, this.coordInput )
+      this.coord.ybox.addEventListener( Event.CHANGE, this.coordInput )
+   }
+
+   protected coordSetPos( pos: PIXI.Point ): void
+   {
+      // now move coordinate box
+      if ( this.coord != null && pos != null )
+      {
+         this.coord.x =  ( pos.x + this.docx ) * Global.zoom
+         this.coord.y = -( pos.y - this.docy ) * Global.zoom
+         this.coord.xbox.text = Number(  this.docx + pos.x ).toFixed( 4 ) + " " + Global.unit
+         this.coord.ybox.text = Number( -this.docy + pos.y ).toFixed( 4 ) + " " + Global.unit
+      }
+   }
+
+   protected coordInput( e: Event ): void
+   {
+      let c = e.target.parent
+      let input: String = e.target.text
+      let inputnum: number = Number( input.replace( /[^0-9-'.']/g,"" ) )
+
+      if ( inputnum > 100 )
+      {
+         inputnum = 100
+      }
+
+      if ( c.dot.parent != null )
+      {
+         if ( e.target.name == "xbox" )
+         {
+            inputnum -= c.dot.parent.this.docx
+            if ( c.dot.point.x != inputnum )
+            {
+               c.dot.x = inputnum * Global.zoom
+               c.dot.point.x = inputnum
+               this.dirty = true
+               this.camdirty = true
+            }
+         }
+         else if ( e.target.name == "ybox" )
+         {
+            inputnum += c.dot.parent.docy
+            if ( c.dot.point.y != inputnum )
+            {
+               c.dot.y = inputnum * Global.zoom
+               c.dot.point.y = inputnum
+               this.dirty = true
+               this.camdirty = true
+            }
+         }
+      }
+      this.redraw( )
+   }
+
+   protected coordDown( e: Event ): void
+   {
+      e.stopPropagation( )
+   }
+
+   protected coordMove( e: Event ): void
+   {
+      e.stopPropagation( )
+   }
+
+   protected coordUp( e: Event ): void
+   {
+      e.stopPropagation( )
+   }
+
+   // if self is set to "true" render to the path itself
+   protected renderLine( seg: Segment, sprite: PIXI.Graphics = null ): void
+   {
+      if ( sprite == null )
+      {
+         sprite = seg
+      }
+
+      sprite.moveTo( seg.p1.x * Global.zoom, -seg.p1.y * Global.zoom )
+      sprite.lineTo( seg.p2.x * Global.zoom, -seg.p2.y * Global.zoom )
+
+      /*let norm: PIXI.Point = new PIXI.Point( -seg.p2.y + seg.p1.y, seg.p2.x - seg.p1.x )
+
+      let distance: number = PIXI.Point.distance( seg.p1,seg.p2 )
+
+      norm.normalize( distance / 5 )
+
+      let mid: PIXI.Point = new PIXI.Point( 0.9 * seg.p2.x+0.1 * seg.p1.x, 0.9 * seg.p2.y+0.1 * seg.p1.y )
+      let a1: PIXI.Point = new PIXI.Point( mid.x + norm.x, mid.y + norm.y )
+      let a2: PIXI.Point = new PIXI.Point( mid.x - norm.x, mid.y - norm.y )
+
+      seg.moveTo( seg.p2.x * Global.zoom, -seg.p2.y * Global.zoom )
+      seg.lineTo( a1.x * Global.zoom, -a1.y * Global.zoom )
+
+      seg.moveTo( seg.p2.x * Global.zoom, -seg.p2.y * Global.zoom )
+      seg.lineTo( a2.x * Global.zoom, -a2.y * Global.zoom );*/
+   }
+
+   protected renderCubic( seg: CubicBezierSegment, sprite: PIXI.Graphics = null ): void
+   {
+      if ( sprite == null )
+      {
+         sprite = seg
+      }
+
+      // use Lorentz's bezier class to approximate cubic curve with quad curve
+      let bezier: Bezier = new Bezier( seg.p1, seg.c1, seg.c2, seg.p2 )
+      let tp1: PIXI.Point = seg.p1
+      let tp2: PIXI.Point
+      let tc1: PIXI.Point
+
+      //O let quadP: Object
+
+      // first render guides
+      if ( seg.active )
+      {
+         this.renderCubicGuides( seg )
+      }
+
+      //O for each ( quadP in bezier.QPts )
+      for ( let quadP of bezier.QPts )
+      {
+         tp2 = new PIXI.Point( quadP.p.x, quadP.p.y )
+         tc1 = new PIXI.Point( quadP.c.x, quadP.c.y )
+         this.renderQuad( new QuadBezierSegment( tp1, tp2, tc1 ), sprite )
+         tp1 = tp2
+      }
+   }
+
+   protected renderQuad( seg: QuadBezierSegment, sprite: PIXI.Graphics = null ): void
+   {
+      if ( seg.active )
+      {
+         this.renderQuadGuides( seg )
+      }
+
+      // sprite is the sprite object that we render to
+      // this is necessary because elliptical arcs and cubics also use the quad function for rendering
+      if ( sprite == null )
+      {
+         sprite = seg
+      }
+
+      sprite.moveTo( seg.p1.x * Global.zoom, -seg.p1.y * Global.zoom )
+      sprite.quadraticCurveTo( seg.c1.x * Global.zoom, -seg.c1.y * Global.zoom, seg.p2.x * Global.zoom, -seg.p2.y * Global.zoom )
+   }
+
+   // note the inverted sweep flag. This is because our definitions of p1 and p2 are reversed
+   protected renderArc( seg: ArcSegment, sprite: PIXI.Graphics = null ): void
+    {
+      //let ellipticalArc: Object = computeSvgArc( seg.rx, seg.ry, seg.angle, seg.lf, !seg.sf, seg.p1.x, seg.p1.y, seg.p2.x, seg.p2.y )
+      let ellipticalArc: ArcObject  = seg.computeSvgArc( )
+      this.drawEllipticalArc( seg, seg.p2, ellipticalArc.cx, ellipticalArc.cy, ellipticalArc.startAngle, ellipticalArc.arc, ellipticalArc.radius, ellipticalArc.yRadius, ellipticalArc.xAxisRotation, sprite )
+
+      /*let norm: PIXI.Point = new PIXI.Point( -seg.p2.y+seg.p1.y, seg.p2.x - seg.p1.x )
+
+      let distance: number = PIXI.Point.distance( seg.p1, seg.p2 )
+
+      norm.normalize( distance / 5 )
+
+      let mid: PIXI.Point = new PIXI.Point( 0.9 * seg.p2.x+0.1 * seg.p1.x, 0.9 * seg.p2.y+0.1 * seg.p1.y )
+      let a1: PIXI.Point = new PIXI.Point( mid.x + norm.x, mid.y + norm.y )
+      let a2: PIXI.Point = new PIXI.Point( mid.x - norm.x, mid.y - norm.y )
+
+      seg.moveTo( seg.p2.x * Global.zoom, -seg.p2.y * Global.zoom )
+      seg.lineTo( a1.x * Global.zoom, -a1.y * Global.zoom )
+
+      seg.moveTo( seg.p2.x * Global.zoom, -seg.p2.y * Global.zoom )
+      seg.lineTo( a2.x * Global.zoom, -a2.y * Global.zoom );*/
+   }
+
+   protected static degreesToRadians( angle: number ): number
+   {
+      return angle * ( Math.PI / 180 )
+   }
+
+   protected static radiansToDegrees( angle: number ): number
+   {
+      return angle * ( 180 / Math.PI )
+   }
+
+   protected drawEllipticalArc( seg: Segment, startpoint: PIXI.Point, x: number, y: number, startAngle: number, arc: number, radius: number, yRadius: number, xAxisRotation: number=0, sprite: PIXI.Graphics = null ): void
+   {
+      if ( sprite == null )
+      {
+         sprite = seg
+      }
+      // Circumvent drawing more than is needed
+      if ( Math.abs( arc ) > 360 )
+      {
+            arc = 360
+      }
+
+      // Draw in a maximum of 45 degree segments. First we calculate how many
+      // segments are needed for our arc.
+      let segs: number = Math.ceil( Math.abs( arc ) / 45 )
+
+      // Now calculate the sweep of each segment
+      let segAngle: number = arc / segs
+
+      let theta: number = Path.degreesToRadians( segAngle )
+      let angle: number = Path.degreesToRadians( startAngle )
+
+      // Draw as 45 degree segments
+      if ( segs > 0 )
+      {
+         let beta: number = Path.degreesToRadians( xAxisRotation )
+         let sinbeta: number = Math.sin( beta )
+         let cosbeta: number = Math.cos( beta )
+
+         let cx: number
+         let cy: number
+         let x1: number
+         let y1: number
+
+         // note that we start at the "end" of the arc as defined in arcSegment
+         let tp1: PIXI.Point = startpoint
+         let tp2: PIXI.Point
+         let tc1: PIXI.Point
+
+         // Loop for drawing arc segments
+         for ( let i = 0; i < segs; i++ )
+         {
+               angle += theta
+
+               let sinangle: number = Math.sin( angle - ( theta / 2 ) )
+               let cosangle: number = Math.cos( angle - ( theta / 2 ) )
+
+               let div: number = Math.cos( theta / 2 )
+               cx= x + ( radius * cosangle * cosbeta - yRadius * sinangle * sinbeta ) / div
+               cy= y + ( radius * cosangle * sinbeta + yRadius * sinangle * cosbeta ) / div
+
+               sinangle = Math.sin( angle )
+               cosangle = Math.cos( angle )
+
+               x1 = x + ( radius * cosangle * cosbeta - yRadius * sinangle * sinbeta )
+               y1 = y + ( radius * cosangle * sinbeta + yRadius * sinangle * cosbeta )
+
+               tp2 = new PIXI.Point( x1,y1 )
+               tc1 = new PIXI.Point( cx, cy )
+
+               this.renderQuad( new QuadBezierSegment( tp1, tp2, tc1 ), sprite )
+
+               tp1 = tp2
+         }
+      }
+   }
+
+   public inchToCm( ): void
+   {
+      this.unitConvert( 2.54 )
+   }
+
+   public cmToInch( ): void
+   {
+      this.unitConvert( 1 / 2.54 )
+   }
+
+   public unitConvert( factor: number ): void
+   {
+
+      this.docx = this.docx * factor
+      this.docy = this.docy * factor
+
+      let transformed: Array< PIXI.Point > = new Array( )
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         let seg: Segment = < Segment > this.seglist[ i ]
+         let cub: CubicBezierSegment = < CubicBezierSegment > this.seglist[ i ]
+         //N let quad: QuadBezierSegment = < QuadBezierSegment > this.seglist[ i ]
+         let cubQuad: CubicBezierSegment | QuadBezierSegment = < CubicBezierSegment | QuadBezierSegment > this.seglist[ i ]
+         let circ: CircularArc = < CircularArc > this.seglist[ i ]
+         let arc: ArcSegment = < ArcSegment > this.seglist[ i ]
+
+         if ( seg.p1 && transformed.indexOf( seg.p1 ) == -1 )
+         {
+            seg.p1.x = seg.p1.x * factor
+            seg.p1.y = seg.p1.y * factor
+            transformed.push( seg.p1 )
+         }
+         if ( seg.p2 && transformed.indexOf( seg.p2 ) == -1 )
+         {
+            seg.p2.x = seg.p2.x * factor
+            seg.p2.y = seg.p2.y * factor
+            transformed.push( seg.p2 )
+         }
+         if ( ( this.seglist[i] instanceof QuadBezierSegment || this.seglist[i] instanceof CubicBezierSegment ) && cubQuad.c1 && transformed.indexOf( cubQuad.c1 ) == -1 )
+         {
+            cubQuad.c1.x = cubQuad.c1.x * factor
+            cubQuad.c1.y = cubQuad.c1.y * factor
+            this.seglist[ i ] = < SACCQ > cubQuad
+            transformed.push( cubQuad.c1 )
+         }
+         if ( this.seglist[i] instanceof CubicBezierSegment && cub.c2 && transformed.indexOf( cub.c2 ) == -1 )
+         {
+            cub.c2.x = cub.c2.x * factor
+            cub.c2.y = cub.c2.y * factor
+            this.seglist[ i ] = < SACCQ > cub
+            transformed.push( cub.c2 )
+         }
+         if ( this.seglist[i] instanceof CircularArc )
+         {
+            circ.center.x *= factor
+            circ.center.y *= factor
+            circ.radius *= factor
+            this.seglist[ i ] = < SACCQ > circ
+         }
+         if ( this.seglist[i] instanceof ArcSegment )
+         {
+            arc.rx *= factor
+            arc.ry *= factor
+            this.seglist[ i ] = < SACCQ > arc
+         }
+      }
+
+      this.redrawDots( )
+   }
+
+   public deleteActive( ): boolean
+   {
+      // delete active segments
+      let i: number = 0
+      while( i < this.seglist.length )
+      {
+         if ( this.seglist[ i ].active == true )
+         {
+            if ( contains( this.seglist[ i ] ) )
+            {
+               this.removeChild( this.seglist[ i ] )
+            }
+            this.seglist.splice( i, 1 )
+            i--
+         }
+         i++
+      }
+      this.redrawDots( )
+      this.setInactive( )
+
+      if ( this.seglist.length == 0 )
+      {
+         return true
+      }
+      else
+      {
+         return false
+      }
+   }
+
+   public snapPoint( dot: Dot ): PIXI.Point
+   {
+      //let globalpoint: PIXI.Point
+      //O let seg: Segment
+      let globalpoint: PIXI.Point
+      //NUnused let snappoint: PIXI.Point
+
+      //NUnused let i = 0
+      if ( dot )
+      {
+         let parentpath: Path = < Path > dot.parent 
+         let globalpos: PIXI.Point = new PIXI.Point( parentpath.mouseX / Global.zoom + parentpath.docx, (-parentpath.mouseY / Global.zoom ) - parentpath.docy )
+         /*
+         if ( dot.loop == true )
+         {
+            if ( dot.s1 )
+            {
+               globalpoint = new PIXI.Point( dot.s1.p1.x + this.docx, dot.s1.p1.y + this.docy )
+            }
+            else if ( dot.s2 )
+            {
+               globalpoint = new PIXI.Point( dot.s2.p2.x + this.docx, dot.s2.p2.y + this.docy )
+            }
+            for( let i = 0; i < this.seglist.length; i++ )
+            {
+               if ( this.seglist[ i ].p1 )
+               {
+                  snappoint = new PIXI.Point( this.seglist[ i ].p1.x + this.docx, this.seglist[ i ].p1.y + this.docy )
+                  if ( PIXI.Point.distance( snappoint, globalpoint ) < .1 )
+                  {
+                     return globalpoint
+                  }
+               }
+               if ( this.seglist[ i ].p2 )
+               {
+                  snappoint = new PIXI.Point( this.seglist[ i ].p2.x + this.docx, this.seglist[ i ].p2.y + this.docy )
+                  if ( PIXI.Point.distance( snappoint, globalpoint ) < .1 )
+                  {
+                     return globalpoint
+                  }
+               }
+            }
+         }
+         */
+         //else
+         //{
+            let op: Array< PIXI.Point > = this.openArray( dot )
+
+            for( let i = 0; i < op.length; i++ )
+            {
+               globalpoint = new PIXI.Point( op[ i ].x + this.docx, op[ i ].y - this.docy )
+               let self: boolean = false
+               if ( dot.point == op[ i ] )
+               {
+                  self = true
+               }
+
+               //O let dis: number = PIXI.Point.distance( globalpos, globalpoint ) * Global.zoom
+               //N PIXI.Point does not have distance.  Use Global
+               let dis: number = Global.distance( globalpos, globalpoint ) * Global.zoom
+
+               if ( Global.unit == "cm" )
+               {
+                  dis *= 2.54
+               }
+
+               // 20 pixel snapping range
+               if ( self == false &&  dis < 20 )
+               {
+                  dot.looppoint = op[ i ]
+
+                  return globalpoint
+               }
+            }
+         //}
+      }
+
+      return null
+   }
+
+   // returns a list of all points that are open ( open points do not have any other points attached to them )
+   protected openArray( dot: Dot = null ): Array< PIXI.Point >
+   {
+      let openarray: Array< PIXI.Point > = new Array( )
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         let p1open = true
+         let p2open = true
+         for( let j = 0; j < this.seglist.length; j++ )
+         {
+            if ( ( dot == null || dot.looppoint == null || !this.seglist[ i ].p1.equals( dot.looppoint ) ) && (( this.seglist[ i ].p1.equals( this.seglist[ j ].p1 ) && i != j ) || this.seglist[ i ].p1.equals( this.seglist[ j ].p2 ) ) )
+            {
+               p1open = false
+            }
+            if ( ( dot == null || dot.looppoint == null || !this.seglist[ i ].p2.equals(dot.looppoint ) ) && (this.seglist[ i ].p2.equals(this.seglist[ j ].p1 ) || (this.seglist[ i ].p2.equals( this.seglist[ j ].p2 ) && i != j ) ) )
+            {
+               p2open = false
+            }
+         }
+         if ( p1open )
+         {
+            openarray.push( this.seglist[ i ].p1 )
+         }
+         if ( p2open )
+         {
+            openarray.push( this.seglist[ i ].p2 )
+         }
+      }
+
+      return openarray
+   }
+
+   // if a point is given, attach the point to the first point of the new this.seglist
+   // (this is for sketch continuation )
+   public mergePath( p: Path, point: PIXI.Point = null, doubles: boolean = true ): void
+   {
+      let dx: number = p.docx
+      let dy: number = p.docy
+
+      let newseglist: Array< SACCQ > = p.deletePath( )
+
+      let transformed: Array< PIXI.Point > = new Array( )
+
+      for( let i = 0; i < newseglist.length; i++ )
+      {
+         if ( newseglist[ i ].p1 && transformed.indexOf( newseglist[ i ].p1 ) == -1 )
+         {
+            newseglist[ i ].p1.x = newseglist[ i ].p1.x + dx - this.docx
+            newseglist[ i ].p1.y = newseglist[ i ].p1.y - dy + this.docy
+            transformed.push( newseglist[ i ].p1 )
+         }
+         if ( newseglist[ i ].p2 && transformed.indexOf( newseglist[ i ].p2 ) == -1 )
+         {
+            newseglist[ i ].p2.x = newseglist[ i ].p2.x + dx - this.docx
+            newseglist[ i ].p2.y = newseglist[ i ].p2.y - dy + this.docy
+            transformed.push( newseglist[ i ].p2 )
+         }
+         //O if ( newseglist[ i ] is QuadBezierSegment )
+         if ( newseglist[ i ] instanceof QuadBezierSegment )
+         {
+            let quad: QuadBezierSegment = < QuadBezierSegment > newseglist[ i ]
+            quad.c1.x = quad.c1.x + dx - this.docx
+            quad.c1.y = quad.c1.y + dy - this.docy
+            // N added or otherwise what is this for
+            newseglist[ i ] = < SACCQ > quad
+         }
+         if ( newseglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cub: CubicBezierSegment = < CubicBezierSegment > newseglist[ i ]
+            cub.c1.x = cub.c1.x + dx - this.docx
+            cub.c1.y = cub.c1.y + dy - this.docy
+
+            cub.c2.x = cub.c2.x + dx - this.docx
+            cub.c2.y = cub.c2.y + dy - this.docy
+            // N added or otherwise what is this for
+            newseglist[ i ] = < SACCQ > cub
+         }
+      }
+
+      if ( point )
+      {
+         newseglist[ 0 ].p1 = point
+      }
+
+      //O for each( let newseg in newseglist )
+      for ( let newseg of newseglist )
+      {
+         this.addSegment( newseg )
+      }
+
+      if ( doubles )
+      {
+         this.removeDoubles( )
+      }
+   }
+
+   protected removeDoubles( ): void
+   {
+      let removelist: Array< number  > = new Array( )
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         for( let j = i; j < this.seglist.length; j++ )
+         {
+            if ( i != j && this.seglist[ i ].p1.equals( this.seglist[ j ].p1 ) && this.seglist[ i ].p2.equals( this.seglist[ j ].p2 ) )
+            {
+               //B removelist is an array of duplicate indexes.  This
+               //B this is supposed to check the index, not a segment as
+               //B indexOf suggests.
+               //O if ( removelist.indexOf( this.seglist[ i ] ) == -1 )
+               if ( removelist.indexOf( i ) == -1 )
+               {
+                  removelist.push( j )
+               }
+            }
+         }
+      }
+
+      for( let i = 0; i < removelist.length; i++ )
+      {
+         this.seglist.splice( removelist[ i ], 1 )
+      }
+   }
+
+   // note: overall tolerance = global.tolerance * tol
+   //O public joinDoubles( tol: number = 0.05, rejoin: boolean = false ): void
+   //NUnused rejoin
+   public joinDoubles( tol: number = 0.05 ): void
+   {
+
+      // keep a list of already joined points
+      let joined: Array< PIXI.Point > = new Array( )
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         for( let j = 0; j < this.seglist.length; j++ )
+         {
+            if ( i != j )
+            {
+               if ( this.seglist[ i ].p1 && this.seglist[ j ].p1 && this.seglist[ i ].p1 != this.seglist[ j ].p1 && joined.indexOf( this.seglist[ i ].p1 ) == -1 && joined.indexOf( this.seglist[ j ].p1 ) == -1 && Global.withinTolerance(this.seglist[ i ].p1, this.seglist[ j ].p1, tol ) )
+               {
+                  this.seglist[ i ].p1 = this.seglist[ j ].p1
+                  joined.push( this.seglist[ i ].p1 )
+               }
+               if ( this.seglist[ i ].p1 && this.seglist[ j ].p2 && this.seglist[ i ].p1 != this.seglist[ j ].p2 && joined.indexOf( this.seglist[ i ].p1 ) == -1 && joined.indexOf( this.seglist[ j ].p2 ) == -1 && Global.withinTolerance(this.seglist[ i ].p1, this.seglist[ j ].p2, tol ) )
+               {
+                  this.seglist[ i ].p1 = this.seglist[ j ].p2
+                  joined.push( this.seglist[ i ].p1 )
+               }
+               if ( this.seglist[ i ].p2 && this.seglist[ j ].p1 && this.seglist[ i ].p2 != this.seglist[ j ].p1 && joined.indexOf( this.seglist[ i ].p2 ) == -1 && joined.indexOf( this.seglist[ j ].p1 ) == -1 && Global.withinTolerance(this.seglist[ i ].p2, this.seglist[ j ].p1, tol ) )
+               {
+                  this.seglist[ i ].p2 = this.seglist[ j ].p1
+                  joined.push( this.seglist[ i ].p2 )
+               }
+               if ( this.seglist[ i ].p2 && this.seglist[ j ].p2 && this.seglist[ i ].p2 != this.seglist[ j ].p2 && joined.indexOf( this.seglist[ i ].p2 ) == -1 && joined.indexOf( this.seglist[ j ].p2 ) == -1 && Global.withinTolerance(this.seglist[ i ].p2, this.seglist[ j ].p2, tol ) )
+               {
+                  this.seglist[ i ].p2 = this.seglist[ j ].p2
+                  joined.push( this.seglist[ i ].p2 )
+               }
+            }
+         }
+      }
+   }
+
+   public deletePath( ): Array< SACCQ >
+   {
+      //O let main: * = this.parent
+      let main: window = this.parent
+      if ( main )
+      {
+         if ( main.contains( this ) )
+         {
+            main.removeChild( this )
+         }
+         let i: number = main.pathlist.indexOf( this )
+         if ( i != -1 )
+         {
+            main.pathlist.splice( main.pathlist.indexOf( this ), 1 )
+         }
+      }
+      return this.seglist
+   }
+
+   public getNumSeg( ): number
+   {
+      return this.seglist.length
+   }
+
+   public matrixTransform( m: PIXI.Matrix ): void
+   {
+
+      let id: PIXI.Matrix = new PIXI.Matrix( )
+      id.identity( )
+
+      if ( id == m )
+      {
+         return
+      }
+
+      this.dirty = true
+      this.camdirty = true
+
+      let transformed: Array< PIXI.Point > = new Array( )
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         let seg: Segment = < Segment > this.seglist[ i ]
+         let p: PIXI.Point
+         if ( seg.p1 && transformed.indexOf( seg.p1 ) == -1 )
+         {
+            //O p = m.transformPoint( seg.p1 )
+            p = m.apply( seg.p1 )
+            seg.p1.x = p.x
+            seg.p1.y = p.y
+            transformed.push( seg.p1 )
+         }
+         if ( seg.p2 && transformed.indexOf( seg.p2 ) == -1 )
+         {
+            //O p = m.transformPoint( seg.p2 )
+            p = m.apply( seg.p2 )
+            seg.p2.x = p.x
+            seg.p2.y = p.y
+            transformed.push( seg.p2 )
+         }
+         if ( this.seglist[ i ] instanceof QuadBezierSegment || this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cubQuad: QuadBezierSegment | CubicBezierSegment = < QuadBezierSegment | CubicBezierSegment > this.seglist[ i ]
+
+            if ( cubQuad.c1 )
+            {
+               //O p = m.transformPoint( cubQuad.c1 )
+               p = m.apply( cubQuad.c1 )
+               cubQuad.c1.x = p.x
+               cubQuad.c1.y = p.y
+               this.seglist[ i ] = < SACCQ > cubQuad
+            }
+         }
+         if ( this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cub: CubicBezierSegment = < CubicBezierSegment > this.seglist[ i ]
+
+            if ( cub.c2 )
+            {
+               //O p = m.transformPoint( cub.c2 )
+               p = m.apply( cub.c2 )
+               cub.c2.x = p.x
+               cub.c2.y = p.y
+               this.seglist[ i ] = < SACCQ > cub
+            }
+         }
+         if ( this.seglist[ i ] instanceof ArcSegment )
+         {
+            let arc: ArcSegment = < ArcSegment > this.seglist[ i ]
+
+            // scaling factors in the x and y directions
+            let sx: number = Math.sqrt( m.a * m.a + m.b * m.b );
+            let sy: number = Math.sqrt( m.c * m.c + m.d * m.d )
+
+            // this is the full rotation matrix, a bit of over kill in this case but may be needed later
+            //OCO //let mrot: PIXI.Matrix = new PIXI.Matrix( m.a / sx, m.b / sx, m.c / sy, m.d / sy, m.tx, m.ty );
+
+            let angle: number = Math.acos( m.a / sx ) * 180 / Math.PI
+
+            arc.rx = arc.rx * sx
+            arc.ry = arc.ry * sy
+
+            arc.angle += angle
+            this.seglist[ i ] = < SACCQ > arc
+         }
+      }
+   }
+
+   // get a point with the max x and y point of the path
+   public getMax( ): PIXI.Point
+   {
+      let maxx: number = 0
+      let maxy: number = 0
+      for( let i =0; i < this.seglist.length; i++ )
+      {
+
+         // x
+
+         if ( this.seglist[ i ].p1.x > maxx )
+         {
+            maxx = this.seglist[ i ].p1.x
+         }
+         if ( this.seglist[ i ].p2.x > maxx )
+         {
+            maxx = this.seglist[ i ].p2.x
+         }
+         if ( this.seglist[ i ] instanceof QuadBezierSegment || this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cubQuad: QuadBezierSegment | CubicBezierSegment = < QuadBezierSegment | CubicBezierSegment > this.seglist[ i ]
+            if ( cubQuad.c1.x > maxx )
+            {
+               maxx = cubQuad.c1.x
+            }
+         }
+         if ( this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cub: CubicBezierSegment = < CubicBezierSegment > this.seglist[ i ]
+            if ( cub.c2.x > maxx )
+            {
+               maxx = cub.c2.x
+            }
+         }
+
+         // y
+
+         if ( this.seglist[ i ].p1.y > maxy )
+         {
+            maxy = this.seglist[ i ].p1.y
+         }
+         if ( this.seglist[ i ].p2.y > maxy )
+         {
+            maxy = this.seglist[ i ].p2.y
+         }
+         //O if ( seglist[ i ] is QuadBezierSegment || seglist[ i ] is CubicBezierSegment )
+         if ( this.seglist[ i ] instanceof QuadBezierSegment || this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cubQuad: QuadBezierSegment | CubicBezierSegment = < QuadBezierSegment | CubicBezierSegment > this.seglist[ i ]
+            if ( cubQuad.c1.y > maxy )
+            {
+               maxy = cubQuad.c1.y
+            }
+         }
+         //O if ( seglist[ i ] is CubicBezierSegment )
+         if ( this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cub: CubicBezierSegment = < CubicBezierSegment > this.seglist[ i ]
+            if ( cub.c2.y > maxy )
+            {
+               maxy = cub.c2.y
+            }
+         }
+      }
+
+      return new PIXI.Point( this.docx + maxx, -this.docy + maxy )
+   }
+
+   // get the min point ( no bezier control points! ) in global coordinates
+   public getMin( ): PIXI.Point
+   {
+      let minx: number = this.seglist[ 0 ].p1.x
+      let miny: number = this.seglist[ 0 ].p1.y
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         if ( this.seglist[ i ].p1.x < minx )
+         {
+            minx = this.seglist[ i ].p1.x
+         }
+         if ( this.seglist[ i ].p2.x < minx )
+         {
+            minx = this.seglist[ i ].p2.x
+         }
+         if ( this.seglist[ i ].p1.y < miny )
+         {
+            miny = this.seglist[ i ].p1.x
+         }
+         if ( this.seglist[ i ].p2.y < miny )
+         {
+            miny = this.seglist[ i ].p2.y
+         }
+      }
+
+      return new PIXI.Point( this.docx + minx, -this.docy + miny )
+   }
+
+   // get the average point ( no bezier control points! ) in global coordinates
+   public getAverage( ): PIXI.Point
+   {
+      let average: PIXI.Point = new PIXI.Point( 0,0 )
+
+      let counted: Array< PIXI.Point > = new Array( )
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         if ( counted.indexOf( this.seglist[ i ].p1 ) == -1 )
+         {
+            average.x += this.seglist[ i ].p1.x + this.docx
+            average.y += this.seglist[ i ].p1.y - this.docy
+
+            counted.push( this.seglist[ i ].p1 )
+         }
+         if ( counted.indexOf( this.seglist[ i ].p2 ) == -1 )
+         {
+            average.x += this.seglist[ i ].p2.x + this.docx
+            average.y += this.seglist[ i ].p2.y - this.docy
+
+            counted.push( this.seglist[ i ].p2 )
+         }
+      }
+
+      average.x = average.x / this.seglist.length
+      average.y = average.y / this.seglist.length
+
+      return average
+   }
+
+   // make deep copy of the current path
+   public clone( ): Path
+   {
+      if ( this.seglist.length < 1 )
+      {
+         return null
+      }
+
+      let newpath: Path = new Path( )
+
+      newpath.docx = this.docx
+      newpath.docy = this.docy
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         if ( this.seglist[ i ] instanceof QuadBezierSegment )
+         {
+            let quad: QuadBezierSegment = < QuadBezierSegment > this.seglist[ i ]
+            newpath.addSegment( new QuadBezierSegment( quad.p1.clone( ), quad.p2.clone( ), quad.c1.clone( ) ) )
+         }
+         else if ( this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cub: CubicBezierSegment = < CubicBezierSegment > this.seglist[ i ]
+            newpath.addSegment( new CubicBezierSegment( cub.p1.clone( ), cub.p2.clone( ), cub.c1.clone( ), cub.c2.clone( ) ) )
+         }
+         else if ( this.seglist[ i ] instanceof ArcSegment )
+         {
+            let arc: ArcSegment = < ArcSegment > this.seglist[ i ]
+            newpath.addSegment( new ArcSegment( arc.p1.clone( ), arc.p2.clone( ), arc.rx, arc.ry, arc.angle, arc.lf, arc.sf ) )
+         }
+         else if ( this.seglist[ i ] instanceof Segment )
+         {
+            let seg: Segment = < Segment > this.seglist[ i ]
+            newpath.addSegment( < SACCQ > new Segment( seg.p1.clone( ), seg.p2.clone( ) ) )
+         }
+      }
+
+      newpath.joinDoubles( )
+
+      return newpath
+   }
+
+   // sets the origin of the path ( docx/docy ) to zero, and shift all segments accordingly
+   public zeroOrigin( ): void
+   {
+      if ( this.docx == 0 && this.docy == 0 )
+      {
+         return
+      }
+
+      let processed: Array< PIXI.Point > = new Array( )
+
+      let p: PIXI.Point
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         p = this.seglist[ i ].p1
+         if ( processed.indexOf( p ) == -1 )
+         {
+            p.x += this.docx
+            p.y -= this.docy
+            processed.push( p )
+         }
+         p = this.seglist[ i ].p2
+         if ( processed.indexOf( p ) == -1 )
+         {
+            p.x += this.docx
+            p.y -= this.docy
+            processed.push( p )
+         }
+         if ( this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cub: CubicBezierSegment = < CubicBezierSegment > this.seglist[ i ]
+            cub.c1.x += this.docx
+            cub.c1.y -= this.docy
+            cub.c2.x += this.docx
+            cub.c2.y -= this.docy
+            this.seglist[ i ] = cub
+         }
+         else if ( this.seglist[ i ] instanceof QuadBezierSegment )
+         {
+            let quad: QuadBezierSegment = < QuadBezierSegment > this.seglist[i]
+            quad.c1.x += this.docx
+            quad.c1.y -= this.docy
+            this.seglist[ i ] = < SACCQ > quad
+         }
+         else if ( this.seglist[ i ] instanceof CircularArc )
+         {
+            let circ: CircularArc = < CircularArc > this.seglist[ i ]
+            circ.center.x += this.docx
+            circ.center.y -= this.docy
+            this.seglist[ i ] = < SACCQ > circ
+         }
+      }
+
+      processed = null
+
+      this.docx = 0
+      this.docy = 0
+
+      this.x = 0
+      this.y = 0
+   }
+
+   // this function creates a linearized version of the path
+   // circular arcs and lines remain untouched
+   // quad and cubic beziers are subdivided to match a set tolerance value
+   public linearize( circle: boolean = false ): Array< Segment >
+   {
+      let newseglist: Array< Segment > = new Array( )
+
+      let nextindex = 0
+
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         //O if ( seglist[ i ] is QuadBezierSegment || seglist[ i ] is CubicBezierSegment )
+         if ( this.seglist[ i ] instanceof QuadBezierSegment || this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            // it is possible for a cubic bezier to form a "singularity", leading to errors in fillmap generation during CAM, the following removes these problem cubics:
+            //O if ( seglist[ i ] is CubicBezierSegment )
+            if ( this.seglist[ i ] instanceof CubicBezierSegment )
+            {
+               let cub: CubicBezierSegment = < CubicBezierSegment > this.seglist[ i ]
+               if ( Global.withinTolerance( cub.p1, cub.p2 ) )
+               {
+                  let c1: PIXI.Point = new PIXI.Point( cub.c1.x-cub.p1.x, cub.c1.y-cub.p1.y )
+                  let c2: PIXI.Point = new PIXI.Point( cub.c2.x-cub.p2.x, cub.c2.y-cub.p2.y )
+
+                  let angle: number = Global.getAngle( c1, c2 )
+
+                  if ( Math.abs( angle ) >= 0.5 * Math.PI )
+                  {
+                     nextindex = i + 1
+                     if ( nextindex == this.seglist.length )
+                     {
+                        nextindex = 0
+                     }
+                     this.seglist[ nextindex ].p1 = cub.p1
+                     this.seglist.splice( i,1 )
+                     i--
+                     continue
+                  }
+               }
+            }
+
+            newseglist = newseglist.concat( this.seglist[ i ].linearize(circle ) )
+         }
+         else if ( this.seglist[ i ] instanceof CircularArc )
+         {
+            let circ: CircularArc = < CircularArc > this.seglist[ i ]
+            newseglist.push( new CircularArc( circ.p1, circ.p2, circ.center.clone( ), circ.radius ) )
+         }
+         else if ( this.seglist[ i ] instanceof ArcSegment )
+         {
+            let arc: ArcSegment = < ArcSegment > this.seglist[i]
+            if ( arc.lf == false && Global.withinTolerance( arc.p1, arc.p2 ) )
+            {
+               nextindex = i + 1
+               if ( nextindex == this.seglist.length )
+               {
+                  nextindex = 0
+               }
+               this.seglist[ nextindex ].p1 = arc.p1
+               this.seglist.splice( i, 1 )
+               i--
+               continue
+            }
+            newseglist = newseglist.concat( this.seglist[ i ].linearize(circle ) )
+         }
+         //O else if ( seglist[ i ] is Segment )
+         else if ( this.seglist[ i ] instanceof Segment )
+         {
+            let seg: Segment = < Segment > this.seglist[i]
+            if ( Global.withinTolerance( seg.p1, seg.p2 ) )
+            {
+               nextindex = i + 1
+               if ( nextindex == this.seglist.length )
+               {
+                  nextindex = 0
+               }
+               this.seglist[ nextindex ].p1 = seg.p1
+               this.seglist.splice( i, 1 )
+               i--
+               continue
+            }
+            newseglist.push( new Segment(this.seglist[ i ].p1, this.seglist[ i ].p2 ) )
+         }
+      }
+
+      return newseglist
+   }
+
+   public invertY( ): void
+   {
+      let len: number = this.seglist.length
+
+      if ( len == 0 )
+      {
+         return
+      }
+
+      let processed: Array< PIXI.Point > = new Array( )
+
+      for( let i = 0; i < len; i++ )
+      {
+         if ( processed.indexOf( this.seglist[ i ].p1 ) == -1 )
+         {
+            let seg: SACCQ = < SACCQ > this.seglist[ i ]
+            seg.p1.y = -seg.p1.y
+            this.seglist[ i ] = < SACCQ > seg
+            processed.push( seg.p1 )
+         }
+         if ( processed.indexOf( this.seglist[ i ].p2 ) == -1 )
+         {
+            let seg: SACCQ = < SACCQ > this.seglist[ i ]
+            seg.p2.y = -seg.p2.y
+            this.seglist[ i ] = < SACCQ > seg
+            processed.push( seg.p2 )
+         }
+         if ( this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            let cub: CubicBezierSegment = < CubicBezierSegment > this.seglist[i]
+            cub.c1.y = -cub.c1.y
+            cub.c2.y = -cub.c2.y
+            this.seglist[ i ] = < SACCQ > cub
+         }
+         else if ( this.seglist[ i ] instanceof QuadBezierSegment )
+         {
+            let quad: QuadBezierSegment = < QuadBezierSegment > this.seglist[i]
+            quad.c1.y = -quad.c1.y
+            this.seglist[ i ] = < SACCQ > quad
+         }
+         else if ( this.seglist[ i ] instanceof ArcSegment )
+         {
+            let arc: ArcSegment = < ArcSegment > this.seglist[i]
+            arc.sf = !arc.sf
+            arc.angle = -arc.angle
+            this.seglist[ i ] = < SACCQ > arc
+         }
+      }
+   }
+
+   public reversePath( ): void
+   {
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         this.seglist[ i ] = this.seglist[ i ].reverse( )
+      }
+      this.seglist.reverse( )
+   }
+
+   // separates non-touching segments into separate paths, and return as new array
+   public separate( ): Array< Path >
+   {
+      let paths: Array< Path > = new Array( new Path( ) )
+      let current: Segment = this.seglist[ 0 ]
+      paths[ paths.length - 1 ].addSegment( this.seglist[ 0 ] )
+
+      for( let i = 1; i < this.seglist.length; i++ )
+      {
+         if ( !( this.seglist[ i ].p1 == current.p1 || this.seglist[ i ].p2 == current.p2 || this.seglist[ i ].p1 == current.p2 || this.seglist[ i ].p2 == current.p1 ) )
+         {
+            paths.push( new Path( ) )
+         }
+
+         paths[ paths.length - 1 ].addSegment( this.seglist[ i ] )
+         current = this.seglist[ i ]
+      }
+
+      //O for each( let path: Path in paths )
+      for ( let path of paths )
+      {
+         path.docx = this.docx
+         path.docy = this.docy
+      }
+
+      return paths
+   }
+
+   // removes small segments that may cause problems ( with offsetting )
+   public cleanup( tol: number, close: boolean = true ): void
+   {
+      if ( this.seglist.length < 2 )
+      {
+         return
+      }
+      // deal with strange beziers
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         if ( this.seglist[ i ] instanceof CubicBezierSegment )
+         {
+            // replace flat cubics with segments
+            let cub: CubicBezierSegment = < CubicBezierSegment > this.seglist[ i ]
+            if ( cub.isflat( cub, Global.tolerance ) || Global.withinTolerance( cub.p1, cub.c2 ) || Global.withinTolerance( cub.p2, cub.c1 ) || ( Global.withinTolerance( cub.p1, cub.c1 ) && Global.withinTolerance( cub.p2, cub.c2 ) ) )
+            {
+               this.seglist[ i ] = < SACCQ > new Segment( cub.p1, cub.p2 )
+            }
+            // replace 1-overlap control point with quad bezier
+            else if ( Global.withinTolerance( cub.p1, cub.c1 ) )
+            {
+               this.seglist[ i ] = < SACCQ > new QuadBezierSegment( cub.p1, cub.p2, cub.c2 )
+            }
+            else if ( Global.withinTolerance( cub.p2, cub.c2 ) )
+            {
+               this.seglist[ i ] = < SACCQ > new QuadBezierSegment( cub.p1, cub.p2, cub.c1 )
+            }
+         }
+         else if ( this.seglist[ i ] instanceof QuadBezierSegment )
+         {
+            let quad: QuadBezierSegment = < QuadBezierSegment > this.seglist[ i ]
+            if ( quad.isflat( quad, Global.tolerance ) || Global.withinTolerance( quad.p1, quad.c1 ) || Global.withinTolerance( quad.p2, quad.c1 ) )
+            {
+               this.seglist[ i ] = < SACCQ > new Segment( quad.p1, quad.p2 )
+            }
+         }
+      }
+
+      // remove small segments
+      for( let i = 0; i < this.seglist.length; i++ )
+      {
+         let arc: ArcSegment = < ArcSegment > this.seglist[ i ]
+         let circ: CircularArc = < CircularArc > this.seglist[ i ]
+         let seg: Segment = < Segment > this.seglist[ i ]
+
+         if ( ( this.seglist[ i ] instanceof CircularArc && Global.withinTolerance( circ.p1, circ.p2, tol ) )
+         || ( !(this.seglist[ i ] instanceof CircularArc ) && this.seglist[ i ] instanceof ArcSegment && arc.lf == false && Global.withinTolerance( arc.p1, arc.p2, tol ) )
+         || ( !(this.seglist[ i ] instanceof CircularArc ) && this.seglist[ i ] instanceof ArcSegment && arc.lf == false && Global.withinTolerance(arc.p1, arc.p2, tol ) )
+         || ( !(this.seglist[ i ] instanceof ArcSegment ) && Global.withinTolerance(seg.p1, seg.p2, tol ) ) )
+         {
+            // remove small segments ( mainly to deal with near-circular offsets becoming a single point )
+            let mid: PIXI.Point
+            if ( !this.seglist[ i ].p1 || !this.seglist[ i ].p2 )
+            {
+               continue
+            }
+            // update original path for joining-circle calculations
+            if ( close )
+            {
+               if ( i == 0 && this.seglist[ i + 1 ].p1 && this.seglist[ this.seglist.length - 1 ].p2 && ( this.seglist[ i ].p1 == this.seglist[ this.seglist.length - 1 ].p2 || Global.withinTolerance(this.seglist[ i ].p1, this.seglist[ this.seglist.length - 1 ].p2, tol ) ) )
+               {
+                  //O mid = PIXI.Point.interpolate( this.seglist[ this.seglist.length - 1 ].p2, this.seglist[ i + 1 ].p1, 0.5 )
+                  //NC PIXI Point does not have interpolate.  Use Global
+                  mid = Global.interpolate( this.seglist[ this.seglist.length - 1 ].p2, this.seglist[ i + 1 ].p1, 0.5 )
+
+                  this.seglist[ this.seglist.length - 1 ].p2 = mid
+                  this.seglist[ i + 1 ].p1 = mid
+
+                  if ( this.seglist[ this.seglist.length - 1 ] instanceof CircularArc )
+                  {
+                     let circ: CircularArc = < CircularArc > this.seglist[ this.seglist.length - 1 ]
+
+                     circ.recalculateCenter( )
+                  }
+                  if ( this.seglist[ i + 1 ] instanceof CircularArc )
+                  {
+                     let circ: CircularArc = < CircularArc > this.seglist[ i + 1 ]
+
+                     circ.recalculateCenter( )
+                  }
+               }
+               else if ( i == this.seglist.length - 1 && this.seglist[ 0 ].p1 && this.seglist[ i - 1 ].p2 && ( this.seglist[ i ].p2 == this.seglist[ 0 ].p1 || Global.withinTolerance(this.seglist[ i ].p2,this.seglist[ 0 ].p1, tol ) ) )
+               {
+                  //O mid = PIXI.Point.interpolate( this.seglist[ i - 1 ].p2, this.seglist[ 0 ].p1, 0.5 )
+                  //NC PIXI Point does not have interpolate.  Use Global
+                  mid = Global.interpolate( this.seglist[ i - 1 ].p2, this.seglist[ 0 ].p1, 0.5 )
+
+                  this.seglist[ i - 1 ].p2 = mid
+                  this.seglist[ 0 ].p1 = mid
+
+                  //O if ( seglist[ i - 1 ] is CircularArc )
+                  if ( this.seglist[ i - 1 ] instanceof CircularArc )
+                  {
+                     let circ: CircularArc = < CircularArc > this.seglist[ i - 1 ]
+                     circ.recalculateCenter( )
+                  }
+                  //O if ( seglist[ 0 ] is CircularArc )
+                  if ( this.seglist[ 0 ] instanceof CircularArc )
+                  {
+                     let circ: CircularArc = < CircularArc > this.seglist[ 0 ]
+                     circ.recalculateCenter( )
+                  }
+               }
+               else if ( i > 0 && i < this.seglist.length - 1 && this.seglist[ i + 1 ].p1 && this.seglist[ i - 1 ].p2 )
+               {
+                  //O mid = PIXI.Point.interpolate( this.seglist[ i - 1 ].p2, this.seglist[ i + 1 ].p1, 0.5 )
+                  //NC PIXI Point does not have interpolate.  Use Global
+                  mid = Global.interpolate( this.seglist[ i - 1 ].p2, this.seglist[ i + 1 ].p1, 0.5 )
+
+                  this.seglist[ i - 1 ].p2 = mid
+                  this.seglist[ i + 1 ].p1 = mid
+
+                  //O if ( seglist[ i - 1 ] is CircularArc )
+                  if ( this.seglist[ i - 1 ] instanceof CircularArc )
+                  {
+                     let circ: CircularArc = < CircularArc > this.seglist[ i - 1 ]
+                     circ.recalculateCenter( )
+                  }
+                  //O if ( seglist[ i + 1 ] is CircularArc )
+                  if ( this.seglist[ i + 1 ] instanceof CircularArc )
+                  {
+                     let circ: CircularArc = < CircularArc > this.seglist[ i + 1 ]
+                     circ.recalculateCenter( )
+                  }
+               }
+            }
+            this.seglist.splice( i, 1 )
+            if ( this.seglist.length < 2 )
+            {
+               return
+            }
+            i--
+         }
+      }
+   }
+
+   // make the path a continuous chain
+   // we assume that the path is already a single link
+   public makeContinuous( ): void
+   {
+      if ( this.seglist.length < 2 )
+      {
+         return
+      }
+
+      let newseglist: Array< SACCQ > = new Array( this.seglist.shift( ) )
+
+      for( let i = 0; i < newseglist.length; i++ )
+      {
+         // find the next segment ( segment attached to p2 )
+         for( let j = 0; j<this.seglist.length; j++ )
+         {
+            if ( this.seglist[ j ].p1 == newseglist[ i ].p2 )
+            {
+               // already in the correct chain order
+               newseglist.push( this.seglist[ j ] )
+               this.seglist.splice( j, 1 )
+               break
+            }
+            else if ( this.seglist[ j ].p2 == newseglist[ i ].p2 )
+            {
+               // must reverse chain order
+               this.seglist[ j ] = this.seglist[ j ].reverse( )
+               newseglist.push( this.seglist[ j ] )
+               this.seglist.splice( j, 1 )
+               break
+            }
+         }
+      }
+
+      this.seglist = newseglist
+   }
+}

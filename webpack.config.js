@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-
 //const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ESLintPlugin = require('eslint-config-prettier');
@@ -31,7 +30,7 @@ let devServerOptions =
    // Specify a host to use. If you want your server to be
    // accessible externally, specify it like this:
    // Default is 'localhost'.
-   host: '192.168.2.97',
+   host: '192.168.2.95',
 
    // This option allows you to whitelist services that are
    // allowed to access the dev server.
