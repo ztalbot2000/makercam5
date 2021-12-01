@@ -9,6 +9,7 @@ import * as PIXI from "pixi.js";
 import { Segment } from "./Segment";
 //import { Path } from "./Path";
 
+//O public class Dot extends Sprite
 export class Dot extends PIXI.Sprite
 {
    // the dot keeps track of which two segments it controls
@@ -16,10 +17,13 @@ export class Dot extends PIXI.Sprite
    public s2: Segment;
 
    // and a reference to the segment point that it controls
+   //O public var point:Point;
    public point: PIXI.Point;
 
    // and which segments for which it is a bezier control point
+   //O public var c1:Segment;
    public c1: Segment;
+   //O public var c2:Segment;
    public c2: Segment;
 
    // active means the dot is red
@@ -39,15 +43,20 @@ export class Dot extends PIXI.Sprite
    //O private hitshape: PIXI.Shape;
    private hitshape: PIXI.Graphics;
 
+   //O public function Dot():void
    public Dot( ): void
    {
+      //O setInactive();
       this.setInactive( );
    }
 
+   //O public function setActive():void
    public setActive(  ): void
    {
+      //O active = true;
       this.active = true;
 
+      //O clearChildren();
       this.clearChildren(  );
       //O let dot1 = new PIXI.Shape(  );
       let dot1 = new PIXI.Graphics(  );
@@ -57,9 +66,12 @@ export class Dot extends PIXI.Sprite
       dot1.drawRect( 0,0,30,30 );
       //O dot1.graphics.endFill(  );
       dot1.endFill(  );
+      //O dot1.x = -15;
       dot1.x = -15;
+      //O dot1.y = -15;
       dot1.y = -15;
 
+      //O dot1.alpha = 0;
       dot1.alpha = 0;
 
       //O let dot3 = new PIXI.Shape(  );
@@ -74,14 +86,19 @@ export class Dot extends PIXI.Sprite
       //NC Unused
       //O let dotsprite = new PIXI.Sprite(  );
 
+      //O addChild(dot1);
       this.addChild( dot1 );
+      //O addChild(dot3);
       this.addChild( dot3 );
    }
 
+   //O public function setInactive():void
    public setInactive(  ): void
    {
+      //O active = false;
       this.active = false;
 
+      //O clearChildren();
       this.clearChildren(  );
       //O let dot1 = new PIXI.Shape(  );
       let dot1 = new PIXI.Graphics(  );
@@ -91,9 +108,12 @@ export class Dot extends PIXI.Sprite
       dot1.drawRect( 0,0,30,30 );
       //O dot1.graphics.endFill(  );
       dot1.endFill(  );
+      //O dot1.x = -15;
       dot1.x = -15;
+      //O dot1.y = -15;
       dot1.y = -15;
 
+      //O dot1.alpha = 0;
       dot1.alpha = 0;
 
       //O,let dot2 = new PIXI.Shape(  );
@@ -117,13 +137,18 @@ export class Dot extends PIXI.Sprite
       //NC Unused
       //O let dotsprite = new PIXI.Sprite(  );
 
+      //O addChild(dot1);
       this.addChild( dot1 );
+      //O addChild(dot2);
       this.addChild( dot2 );
+      //O addChild(dot3);
       this.addChild( dot3 );
    }
 
+   //O public function setLoop():void
    public setLoop(  ): void
    {
+      //O loop = true;
       this.loop = true;
       //O if ( this.loopshape == null || ( this.loopshape != null && !contains( this.loopshape ) ) )
       if ( this.loopshape == null || ( this.loopshape != null && ! this.hitArea.contains(this.loopshape.x, this.loopshape.y ) ) )
@@ -141,16 +166,20 @@ export class Dot extends PIXI.Sprite
          //O this.loopshape.graphics.endFill(  );
          this.loopshape.endFill(  );
 
+         //O addChild(loopshape);
          this.addChild( this.loopshape );
       }
    }
 
+   //O public function unsetLoop():void
    public unsetLoop( ): void
    {
+      //O loop = false;
       this.loop = false;
       //O if( this.loopshape != null && contains( this.loopshape ) )
       if( this.loopshape != null && this.hitArea.contains(this.loopshape.x, this.loopshape.y ) )
       {
+         //O removeChild(loopshape);
          this.removeChild( this.loopshape );
       }
    }
@@ -160,20 +189,26 @@ export class Dot extends PIXI.Sprite
       //O while( numChildren > 0 )
       while( this.children.length > 0 )
       {
+         //O removeChildAt(0);
          this.removeChildAt( 0 );
       }
    }
 
+   //O public function setCurrent():void
    public setCurrent(  ): void
    {
+      //O current = true;
       this.current = true;
    }
 
+   //O public function unsetCurrent():void
    public unsetCurrent(  ): void
    {
+      //O current = false;
       this.current = false;
    }
 
+   //O public function setDragging():void
    public setDragging(  ): void
    {
       // we need a larger hit area for the current dot in order for the mouse to "stay on the dot" during snapping operations
@@ -188,23 +223,29 @@ export class Dot extends PIXI.Sprite
          this.hitshape.drawCircle( 0,0,80 );
          //O this.hitshape.graphics.endFill(  );
          this.hitshape.endFill(  );
+         //O hitshape.alpha = 0;
          this.hitshape.alpha = 0;
+         //O addChild(hitshape);
          this.addChild( this.hitshape );
       }
    }
 
+   //O public function unsetDragging():void
    public unsetDragging(  ): void
    {
       //O if ( this.hitshape != null && contains( this.hitshape ) )
       if ( this.hitshape != null && this.hitArea.contains(this.hitshape.x, this.hitshape.y ) )
       {
+         //O removeChild(hitshape);
          this.removeChild( this.hitshape );
       }
    }
 
    // identifies this dot as a sketch dot
+   //O public function setSketch():void
    public setSketch(  ): void
    {
+      //O clearChildren();
       this.clearChildren(  );
       //O let sketchshape = new PIXI.Shape(  );
       let sketchshape = new PIXI.Graphics(  );
@@ -215,6 +256,7 @@ export class Dot extends PIXI.Sprite
       //O sketchshape.graphics.endFill( );
       sketchshape.endFill( );
 
+      //O addChild(sketchshape);
       this.addChild( sketchshape );
    }
 

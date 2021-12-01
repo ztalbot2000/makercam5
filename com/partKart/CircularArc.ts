@@ -317,6 +317,7 @@ export class CircularArc extends ArcSegment
 
    // returns a linearized version of this arc, with deviation no more than the given tolerance
    // not useful for now, but may come in handy later ( ? )
+   //O Originally commented out
    /*public linearize( tol: number ):Array{
       let dtheta: number = Math.sqrt( tol / Math.abs( this.radius * 2 ) )
       let angle: number = Global.getAngle( new Point( this.p1.x - this.center.x, this.p1.y - this.center.y ), new PIXI.Point( this.p2.x - this.center.x, this.p2.y - this.center.y ) )

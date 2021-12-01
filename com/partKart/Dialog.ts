@@ -13,16 +13,17 @@
 //O   import fl.controls.List
 
 import * as PIXI from 'pixi.js'
-import { Button } from '../ui/button'
-import { Checkbox } from '../ui/checkbox'
-import { List } from '../ui/list'
+import Button from '../ui/button'
+import Checkbox from '../ui/checkbox'
+import List from '../ui/list'
 
 // this sets up a modal dialog from a list of text input objects
 //public class Dialog extends Sprite
-public class Dialog extends PIXI.Sprite
+export class Dialog extends PIXI.Sprite
 {
    // array of field objects that will serve as our data provider
-   private flist: Array< string >
+   //O private var flist:Array;
+   private flist: Array< Object >
 
    // width of the dialog
    private dwidth: number
@@ -41,10 +42,15 @@ public class Dialog extends PIXI.Sprite
    private submitlabel: string
 
    // if true, close the window after performing desired action
-   private closeWindow: boolean
+   //O private var closewindow:Boolean;
+   private closewindow: boolean
 
-   constructor( dialogwidth: number, dialogheight: number, fieldlist: Array, inputlabel: string = "OK", inputclose: boolean = true ): void
+   //O public function Dialog(dialogwidth:int, dialogheight:int, fieldlist:Array, inputlabel:String = "OK", inputclose:Boolean = true):void
+   constructor( dialogwidth: number, dialogheight: number, fieldlist: Array < Object >, inputlabel: string = "OK", inputclose: boolean = true )
    {
+      //N 'super' must be called before accessing 'this'
+      super();
+
       this.dwidth = dialogwidth
       this.dheight = dialogheight
       this.flist = fieldlist
@@ -57,12 +63,14 @@ public class Dialog extends PIXI.Sprite
 
    private init( ): void
    {
-      //this.back = new Shape( )
+      //O this.back = new Shape( )
       this.back = new PIXI.Graphics( )
 
-      let m: PIXIMatrix = new PIXIMatrix( this.dwidth/1000, 0, 0, this.dheight/1000, this.dwidth/2, this.dheight/2 )
+      //O var m:Matrix = new Matrix(dwidth/1000, 0, 0, dheight/1000,dwidth/2, dheight/2);
+      let m = new PIXI.Matrix( this.dwidth/1000, 0, 0, this.dheight/1000, this.dwidth/2, this.dheight/2 )
       this.back.beginGradientFill( GradientType.RADIAL, [0x444444, 0x222222],[1, 1],[50, 255], m )
-      this.back.drawRoundRect( 0, 0, this.dwidth, this.dheight, 20, 20 )
+      //O back.graphics.drawRoundRect(0,0,dwidth,dheight,20,20);
+      this.back.drawRoundedRect( 0, 0, this.dwidth, this.dheight, 20, 20 )
       this.back.endFill( )
 
       this.addChild( this.back )
@@ -72,7 +80,8 @@ public class Dialog extends PIXI.Sprite
 
       // add close button
 
-      this.clsprite = new Sprite( )
+      //O clsprite = new Sprite();
+      this.clsprite = new PIXI.Sprite( )
 
       //O let cl = new Shape( )
       let cl: PIXI.Graphics = new PIXI.Graphics( )
@@ -80,6 +89,7 @@ public class Dialog extends PIXI.Sprite
       cl.drawCircle( 0, 0, 8 )
       cl.endFill( )
 
+      //O cl.graphics.lineStyle(2, 0xffffff, 1, false, LineScaleMode.NONE, CapsStyle.ROUND);
       cl.lineStyle( 2, 0xffffff, 1, false, LineScaleMode.NONE, CapsStyle.ROUND )
 
       cl.moveTo( -3, -3 )
@@ -111,12 +121,14 @@ public class Dialog extends PIXI.Sprite
       //O let format: TextFormat = new TextFormat( "Arial", 11 )
       let format: PIXI.TextStyle = new PIXI.TextStyle( "Arial", 11 )
 
-      let shadowfilter: DropShadowFilter = new DropShadowFilter( 2, 45, 0, 0.65, 3, 3 )
+      //O var shadowfilter:DropShadowFilter = new DropShadowFilter(2,45,0,0.65,3,3);
+      let shadowfilter: PIXI.filters.DropShadowFilter = new DropShadowFilter( 2, 45, 0, 0.65, 3, 3 )
 
       let input: TextField
 
       for( let i = 0; i < this.flist.length; i++)
       {
+         //O var f:Object = flist[i];
          let f: Object = this.flist[i]
 
          switch( f.type )
@@ -184,7 +196,8 @@ public class Dialog extends PIXI.Sprite
 
                if ( f.items )
                {
-                  for ( let item: Object in f.items )
+                  //O for each(var item:Object in f.items)
+                  for ( let item in f.items )
                   {
                      combobox.addItem( item )
                      if ( f.value != null && f.value == item.data )
@@ -212,17 +225,21 @@ public class Dialog extends PIXI.Sprite
                break
             case "file":
                this.addLabel( f, hposition, vposition )
-               let browse: Button = new Button( )
+               //O var browse:Button = new Button();
+               let browse = new Button( )
                browse.label = "Browse"
                browse.width = 80
                browse.x = this.dwidth
                browse.y = vposition
+               //O addChild(browse);
                this.addChild( browse )
 
-               browse.addEventListener( 'click', browseAction )
+               //O browse.addEventListener(MouseEvent.CLICK, browseAction);
+               browse.addEventListener( 'click', this.browseAction )
                break
             case "checkbox":
-               let checkbox: CheckBox = new CheckBox( )
+               //O var checkbox:CheckBox = new CheckBox();
+               let checkbox = new Checkbox( )
                //O let fo: TextFormat = new TextFormat( "Arial", 11 )
                let fo: PIXI.TextStyle = new PIXI.TextStyle( "Arial", 11 )
                fo.color = 0xffffff
@@ -288,7 +305,8 @@ public class Dialog extends PIXI.Sprite
                vposition += 210
 
                // manipulator buttons
-               let up: Button = new Button( )
+               //O var up:Button = new Button();
+               let up = new Button( )
                up.label = "+"
                up.width = 20
                up.x = hposition
@@ -314,7 +332,8 @@ public class Dialog extends PIXI.Sprite
 
                up.addEventListener( 'click', uphandler )
 
-               let down: Button = new Button( )
+               //O var down:Button = new Button();
+               let down = new Button( )
                down.label = "-"
                down.width = 20
                down.x = hposition + 25
@@ -340,7 +359,8 @@ public class Dialog extends PIXI.Sprite
 
                down.addEventListener( 'click', downhandler )
 
-               let sort: Button = new Button( )
+               //O var sort:Button = new Button();
+               let sort = new Button( )
                sort.label = "sort by tool"
                sort.width = 80
                sort.x = hposition + 50
@@ -365,7 +385,8 @@ public class Dialog extends PIXI.Sprite
 
                sort.addEventListener( 'click', sorthandler )
 
-               let profile: Button = new Button( )
+               //O var profile:Button = new Button();
+               let profile = new Button( )
                profile.label = "profiles last"
                profile.width = 80
                profile.x = hposition + 135
@@ -394,7 +415,8 @@ public class Dialog extends PIXI.Sprite
 
                profile.addEventListener( "click", profilehandler )
 
-               let all: Button = new Button( )
+               //O var all:Button = new Button();
+               let all = new Button( )
                all.label = "all"
                all.width = 30
                all.x = hposition + 220
@@ -445,7 +467,8 @@ public class Dialog extends PIXI.Sprite
 
       let buttonwidth: number = Math.max( 50, this.submitlabel.length * 7 )
 
-      let submit: Button = new Button( )
+      //O var submit:Button = new Button();
+      let submit = new Button( )
       submit.label = this.submitlabel
       submit.width = buttonwidth
       submit.x = this.width / 2 - buttonwidth / 2
@@ -519,14 +542,14 @@ public class Dialog extends PIXI.Sprite
       if ( this.parent )
       {
          let main: * = this.parent
-         if ( this.closeWindow )
+         if ( this.closewindow )
          {
             this.closeDialog( e )
          }
          main.processDialog( this.flist, this.name )
          return
       }
-      if ( this.closeWindow )
+      if ( this.closewindow )
       {
          this.closeDialog( e )
       }
@@ -535,10 +558,13 @@ public class Dialog extends PIXI.Sprite
    // @ts-ignore error TS6133: 'e' is declared but never read
    private browseAction( e: MouseEvent ): void
    {
+      //O file = new FileReference();
       this.file = new FileReference( )
 
-      this.file.addEventListener( Event.SELECT, fileSelect )
-      this.file.addEventListener( Event.CANCEL, fileCancel )
+      //O file.addEventListener(Event.SELECT, fileSelect);
+      this.file.addEventListener( Event.SELECT, this.fileSelect )
+      //O file.addEventListener(Event.CANCEL, fileCancel);
+      this.file.addEventListener( Event.CANCEL, this.fileCancel )
 
       this.file.browse( new Array( new FileFilter( "Images ( *.jpg, *.jpeg, *.gif, *.png )", "*.jpg;*.jpeg;*.gif;*.png" ) ) )
    }
@@ -546,9 +572,12 @@ public class Dialog extends PIXI.Sprite
    // @ts-ignore error TS6133: 'e' is declared but never read
    private fileSelect( e: Event ): void
    {
-      this.file.addEventListener( Event.COMPLETE, fileProcess )
-      this.file.addEventListener( IOErrorEvent.IO_ERROR, fileError )
+      //O file.addEventListener(Event.COMPLETE, fileProcess);
+      this.file.addEventListener( Event.COMPLETE, this.fileProcess )
+      //O file.addEventListener(IOErrorEvent.IO_ERROR, fileError);
+      this.file.addEventListener( IOErrorEvent.IO_ERROR, this.fileError )
 
+      //O file.load();
       this.file.load( )
    }
 

@@ -1,23 +1,23 @@
 ﻿//package
 
-// import flash.display.*;
-// import flash.ui.Keyboard;
-// import flash.events.*;
-// import flash.text.*;
-// import flash.geom.Point;
-// import flash.utils.Timer;
-// import fl.controls.ComboBox;
-// import flash.ui.Mouse;
-// import flash.net.FileReference;
-// import fl.data.DataProvider;
-// import flash.filters.BlurFilter;
-// import flash.filters.ColorMatrixFilter;
-// import flash.geom.Matrix;
-// import flash.ui.MouseCursor;
-// import flash.display.Bitmap;
-// import flash.display.BitmapData;
-// import flash.geom.Rectangle;
-// import fl.events.ListEvent;
+//O import flash.display.*;
+//O import flash.ui.Keyboard;
+//O import flash.events.*;
+//O import flash.text.*;
+//O import flash.geom.Point;
+//O import flash.utils.Timer;
+//O import fl.controls.ComboBox;
+//O import flash.ui.Mouse;
+//O import flash.net.FileReference;
+//O import fl.data.DataProvider;
+//O import flash.filters.BlurFilter;
+//O import flash.filters.ColorMatrixFilter;
+//O import flash.geom.Matrix;
+//O import flash.ui.MouseCursor;
+//O import flash.display.Bitmap;
+//O import flash.display.BitmapData;
+//O import flash.geom.Rectangle;
+//O import fl.events.ListEvent;
 
 import * as PIXI from "pixi.js";
 
@@ -34,709 +34,1093 @@ import { PathCommand } from "./com/lorentz/SVG/PathCommand";
 import { StringUtil } from "./com/lorentz/SVG/StringUtil";
 import { SVGColor } from "./com/lorentz/SVG/SVColor";
 
+//O public class Main extends Sprite
 public class Main extends PIXI.Sprite
 {
 
+   //O private var grid:Grid;
    private grid:Grid;
 
+   //O public var scene:SceneGraph;
    public scene: SceneGraph;
 
+   //O private var background:Sprite; // background image
    private background: PIXI.Sprite;   // background image
+   //O private var backgroundscale:Number = 72;
    private backgroundscale: number = 72;
+   //O private var backgroundvisibility:Number = 50;
    private backgroundvisibility: number = 50;
 
+   //O public var xstart:Number = 0;
    public xstart: number = 0;
+   //O public var ystart:Number = 0;
    public ystart: number = 0;
 
+   //O private var dragging:Boolean = false;
    private dragging: boolean = false;
 
+   //O private var xoriginstart:Number;
    private xoriginstart: number;
+   //O private var yoriginstart:Number;
    private yoriginstart: number;
 
+   //O private var sketch:Sketch; // draw one sketch at a time
    private sketch: Sketch;  // draw one sketch at a time
+   //O private var sketchdot:Dot;
    private sketchdot:Dot;   // currently active sketchdot for path joining after sketch operation
 
+   //O private var pen:Pen;
    private pen: Pen;
+   //O private var pendot:Dot;
    private pendot: Dot;
 
    // the imposter "pretends" to be the scene graph during zoom operations, this makes the app more responsive with extremely complex files
+   //O private var imposter:Sprite;
    private imposter: PIXI.Sprite;
 
    // flag used to indicate that a zoom operation is in progress
+   //O private var zooming:Boolean = false;
    private zooming: boolean = false;
+   //O private var startzoom:Number;
    private startzoom: number;
 
+   //O private var now:int = 0;
    private now: number = 0;
+   //O private var timer:Timer;
    private timer: Timer;
 
    // temporary holder for the tool number while we display a modal dialog
+   //O private var temptool:int = 0
    private temptool: number = 0;
 
+   //O private var file:FileReference;
    private file: FileReference;
+   //O  private var progressdialog:ProgressDialo;
    private progressdialog: ProgressDialog;
 
+   //O private var partkart:PartKart;
    private partkart: PartKart;
 
+   //O public function Main()
    public Main( )
    {
       // partkart related functions
+      //O partkart = new PartKart(this);
       partkart = new PartKart( this );
 
       // setup stage scale mode and alignment
+      //O stage.align = StageAlign.TOP_LEFT;
       this.stage.align = StageAlign.TOP_LEFT;
+      //O stage.scaleMode = StageScaleMode.NO_SCALE;
       this.stage.scaleMode = StageScaleMode.NO_SCALE;
 
+      //O stage.addEventListener(Event.RESIZE, stageResize);
       this.stage.addEventListener( Event.RESIZE, stageResize );
 
+      //O background = new Sprite();
       this.background = new PIXI.Sprite( );
+      //O addChild(background);
       this.addChild( this.background );
 
+      //O grid = new Grid();
       this.grid = new Grid( );
+      //O addChild(grid);
       this.addChild( this.grid );
 
+      //O scene = SceneGraph.getInstance();
       this.scene = SceneGraph.getInstance( );
+      //O addChild(scene);
       this.addChild( this.scene );
 
       // tools pallete on top
+      //O addChild(tools);
       this.addChild( this.tools );
+      //O attachToolsListeners();
       this.attachToolsListeners( );
 
+      //O addEventListener(MouseEvent.MOUSE_DOWN, mainMouseDown);
       addEventListener( 'mousedown', this.mainMouseDown );
+      //O addEventListener(MouseEvent.MOUSE_UP, mainMouseUp);
       addEventListener( 'mouseup', this.mainMouseUp );
+      //O stage.addEventListener(Event.MOUSE_LEAVE, mainMouseLeave);
       this.stage.addEventListener( Event.MOUSE_LEAVE, this.mainMouseLeave );
 
+      //O this.stage.addEventListener(KeyboardEvent.KEY_DOWN, mainKeyDown);
       this.stage.addEventListener( KeyboardEvent.KEY_DOWN, this.mainKeyDown );
+      //O this.stage.addEventListener(KeyboardEvent.KEY_UP, mainKeyUp);
       this.stage.addEventListener( KeyboardEvent.KEY_UP, this.mainKeyUp );
 
+      //O stage.dispatchEvent(new Event(Event.RESIZE));
       this.stage.dispatchEvent( new Event( Event.RESIZE ) );
 
+      //O scene.redraw();
       this.scene.redraw( );
    }
 
+   //O public function stageResize(e:Event)
    public stageResize( e:Event )
    {
+      //O if(stage.stageWidth > 400)
       if ( this.stage.stageWidth > 400 )
       {
+         //O tools.background.width = stage.stageWidth;
          this.tools.background.width = this.stage.stageWidth;
+         //O tools.viewcuts.x = stage.stageWidth - 254;
          this.tools.viewcuts.x = this.stage.stageWidth - 254;
+         //O tools.snap.x = stage.stageWidth - 173;
          this.tools.snap.x = this.stage.stageWidth - 173;
+         //O tools.unit.x = stage.stageWidth - 111;
          this.tools.unit.x = this.stage.stageWidth - 111;
+         //O tools.zoomin.x = stage.stageWidth - 53;
          this.tools.zoomin.x = this.stage.stageWidth - 53;
+         //O  tools.zoomout.x = stage.stageWidth - 29;
          this.tools.zoomout.x = this.stage.stageWidth - 29;
       }
 
       // resize from bottom left corner
+      //O Global.yorigin += stage.stageHeight - Global.docheight;j
       Global.yorigin += this.stage.stageHeight - Global.docheight;
 
+      //O Global.docwidth = stage.stageWidth;
       Global.docwidth = this.stage.stageWidth;
+      //O Global.docheight = stage.stageHeight;
       Global.docheight = this.stage.stageHeight;
+      //O grid.clear();
       this.grid.clear( );
+      //O grid.init();
       this.grid.init( );
 
       // redraw scene
+      //O scene.redraw();
       this.scene.redraw( );
    }
 
+   //O public function mainMouseDown(e:MouseEvent):void
    public mainMouseDown( e: PIXI.interaction.InteractionEvent ): void
    {
       // remove all selectareas
+      //O if(getChildByName("selectarea") )
       if ( getChildByName( "selectarea" ) )
       {
+         //O removeChild(getChildByName("selectarea"));
          this.removeChild( getChildByName( "selectarea" ) );
       }
 
+      //O if(Global.tool != 99)
       if ( Global.tool != 99 )
       {
+         //O scene.clearDots();
          this.scene.clearDots( );
+         //O clearMenu();
          this.clearMenu( );
+         //O tools.active = false;
          this.tools.active = false;
+         //O stage.focus = null;
          this.stage.focus = null;
       }
 
+      //O if(Global.space == true && Global.tool != 99 )
       if ( Global.space == true && Global.tool != 99 )  // tool 99 means "no tool"
       {
+         //O mainStartDrag(e);
          this.mainStartDrag( e );
       }
       else
       {
+         // O switch(Global.tool)
          switch( Global.tool )
          {
             case 0:
+               //O mainStartSelect(e);
                this.mainStartSelect( e );
                break;
             case 2:
+               //O mainStartDrag(e);
                this.mainStartDrag( e );
                break;
             case 1:
+               //O startSketch(e);
                this.startSketch( e );
                break;
             case 4:
+               //O startPen(e);
                this.startPen( e );
                break;
          }
       }
    }
 
+   //O
    /*public mainMiddleDown( e: PIXI.interaction.InteractionEvent ): void{
       mainStartDrag( e);
    }*/
 
+   //O public function mainStartDrag(e:MouseEvent):void
    public mainStartDrag( e:  PIXI.interaction.InteractionEvent ): void
    {
+      //O addChild(tools);
       this.addChild( this.tools );  // tools should be on top when dragging
+      //O xstart = e.stageX;
       this.xstart = e.stageX;
+      //O ystart = e.stageY;
       this.ystart = e.stageY;
+      //O xoriginstart = Global.xorigin;
       this.xoriginstart = Global.xorigin;
+      //O yoriginstart = Global.yorigin;
       this.yoriginstart = Global.yorigin;
+      //O dragging = true;
       this.dragging = true;
+      //O Global.dragging = true;
       Global.dragging = true;
 
+      //O addEventListener(MouseEvent.MOUSE_MOVE, mainDrag);
       addEventListener( 'mousemove', this.mainDrag );
    }
 
+   //O public function mainDrag(e:MouseEvent):void
    public mainDrag( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O if(dragging && (Global.tool == 2 || Global.space == true) && Global.tool != 99)
       if ( this.dragging && ( Global.tool == 2 || Global.space == true ) && Global.tool != 99 )
       {
+         //O var xdelta:Number = e.stageX - xstart;
          let xdelta: number = e.stageX - this.xstart;
+         //O var ydelta:Number = e.stageY - ystart;
          let ydelta: number = e.stageY - this.ystart;
 
+         //O Global.xorigin = xoriginstart + xdelta;
          Global.xorigin = this.xoriginstart + xdelta;
+         //O Global.yorigin = yoriginstart + ydelta;
          Global.yorigin = this.yoriginstart + ydelta;
-         this.rid.setOrigin( );
-         this.edrawBackground( );
+         //O grid.setOrigin();
+         this.grid.setOrigin( );
+         //O redrawBackground();
+         this.redrawBackground( );
 
          // update path positions
-         this.cene.x = Global.xorigin;
-         this.cene.y = Global.yorigin;
+         //O scene.x = Global.xorigin;
+         this.scene.x = Global.xorigin;
+         //O scene.y = Global.yorigin;
+         this.scene.y = Global.yorigin;
       }
+      //O else if(dragging && Global.tool == 0)
       else if ( dragging && Global.tool == 0 )
       {
+         //O var selectbox:Sprite = getChildByName("selectarea") as Sprite
          let selectbox: PIXI.Sprite = this.etChildByName( "selectarea" ) as PIXI.Sprite;
 
+         //O if(selectbox != null)
          if ( selectbox != null )
          {
+            //O var b:Shape = selectbox.getChildAt(0) as Shape;
             let b: PIXI.Shape = selectbox.getChildAt( 0 )  as PIXI.Shape;
 
+            //O var xs:Number;
             let xs: number;
+            //O var ys:Number;
             let ys: number;
 
+            //O var w:Number;
             let w: number;
+            //O var h:Number;
             let h: number;
 
+            //O if(e.stageX > xstart)
             if ( e.stageX > xstart )
             {
+               //O xs = 0;
                xs = 0;
+               //O w = e.stageX - xstart;
                w = e.stageX - xstart;
             }
             else
             {
+               //O xs = e.stageX - xstart;
                xs = e.stageX - xstart;
+               //O w = xstart - e.stageX;
                w = xstart - e.stageX;
             }
 
+            //O if(e.stageY > ystart)
             if ( e.stageY > ystart )
             {
+               //O ys = 0;
                ys = 0;
+               //O h = e.stageY - ystart;
                h = e.stageY - ystart;
             }
             else
             {
+               //O ys = e.stageY - ystart;
                ys = e.stageY - ystart;
+               //O h = ystart - e.stageY;
                h = ystart - e.stageY;
             }
 
+            //O b.x = xs;
             b.x = xs;
+            //O b.y = ys;
             b.y = ys;
+            //O b.width = w
             b.width = w;
+            //O b.height = h;
             b.height = h;
          }
       }
    }
 
+   //O public function mainMouseUp(e:MouseEvent):void
    public mainMouseUp( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O removeEventListener(MouseEvent.MOUSE_MOVE, mainDrag);
       removeEventListener( 'mousemove', this.mainDrag );
+      //O if(Global.dragging && Global.tool == 0 && !Global.space)
       if ( Global.dragging && Global.tool == 0 && !Global.space )
       {
+         //O mainFinishSelect();
          this.mainFinishSelect( );
       }
+      //O dragging = false;
       this.dragging = false;
+      //O lobal.dragging = false;
       Global.dragging = false;
    }
 
+   //O public function mainStartSelect(e:MouseEvent):void
    public mainStartSelect( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O addChild(tools);
       this.addChild( this.tools ); // tools should be on top when dragging
+      //O xstart = e.stageX;
       this.xstart = e.stageX;
+      //O ystart = e.stageY
       this.ystart = e.stageY;
 
+      //O dragging = true;
       this.dragging = true;
+      //O Global.dragging = true;
       Global.dragging = true;
 
+      //O addEventListener(MouseEvent.MOUSE_MOVE, mainDrag);
       addEventListener( 'mousemove', this.mainDrag );
 
+      //O var selectbox:Sprite = new Sprite();
       let selectbox: PIXI.Sprite = new PIXI.Sprite( );
+      //O selectbox.name = "selectarea";
       this.selectbox.name = "selectarea";
 
+      //O selectbox.x = e.stageX;
       this.selectbox.x = e.stageX;
+      //O selectbox.y = e.stageY;
       this.selectbox.y = e.stageY;
 
+      //O var box:Shape = new Shape();
       let box: PIXI.Shape = new PIXI.Shape( );
+      //O box.graphics.beginFill(0xbce4fe);
       box.graphics.beginFill( 0xbce4fe );
+      //O box.graphics.drawRect(0,0,1,1);
       box.graphics.drawRect( 0, 0, 1, 1 );
+      //O box.graphics.endFill()
       box.graphics.endFill( );
 
+      //O box.alpha = 0.5;
       box.alpha = 0.5;
 
+      //O selectbox.addChild(box);
       this.selectbox.addChild( box );
+      //O addChild(selectbox);
       this.addChild( this.selectbox );
 
+      //O scene.cacheAsBitmap = false;
       this.scene.cacheAsBitmap = false;
 
       // disable all path related events until selection is finished
+      //O scene.mouseChildren = false;
       this.scene.mouseChildren = false;
    }
 
+   //O public function mainFinishSelect():void
    public mainFinishSelect( ): void
    {
+      //O if(!scene.ctrl)
       if ( !this.scene.ctrl )
       {
+         //O scene.setInactive();
          this.scene.setInactive( );
       }
 
+      //O var selectbox:Sprite = getChildByName("selectarea") as Sprite;
       let selectbox: PIXI.Sprite = getChildByName( "selectarea" ) as PIXI.Sprite;
+      //O if(selectbox != null && selectbox.width > 1 && selectbox.height > 1
       if ( selectbox != null && selectbox.width > 1 && selectbox.height > 1 )
       {
+         //O scene.addChild(selectbox);
          this.scene.addChild( selectbox );
+         //O selectbox.x -= scene.x;
          selectbox.x -= this.scene.x;
+         //O selectbox.y -= scene.y;
          selectbox.y -= this.scene.y;
 
+         //O scene.select(selectbox);
          this.scene.select( selectbox);
+         //O scene.removeChild(selectbox);
          this.scene.removeChild( selectbox );
       }
+      //O scene.cacheAsBitmap = true;
       this.scene.cacheAsBitmap = true;
+      //O scene.mouseChildren = true;
       this.scene.mouseChildren = true;
    }
 
+   //O public function mainMouseLeave(e:Event):void
    public mainMouseLeave( e:Event ): void
    {
       // this function is required to handle cases where the mouse leaves the stage
+      //O if(dragging == true)
       if ( this.dragging == true )
       {
+         //O dragging = false;
          this.dragging = false;
+         //O Global.dragging = false;
          Global.dragging = false;
+         //O removeEventListener(MouseEvent.MOUSE_MOVE, mainDrag);
          removeEventListener( 'mousemove', this.mainDrag );
+         //O mainFinishSelect();
          this.mainFinishSelect( );
       }
 
+      //O scene.mouseLeave();
       this.scene.mouseLeave( );
    }
 
+   //O public function mainKeyDown(e:KeyboardEvent):voi
    public mainKeyDown( e: KeyboardEvent ): void
    {
+      //O if(e.ctrlKey || e.shiftKey)
       if (  e.ctrlKey || e.shiftKey)
       {
+         //O scene.ctrl = true;
          scene.ctrl = true;
       }
+      //O else if(e.keyCode == 32 && Global.space == false)
       else if ( e.keyCode == 32 && Global.space == false )  // space key
       {
+         //O Global.space = true;
          Global.space = true;
+         //O Mouse.cursor = MouseCursor.HAND;
          Mouse.cursor = MouseCursor.HAND;
+         //O scene.clearDots();
          scene.clearDots( );
+         //O //scene.redraw();
          //scene.redraw( );
       }
+      //O else if(e.keyCode == 46 || e.keyCode == 8)
       else if ( e.keyCode == 46 || e.keyCode == 8 )         // delete key
       {
+         //O if(stage.focus == null)
          if ( stage.focus == null)
          {
+            //O scene.deleteSelected();
             this.scene.deleteSelected( );
          }
       }
    }
 
+   //O public function mainKeyUp(e:KeyboardEvent):void
    public mainKeyUp( e: KeyboardEvent ): void
    {
+      //O if(e.ctrlKey == true && e.keyCode == 67)
       if ( e.ctrlKey == true && e.keyCode == 67 )
       {
+         //O scene.startCopy();
          this.scene.startCopy( );
       }
+      //O else if(e.ctrlKey == true && e.keyCode == 86)
       else if ( e.ctrlKey == true && e.keyCode == 86 )
       {
+         //O var p:Point = new Point((this.mouseX-Global.xorigin)/Global.zoom, (-this.mouseY+Global.yorigin)/Global.zoom);
          let p:Point = new Point( ( this.mouseX - Global.xorigin)/Global.zoom, ( -this.mouseY + Global.yorigin)/Global.zoom );
+         //O trace("paste point: ", p);
          trace( "paste point: ", p );
+         //O scene.startPaste(p);
          this.scene.startPaste( p );
       }
 
+      //O if(!e.ctrlKey || !e.shiftKey)
       if ( !e.ctrlKey || !e.shiftKey )
       {
+         //O scene.ctrl = false;
          this.scene.ctrl = false;
       }
+      //O if(e.keyCode == 32)
       if (  e.keyCode == 32)
       {
+         //O Global.space = false;
          Global.space = false;
+         //O setCursor();
          this.setCursor( );
       }
    }
 
+   //O public function attachToolsListeners():void
    public attachToolsListeners( ): void
    {
+      //O tools.addEventListener(MouseEvent.MOUSE_OVER, toolsOver);
       this.tools.addEventListener( 'mouseover', this.toolsOver );
+      //O tools.addEventListener(MouseEvent.MOUSE_DOWN, toolsDown);
       this.tools.addEventListener( 'mousedown', this.toolsDown );
+      //O tools.addEventListener(MouseEvent.MOUSE_MOVE, toolsMove);
       this.tools.addEventListener( 'mousemove', this.toolsMove );
+      //O tools.addEventListener(MouseEvent.MOUSE_UP, toolsUp);
       this.tools.addEventListener( 'mouseup', this.toolsUp );
       //O this.tools.addEventListener( MouseEvent.MOUSE_OUT, this.toolsOut );
       this.tools.addEventListener( 'mouseout', this.toolsOut );
 
       //O this.tools.tool0.addEventListener( MouseEvent.MOUSE_OVER, this.toolOver );
       this.tools.tool0.addEventListener( 'mouseover', this.toolOver );
+      //O tools.tool1.addEventListener(MouseEvent.MOUSE_OVER, toolOver);
       this.tools.tool1.addEventListener( 'mouseover', this.toolOver );
+      //O tools.tool2.addEventListener(MouseEvent.MOUSE_OVER, toolOver);
       this.tools.tool2.addEventListener( 'mouseover', this.toolOver );
+      //O tools.tool3.addEventListener(MouseEvent.MOUSE_OVER, toolOver);
       this.tools.tool3.addEventListener( 'mouseover', this.toolOver );
+      //O tools.tool4.addEventListener(MouseEvent.MOUSE_OVER, toolOver);
       this.tools.tool4.addEventListener( 'mouseover', this.toolOver );
 
+      //O tools.tool0.addEventListener(MouseEvent.MOUSE_DOWN, toolDown);
       this.tools.tool0.addEventListener( 'mousedown', this.toolDown );
+      //O tools.tool1.addEventListener(MouseEvent.MOUSE_DOWN, toolDown);
       this.tools.tool1.addEventListener( 'mousedown', this.toolDown );
+      //O tools.tool2.addEventListener(MouseEvent.MOUSE_DOWN, toolDown);
       this.tools.tool2.addEventListener( 'mousedown', this.toolDown );
+      //O tools.tool3.addEventListener(MouseEvent.MOUSE_DOWN, toolDown);
       this.tools.tool3.addEventListener( 'mousedown', this.toolDown );
+      //O tools.tool4.addEventListener(MouseEvent.MOUSE_DOWN, toolDown);
       this.tools.tool4.addEventListener( 'mousedown', this.toolDown );
 
       //O this.tools.tool0.addEventListener( MouseEvent.MOUSE_OUT, this.toolOut );
       this.tools.tool0.addEventListener( 'mouseout', this.toolOut );
+      //O tools.tool1.addEventListener(MouseEvent.MOUSE_OUT, toolOut);
       this.tools.tool1.addEventListener( 'mouseout', this.toolOut );
+      //O tools.tool2.addEventListener(MouseEvent.MOUSE_OUT, toolOut);
       this.tools.tool2.addEventListener( 'mouseout', this.toolOut);
+      //O tools.tool3.addEventListener(MouseEvent.MOUSE_OUT, toolOut);
       this.tools.tool3.addEventListener( 'mouseout', this.toolOut );
+      //O tools.tool4.addEventListener(MouseEvent.MOUSE_OUT, toolOut);
       this.tools.tool4.addEventListener( 'mouseout', this.toolOut );
 
-      //O this.tools.zoomin.addEventListener( MouseEvent.CLICK, this.zoomIn );
+      //O tools.zoomin.addEventListener( MouseEvent.CLICK, this.zoomIn );
       this.tools.zoomin.addEventListener( 'click', this.zoomIn );
-      //O this.tools.zoomout.addEventListener( MouseEvent.CLICK, this.zoomOut );
+      //O tools.zoomout.addEventListener( MouseEvent.CLICK, this.zoomOut );
       this.tools.zoomout.addEventListener( 'click', this.zoomOut );
 
-      //O this.stage.addEventListener( MouseEvent.MOUSE_WHEEL, this.zoomWheel );
+      //O stage.addEventListener( MouseEvent.MOUSE_WHEEL, this.zoomWheel );
       this.stage.addEventListener( 'wheel', this.zoomWheel );
 
-      //O this.tools.unit.addEventListener( Event.CHANGE, this.unitChange );
+      //O tools.unit.addEventListener(Event.CHANGE, unitChange);
+      this.tools.unit.addEventListener( Event.CHANGE, this.unitChange );
 
-      //O this.tools.snap.addEventListener( Event.CHANGE, this.snapChange );
-      //O this.tools.viewcuts.addEventListener( Event.CHANGE, this.viewcutsChange );
+      //O tools.snap.addEventListener( Event.CHANGE, this.snapChange );
+      this.tools.snap.addEventListener( Event.CHANGE, this.snapChange );
+      //O tools.viewcuts.addEventListener( Event.CHANGE, this.viewcutsChange );
+      this.tools.viewcuts.addEventListener( Event.CHANGE, this.viewcutsChange );
 
+      //O tools.active = false;
       this.tools.active = false;
 
+      //O tools.mFile.mouseChildren = false;
       this.tools.mFile.mouseChildren = false;
+      //O tools.mEdit.mouseChildren = false;
       this.tools.mEdit.mouseChildren = false;
+      //O tools.mInsert.mouseChildren = false;
       this.tools.mInsert.mouseChildren = false;
+      //O tools.mCAM.mouseChildren = false;
       this.tools.mCAM.mouseChildren = false;
+      //O tools.mToolpaths.mouseChildren = false;
       this.tools.mToolpaths.mouseChildren = false;
+      //O tools.mNesting.mouseChildren = false;
       this.tools.mNesting.mouseChildren = false;
+      //O tools.mPartkart.mouseChildren = false;
       this.tools.mPartkart.mouseChildren = false;
 
+      //O tools.dFile.visible = false;
       this.tools.dFile.visible = false;
+      //O tools.dEdit.visible = false;
       this.tools.dEdit.visible = false;
+      //O tools.dInsert.visible = false;
       this.tools.dInsert.visible = false;
+      //O tools.dCAM.visible = false;
       this.tools.dCAM.visible = false;
+      //O tools.dToolpaths.visible = false;
       this.tools.dToolpaths.visible = false;
+      //O tools.dNesting.visible = false;
       this.tools.dNesting.visible = false;
+      //O tools.dPartkart.visible = false;
       this.tools.dPartkart.visible = false;
 
-      //O this.tools.dFile.addEventListener( Event.CHANGE, this.menuSelect );
-      //O this.tools.dEdit.addEventListener( Event.CHANGE, this.menuSelect );
-      //O this.tools.dInsert.addEventListener( Event.CHANGE, this.menuSelect );
-      //O this.tools.dCAM.addEventListener( Event.CHANGE, this.menuSelect );
-      //O this.tools.dToolpaths.addEventListener( Event.CHANGE, this.menuSelect );
-      //O this.tools.dNesting.addEventListener( Event.CHANGE, this.menuSelect );
-      //O this.tools.dPartkart.addEventListener( Event.CHANGE, this.menuSelect );
-      //o this.tools.dToolpaths.addEventListener( ListEvent.ITEM_ROLL_OVER, this.toolpathOver );
+      //O tools.dFile.addEventListener( Event.CHANGE, this.menuSelect );
+      this.tools.dFile.addEventListener( Event.CHANGE, this.menuSelect );
+      //O tools.dEdit.addEventListener( Event.CHANGE, this.menuSelect );
+      this.tools.dEdit.addEventListener( Event.CHANGE, this.menuSelect );
+      //O tools.dInsert.addEventListener( Event.CHANGE, this.menuSelect );
+      this.tools.dInsert.addEventListener( Event.CHANGE, this.menuSelect );
+      //O tools.dCAM.addEventListener( Event.CHANGE, this.menuSelect );
+      this.tools.dCAM.addEventListener( Event.CHANGE, this.menuSelect );
+      //O tools.dToolpaths.addEventListener( Event.CHANGE, this.menuSelect );
+      this.tools.dToolpaths.addEventListener( Event.CHANGE, this.menuSelect );
+      //O tools.dNesting.addEventListener( Event.CHANGE, this.menuSelect );
+      this.tools.dNesting.addEventListener( Event.CHANGE, this.menuSelect );
+      //O tools.dPartkart.addEventListener( Event.CHANGE, this.menuSelect );
+      this.tools.dPartkart.addEventListener( Event.CHANGE, this.menuSelect );
+      //o tools.dToolpaths.addEventListener( ListEvent.ITEM_ROLL_OVER, this.toolpathOver );
+      this.tools.dToolpaths.addEventListener( ListEvent.ITEM_ROLL_OVER, this.toolpathOver );
 
+      //O tools.mFile.drop = tools.dFile;
       this.tools.mFile.drop = this.tools.dFile;
+      //O tools.mEdit.drop = this.tools.dEdit;
       this.tools.mEdit.drop = this.tools.dEdit;
+      //O tools.mInsert.drop = tools.dInsert;
       this.tools.mInsert.drop = this.tools.dInsert;
+      //O tools.mCAM.drop = tools.dCAM;
       this.tools.mCAM.drop = this.tools.dCAM;
+      //O tools.mToolpaths.drop = tools.dToolpaths;
       this.tools.mToolpaths.drop = this.tools.dToolpaths;
+      //O tools.mNesting.drop = tools.dNesting;
       this.tools.mNesting.drop = this.tools.dNesting;
+      //O tools.mPartkart.drop = tools.dPartkart;
       this.tools.mPartkart.drop = this.tools.dPartkart;
 
-      //O this.tools.mFile.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
-      //O this.tools.mEdit.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
-      //O this.tools.mInsert.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
-      //O this.tools.mCAM.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
-      //O this.tools.mToolpaths.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
-      //O this.tools.mNesting.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
-      //O this.tools.mPartkart.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      //O tools.mFile.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      this.tools.mFile.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      //O tools.mEdit.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      this.tools.mEdit.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      //O tools.mInsert.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      this.tools.mInsert.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      //O tools.mCAM.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      this.tools.mCAM.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      //O tools.mToolpaths.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      this.tools.mToolpaths.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      //O tools.mNesting.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      this.tools.mNesting.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      //O tools.mPartkart.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
+      this.tools.mPartkart.addEventListener( MouseEvent.ROLL_OVER, this.menuOver );
 
-      //O this.tools.mFile.addEventListener( MouseEvent.ROLL_OUT, this.menuOut );
+      //O tools.mFile.addEventListener( MouseEvent.ROLL_OUT, this.menuOut );
       this.tools.mFile.addEventListener( 'mouseupoutside', this.menuOut );
+      //O tools.mEdit.addEventListener(MouseEvent.ROLL_OUT, menuOut);
       this.tools.mEdit.addEventListener( 'mouseupoutside', this.menuOut );
+      //O tools.mInsert.addEventListener(MouseEvent.ROLL_OUT, menuOut);
       this.tools.mInsert.addEventListener( 'mouseupoutside', this.menuOut );
+      //O tools.mCAM.addEventListener(MouseEvent.ROLL_OUT, menuOut);
       this.tools.mCAM.addEventListener( 'mouseupoutside', this.menuOut );
+      //O tools.mToolpaths.addEventListener(MouseEvent.ROLL_OUT, menuOut);
       this.tools.mToolpaths.addEventListener( 'mouseupoutside', this.menuOut );
+      //O tools.mNesting.addEventListener(MouseEvent.ROLL_OUT, menuOut);
       this.tools.mNesting.addEventListener( 'mouseupoutside', this.menuOut );
+      //O tools.mPartkart.addEventListener(MouseEvent.ROLL_OUT, menuOut);
       this.tools.mPartkart.addEventListener( 'mouseupoutside', this.menuOut );
 
-      //Othis.tools.mFile.addEventListener( MouseEvent.MOUSE_DOWN, this.menuDown );
+      //O tools.mFile.addEventListener( MouseEvent.MOUSE_DOWN, this.menuDown );
       this.tools.mFile.addEventListener( 'mousedown', this.menuDown );
+      //O tools.mEdit.addEventListener(MouseEvent.MOUSE_DOWN, menuDown);
       this.tools.mEdit.addEventListener( 'mousedown', this.menuDown );
+      //O tools.mInsert.addEventListener(MouseEvent.MOUSE_DOWN, menuDown);
       this.tools.mInsert.addEventListener( 'mousedown', this.menuDown );
+      //O tools.mCAM.addEventListener(MouseEvent.MOUSE_DOWN, menuDown);
       this.tools.mCAM.addEventListener( 'mousedown', this.menuDown );
+      //O tools.mToolpaths.addEventListener(MouseEvent.MOUSE_DOWN, menuDown);
       this.tools.mToolpaths.addEventListener( 'mousedown', this.menuDown );
+      //O tools.mNesting.addEventListener(MouseEvent.MOUSE_DOWN, menuDown);
       this.tools.mNesting.addEventListener( 'mousedown', this.menuDown );
+      //O tools.mPartkart.addEventListener(MouseEvent.MOUSE_DOWN, menuDown);
       this.tools.mPartkart.addEventListener( 'mousedown', this.menuDown );
    }
 
+   //O public function clearMenu():void
    public clearMenu(  ): void
    {
+      //O tools.mFile.highlightDown.alpha = 0;
       this.tools.mFile.highlightDown.alpha = 0;
+      //O tools.mEdit.highlightDown.alpha = 0;
       this.tools.mEdit.highlightDown.alpha = 0;
+      //O tools.mInsert.highlightDown.alpha = 0;
       this.tools.mInsert.highlightDown.alpha = 0;
+      //O tools.mCAM.highlightDown.alpha = 0;
       this.tools.mCAM.highlightDown.alpha = 0;
+      //O tools.mToolpaths.highlightDown.alpha = 0;
       this.tools.mToolpaths.highlightDown.alpha = 0;
+      //O tools.mNesting.highlightDown.alpha = 0;
       this.tools.mNesting.highlightDown.alpha = 0;
+      //O tools.mPartkart.highlightDown.alpha = 0;
       this.tools.mPartkart.highlightDown.alpha = 0;
 
+      //O tools.mFile.highlightUp.alpha = 0;
       this.tools.mFile.highlightUp.alpha = 0;
+      //O tools.mEdit.highlightUp.alpha = 0;
       this.tools.mEdit.highlightUp.alpha = 0;
+      //O tools.mInsert.highlightUp.alpha = 0;
       this.tools.mInsert.highlightUp.alpha = 0;
+      //O tools.mCAM.highlightUp.alpha = 0;
       this.tools.mCAM.highlightUp.alpha = 0;
+      //O tools.mToolpaths.highlightUp.alpha = 0;
       this.tools.mToolpaths.highlightUp.alpha = 0;
+      //O tools.mNesting.highlightUp.alpha = 0;
       this.tools.mNesting.highlightUp.alpha = 0;
+      //O tools.mPartkart.highlightUp.alpha = 0;
       this.tools.mPartkart.highlightUp.alpha = 0;
 
+      //O tools.mFile.text.textColor =  0x000000;
       this.tools.mFile.text.textColor =  0x000000;
+      //O tools.mEdit.text.textColor =  0x000000
       this.tools.mEdit.text.textColor =  0x000000;
+      //O tools.mInsert.text.textColor =  0x000000;
       this.tools.mInsert.text.textColor =  0x000000;
+      //O tools.mCAM.text.textColor =  0x000000;
       this.tools.mCAM.text.textColor =  0x000000;
+      //O tools.mToolpaths.text.textColor =  0x000000;
       this.tools.mToolpaths.text.textColor =  0x000000;
+      //O tools.mNesting.text.textColor =  0x000000;
       this.tools.mNesting.text.textColor =  0x000000;
+      //O tools.mPartkart.text.textColor =  0x000000;
       this.tools.mPartkart.text.textColor =  0x000000;
 
+      //O tools.dFile.visible = false;
       this.tools.dFile.visible = false;
+      //O tools.dEdit.visible = false;
       this.tools.dEdit.visible = false;
+      //O tools.dInsert.visible = false;
       this.tools.dInsert.visible = false;
+      //O tools.dCAM.visible = false;
       this.tools.dCAM.visible = false;
+      //O tools.dToolpaths.visible = false;
       this.tools.dToolpaths.visible = false;
+      //O tools.dNesting.visible = false;
       this.tools.dNesting.visible = false;
+      //O tools.dPartkart.visible = false;
       this.tools.dPartkart.visible = false;
 
+      //O tools.dFile.clearSelection();
       this.tools.dFile.clearSelection( );
+      //O tools.dEdit.clearSelection();
       this.tools.dEdit.clearSelection( );
+      //O tools.dInsert.clearSelection();
       this.tools.dInsert.clearSelection( );
+      //O tools.dCAM.clearSelection();
       this.tools.dCAM.clearSelection( );
+      //O tools.dToolpaths.clearSelection();
       this.tools.dToolpaths.clearSelection( );
+      //O tools.dNesting.clearSelection();
       this.tools.dNesting.clearSelection( );
+      //O tools.dPartkart.clearSelection();
       this.tools.dPartkart.clearSelection( );
    }
 
+   //O public function toolsOver(e:MouseEvent):voi
    public toolsOver( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O Mouse.cursor = MouseCursor.AUTO;
       Mouse.cursor = MouseCursor.AUTO;
    }
 
+   //O public function toolsDown(e:MouseEvent):void
    public toolsDown( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O e.stopPropagation();
       e.stopPropagation( );
+      //O addChild(tools);
       this.addChild( this.tools ); // put on top of z stack
    }
 
+   //O public function toolsMove(e:MouseEvent):voi
    public toolsMove( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O e.stopPropagation();
       e.stopPropagation( );
    }
 
+   //O public function toolsUp(e:MouseEvent):void
    public toolsUp( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O e.stopPropagation();
       //e.stopPropagation( );
    }
 
+   //O public function toolsOut(e:MouseEvent):void
    public toolsOut( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O setCursor();
       this.setCursor( );
    }
 
+   //O public function toolOver(e:MouseEvent):void
    public toolOver( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O e.target.alpha = 0.5;
       e.target.alpha = 0.5;
    }
 
+   //O public function toolDown(e:MouseEvent):voi
    public toolDown( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O e.target.alpha = 1;
       e.target.alpha = 1;
 
+      //O if(Global.tool == 4 && e.target.name != "tool4")
       if ( Global.tool == 4 && e.target.name != "tool4" )
       {
          // clean up pen operations
+         //O if(pen != null
          if ( pen != null)
          {
+            //O pen.graphics.clear();
             this.pen.graphics.clear( );
+            //O pen = null;
             this.pen = null;
+            //O removeEventListener(MouseEvent.MOUSE_MOVE, movePen)
             removeEventListener( 'mousemove', this.movePen );
+            //O removeEventListener(MouseEvent.MOUSE_UP, upPen);
             removeEventListener( 'mouseup', this.upPen );
          }
       }
 
+      //O if(e.target.name == "tool0")
       if ( e.target.name == "tool0")
       {
+         //O Global.tool = 0;
          Global.tool = 0;
+         //O scene.clearDots();
          this.scene.clearDots( );
+         //O setZoom(Global.zoom);
          this.setZoom( Global.zoom );  // re-render everything
       }
+      //O if(e.target.name == "tool1")
       else if ( e.target.name == "tool1" )
       {
+         //O Global.tool = 1;
          Global.tool = 1;
+         //O scene.addDots();
          this.scene.addDots( );
+         //O setZoom(Global.zoom); 
          this.setZoom( Global.zoom );  // re-render everything
       }
+      //O else if(e.target.name == "tool2")
       else if ( e.target.name == "tool2" )
       {
+         //O Global.tool = 2;
          Global.tool = 2;
+         //O scene.clearDots();
          this.scene.clearDots( );
+         //O setZoom(Global.zoom); 
          this.setZoom( Global.zoom );  // re-render everything
       }
+      //O else if(e.target.name == "tool3")
       else if ( e.target.name == "tool3" )
       {
+         //O Global.tool = 3;
          Global.tool = 3;
+         //O scene.addDots();
          this.scene.addDots( );
+         //O setZoom(Global.zoom); 
          this.setZoom( Global.zoom );   // re-render everything
       }
+      //O else if(e.target.name == "tool4")
       else if ( e.target.name == "tool4" )
       {
+         //O Global.tool = 4;
          Global.tool = 4;
+         //O scene.clearDots();
          this.scene.clearDots( );
+         //O setZoom(Global.zoom);
          this.setZoom( Global.zoom );  // re-render everything
       }
 
+      //O setCursor();
       this.setCursor( );
    }
 
+   //O public function toolOut(e:MouseEvent):void
    public toolOut( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O e.target.alpha = 1;
       e.target.alpha = 1;
    }
 
+   //O public function menuOver(e:MouseEvent):void
    public menuOver( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O if(tools.active == false)
       if ( this.tools.active == false )
       {
+         //O e.target.getChildByName("highlightUp").alpha = 0.15;
          e.target.getChildByName( "highlightUp").alpha = 0.15;
       }
+      //O else if(e.target
       else if ( e.target )
       {
+         //O clearMenu();
          this.clearMenu( );
+         //O e.target.getChildByName("highlightDown").alpha = 1;
          e.target.getChildByName( "highlightDown" ).alpha = 1;
+         //O var t:TextField = e.target.getChildByName("text") as TextField;
          let t:TextField = e.target.getChildByName( "text" ) as TextField;
+         //O t.textColor = 0xffffff;
          t.textColor = 0xffffff;
+         //O if(e.target.drop)
          if ( e.target.drop )
          {
+            //O e.target.drop.visible = true;
             e.target.drop.visible = true;
          }
       }
    }
 
+   //O public function menuOut(e:MouseEvent):void
    public menuOut( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O if(tools.active == false)
       if ( this.tools.active == false)
       {
+         //O e.target.getChildByName("highlightUp").alpha = 0;
          e.target.getChildByName( "highlightUp" ).alpha = 0;
+         //O var t:TextField = e.target.getChildByName("text") as TextField;
          let t:TextField = e.target.getChildByName( "text" ) as TextField;
+         //O t.textColor = 0x000000;
          t.textColor = 0x000000;
       }
    }
 
+   //O public function toolpathOver(e:ListEvent):void
    public toolpathOver( e:ListEvent ): void
    {
+      //O for each(var cut:CutObject in scene.cutlist)
       for each( let cut:CutObject in this.scene.cutlist )
       {
+         //O cut.setInactive();
          cut.setInactive( );
       }
+      //O e.item.data.setActive();
       e.item.data.setActive( );
+      //O stage.focus = null;
       this.stage.focus = null;
    }
 
+   //O public function menuDown(e:MouseEvent):void
    public menuDown( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O var t:TextField = e.target.getChildByName("text") as TextField;
       let t:TextField = e.target.getChildByName( "text" ) as TextField;
 
+      //O if(tools.active == true)
       if ( this.tools.active == true )
       {
+         //O tools.active = false;
          this.tools.active = false;
+         //O clearMenu();
          this.clearMenu( );
       }
       else
       {
+         //O tools.active = true;
          this.tools.active = true;
 
+         //O clearMenu();
          this.clearMenu( );
 
+         //O e.target.getChildByName("highlightDown").alpha = 1;
          e.target.getChildByName( "highlightDown" ).alpha = 1;
+         //O if(e.target.drop)
          if ( e.target.drop )
          {
+            //O e.target.drop.visible = true;
             e.target.drop.visible = true;
          }
 
+         //O t.textColor = 0xffffff;
          t.textColor = 0xffffff;
       }
    }
 
+   //O public function menuSelect(e:Event):void
    public menuSelect( e:Event ): void
    {
+      //O if(e.target == tools.dFile)
       if ( e.target == tools.dFile )
       {
+         //O witch(e.target.selectedIndex)
          switch( e.target.selectedIndex )
          {
             case 0:
                // import file
+               //O trace("import!");
                trace( "import!");
+               //O loadFile();
                this.loadFile( );
                break;
             case 1:
                // export file
+               //O trace("export!");
                trace( "export!" );
+               //O saveFile();
                this.saveFile( );
                break;
          }
       }
+      //O else if(e.target == tools.dEdit)
       else if ( e.target == tools.dEdit )
       {
+         //O switch(e.target.selectedIndex)
          switch( e.target.selectedIndex )
          {
             case 0:
                // undo
+               //O Global.undoAction();
                Global.undoAction( );
+               //O scene.redraw();
                this.scene.redraw( );
                break;
             case 1:
                // redo
+               //O Global.redoAction();
                Global.redoAction( );
+               //O scene.redraw();
                this.scene.redraw( );
                break;
             case 2:
                // copy
+               //O scene.startCopy()
                this.scene.startCopy( );
                break;
             case 3:
                // paste
+               //O scene.startPaste();
                this.scene.startPaste( );
                break;
             case 4:
+               //O startDialog(120, 100, new Array({type: "number", label:"Scale X (%)", value: 100},
                this.startDialog( 120, 100, new Array( {type: "number", label:"Scale X ( %)", value: 100},
                   {type: "number", label:"Scale Y ( %)", value: 100}
                ),
                   "scale" );
                break;
             case 5:
+               //O startDialog(120, 50, new Array({type: "number", label:"Rotate (degrees)", value: "0"}),
                this.startDialog( 120, 50, new Array( {type: "number", label:"Rotate ( degrees)", value: "0" }
                ),
                   "rotate" );
                break;
             case 6:
+               //O startDialog(120, 100, new Array({type: "number", label:"Skew X (%)", value: "0"},
                this.startDialog( 120, 100, new Array( {type: "number", label:"Skew X ( %)", value: "0"},
                   { type: "number", label:"Skew Y ( %)", value: "0" }
                ),
                   "skew" );
                break;
             case 7:
+               //O scene.separateSelected();
                this.scene.separateSelected( );
                break;
             case 8:
+               //O startDialog(200, 100, new Array({type: "file", label:"Load Image From Disk"},
                this.startDialog( 200, 100, new Array( {type: "file", label:"Load Image From Disk"},
                   {type:"number", label: "Image Resolution ( px/" + Global.unit + ")", value: backgroundscale},
                   {type:"number", label:"Visibility ( %)", value: String( backgroundvisibility )}
@@ -744,6 +1128,7 @@ public class Main extends PIXI.Sprite
                   "background" );
                break;
             case 9:
+               //O startDialog(250, 150, new Array({type: "number", label:"SVG Import Default Resolution (px/inch)", value:Global.importres},
                this.startDialog( 250, 150, new Array( {type: "number", label:"SVG Import Default Resolution ( px/inch)", value:Global.importres },
                   {type:"label", label:"Common values:" },
                   {type:"label", label:"Illustrator: 72, Inkscape: 90" },
@@ -760,18 +1145,23 @@ public class Main extends PIXI.Sprite
                break;
          }
       }
+      //O else if(e.target == tools.dInsert)
       else if ( e.target == tools.dInsert )
       {
+         //O switch(e.target.selectedIndex)
          switch( e.target.selectedIndex )
          {
             case 0:
                // add circle
+               //O startDialog(120, 50, new Array({type:"number", label:"Diameter ("+Global.unit+")", value:1}),
                this.startDialog( 120, 50, new Array( {type:"number", label:"Diameter ( "+Global.unit+")", value:1}
                ),
                   "addcircle" );
                break;
             case 1:
                // add ellipse
+               //O startDialog(120, 100, new Array(
+                                          {type:"number", label:"Ellipse Width ("+Global.unit+")", value:1},
                this.startDialog( 120, 100, new Array( 
                   {type:"number", label:"Ellipse Width ( " + Global.unit + ")", value:1},
                   {type:"number", label:"Ellipse Height ( " + Global.unit + ")", value:1}
@@ -780,6 +1170,7 @@ public class Main extends PIXI.Sprite
                break;
             case 2:
                // add rectangle
+               //O startDialog(150, 100, new Array({type:"number", label:"Rectangle Width ("+Global.unit+")", value:1},
                startDialog( 150, 100, new Array( {type:"number", label:"Rectangle Width ( "+Global.unit+")", value:1},
                   {type:"number", label:"Rectangle Height ( " + Global.unit + ")", value:1}
                ),
@@ -787,6 +1178,7 @@ public class Main extends PIXI.Sprite
                break;
             case 3:
                // add rounded rectangle
+               //O startDialog(150, 100, new Array({type:"number", label:"Rectangle Width ("+Global.unit+")", value:1},
                startDialog( 150, 100, new Array( {type:"number", label:"Rectangle Width ( "+Global.unit+")", value:1},
                   {type:"number", label:"Rectangle Height ( " + Global.unit + ")", value:1},
                   {type:"number", label:"Corner Radius ( " + Global.unit + ")", value:0.2}
@@ -795,6 +1187,7 @@ public class Main extends PIXI.Sprite
                break;
             case 4:
                // add polygon
+               //O startDialog(120, 100, new Array({type:"number", label:"Number of Sides", value:6},
                startDialog( 120, 100, new Array( {type:"number", label:"Number of Sides", value:6},
                   {type:"number", label:"Radius ( " + Global.unit + ")", value:1}
                ),
@@ -802,6 +1195,7 @@ public class Main extends PIXI.Sprite
                break;
             case 5:
                // add star
+               //O startDialog(120, 100, new Array({type:"number", label:"Number of Points", value:6},
                this.startDialog( 120, 100, new Array( {type:"number", label:"Number of Points", value:6},
                   {type:"number", label:"Radius ( " + Global.unit + ")", value:1},
                   {type:"number", label:"Pointiness ( %)", value:50}
@@ -810,55 +1204,82 @@ public class Main extends PIXI.Sprite
                break;
          }
       }
+      //O else if(e.target == tools.dCAM)
       else if ( e.target == tools.dCAM )
       {
+         //O var selected:Boolean;
          let selected: boolean;
+         //O var p:Path;
          let p:Path;
+         //O var closed:Boolean;
          let closed: boolean;
+         //O var unit:String;
          let unit: string;
 
          // setup default values to populate fields
 
+         //O var safetyheight:Number = Global.unit == "in" ? 0.125 : 15;
          let safetyheight: number = Global.unit == "in" ? 0.125 : 15;
+         //O var stocksurface:String = "0";
          let stocksurface: string = "0";
+         //O var targetdepth:Number  = Global.unit == "in" ? -0.76 : -10;
          let targetdepth: number  = Global.unit == "in" ? -0.76 : -10;
+         //O var stepdown:Number = Global.unit == "in" ? 0.03125 : 1.5;
          let stepdown: number = Global.unit == "in" ? 0.03125 : 1.5;
+         //O var stepover:Number = 40;
          let stepover: number = 40;
+         //O var feedrate:Number = Global.unit == "in" ? 30 : 1500;
          let feedrate: number = Global.unit == "in" ? 30 : 1500;
+         //O var plungerate:Number = Global.unit == "in" ? 10 : 800;
          let plungerate: number = Global.unit == "in" ? 10 : 800;
 
+         //O var tooldiameter:Number = Global.unit == "in" ? 0.125 : 5;
          let tooldiameter: number = Global.unit == "in" ? 0.125 : 5;
+         //O var roughingclearance:String = "0";
          let roughingclearance: string = "0";
+         //O var dir:int = 1;
          let dir:int = 1;
 
+         //O switch(e.target.selectedIndex)
          switch( e.target.selectedIndex )
          {
             case 0:
                // make sure at least one path is selected
+               //O selected = false;
                selected = false;
+               //O for each(p in scene.pathlist)
                for each( p in this.scene.pathlist )
                {
+                  //O closed = p.isClosed();
                   closed = p.isClosed( );
+                  //O if(p.active == true && closed)
                   if ( p.active == true && closed )
                   {
+                     //O selected = true;
                      selected = true;
                   }
+                  //O else if(p.active == true && !closed)
                   else if ( p.active == true && !closed )
                   {
+                     //O p.setInactive();
                      p.setInactive( );
                   }
                }
 
+               //O if(selected == false)
                if ( selected == false )
                {
+                  //O startDialog(240, 50, new Array({type:"label", label:"Please select at least one closed path"}), "error");
                   this.startDialog( 240, 50, new Array( {type:"label", label:"Please select at least one closed path"}
                   ), "error" );
                }
                else
                {
 
+                  //O unit = Global.unit == "in" ? "in" : "mm";
                   unit = Global.unit == "in" ? "in" : "mm";
 
+                  //O startDialog(150,200, new Array({type:"string", label:"name", value:"profile "+(scene.cutlist.length+1)},
                   this.startDialog( 150,200, new Array( {type:"string", label:"name", value:"profile "+( scene.cutlist.length + 1 )},
                      {type:"number", label:"tool diameter ( " + unit + ")", value: tooldiameter, highlight: true},
                      {type:"number", label:"target depth ( " + unit + ")", value: targetdepth, highlight: true},
@@ -895,30 +1316,41 @@ public class Main extends PIXI.Sprite
                break;
             case 1:
                // make sure at least one path is selected
+               //O selected = false;
                selected = false;
+               //O for each(p in scene.pathlist)
                for each( p in scene.pathlist )
                {
+                  //O closed = p.isClosed();
                   closed = p.isClosed( );
+                  //O if(p.active == true && closed
                   if ( p.active == true && closed )
                   {
+                     //O selected = true;
                      selected = true;
                   }
+                  //O else if(p.active == true && !closed)
                   else if ( p.active == true && !closed )
                   {
+                     //O p.setInactive();
                      p.setInactive( );
                   }
                }
 
+               //O if(selected == false){
                if ( selected == false )
                {
+                  //O startDialog(240, 50, new Array({type:"label", label:"Please select at least one closed path"}), "error");
                   this.startDialog( 240, 50, new Array( {type:"label", label:"Please select at least one closed path"}
                   ), "error" );
                }
                else
                {
 
+                  //O unit = Global.unit == "in" ? "in" : "mm";
                   unit = Global.unit == "in" ? "in" : "mm";
 
+                  //O startDialog(150,200, new Array({type:"string", label:"name", value:"pocket "+(scene.cutlist.length+1)},
                   this.startDialog( 150,200, new Array( {type:"string", label:"name", value:"pocket "+( scene.cutlist.length+1)},
                      {type:"number", label:"tool diameter ( " + unit + ")", value: tooldiameter, highlight: true},
                      {type:"number", label:"target depth ( " + unit + ")", value: targetdepth, highlight: true},
@@ -945,25 +1377,33 @@ public class Main extends PIXI.Sprite
                }
                break;
             case 2:
+               //O selected = false;
                selected = false;
+               //O for each(p in scene.pathlist){
                for each( p in scene.pathlist )
                {
+                  //O if(p.active == true){
                   if ( p.active == true )
                   {
+                     //O selected = true;
                      selected = true;
                   }
                }
 
+               //O if(selected == false)
                if ( selected == false )
                {
+                  //O startDialog(230, 50, new Array({type:"label", label:"Please select at least one path"}), "error");
                   this.startDialog( 230, 50, new Array( {type:"label", label:"Please select at least one path"}
                   ), "error" );
                }
                else
                {
 
+                  //O unit = Global.unit == "in" ? "in" : "mm";
                   this.unit = Global.unit == "in" ? "in" : "mm";
 
+                  //O startDialog(150,200, new Array({type:"string", label:"name", value:"follow path "+(scene.cutlist.length+1)},
                   this.startDialog( 150,200, new Array( {type:"string", label:"name", value:"follow path " + ( this.scene.cutlist.length + 1 ) },
                      {type:"number", label:"tool diameter ( " + unit + ")", value: tooldiameter, highlight: true},
                      {type:"number", label:"target depth ( " + unit + ")", value: targetdepth, highlight: true},
@@ -978,8 +1418,10 @@ public class Main extends PIXI.Sprite
                break;
             case 3:
                // drill operation
+               //O unit = Global.unit == "in" ? "in" : "mm";
                unit = Global.unit == "in" ? "in" : "mm";
 
+               //O startDialog(150,200, new Array({type:"string", label:"name", value:"drill "+(scene.cutlist.length+1)},
                this.startDialog( 150,200, new Array( {type:"string", label:"name", value:"drill "i +i ( this.scene.cutlist.length+1)},
                   {type:"number", label:"tool diameter ( " + unit + ")", value: tooldiameter, highlight: true},
                   {type:"number", label:"target depth ( " + unit + ")", value: targetdepth, highlight: true},
@@ -1006,23 +1448,30 @@ public class Main extends PIXI.Sprite
                // add tabs
 
                // check that there is at least one calculated profile op
+               //O var valid:Boolean = false;
                let valid: boolean = false;
+               //O for each(var cutobject:CutObject in scene.cutlist)
                for each( let cutobject:CutObject in scene.cutlist )
                {
+                  //O if(cutobject is ProfileCutObject && cutobject.processed == true)
                   if (  cutobject is ProfileCutObject && cutobject.processed == true)
                   {
+                     //O valid = true;
                      valid = true;
                      break;
                   }
                }
 
+               //O if(!valid)
                if ( !valid )
                {
+                  //O startDialog(320,50,new Array({type:"label", label:"Please select at least one calculated profile operation"}), "error");
                   this.startDialog( 320,50,new Array( {type:"label", label:"Please select at least one calculated profile operation"}
                   ), "error" );
                   return;
                }
 
+               //O startDialog(150,200, new Array({type:"number", label:"tab spacing ("+Global.unit+")", value: Global.unit == "in" ? 5 : 15},
                this.startDialog( 150,200, new Array( {type:"number", label:"tab spacing ( "+Global.unit+")", value: Global.unit == "in" ? 5 : 15},
                   {type:"number", label:"tab width ( " + Global.unit + ")", value: Global.unit == "in" ? .25 : 0.5},
                   {type:"number", label:"tab height ( " + Global.unit + ")", value: Global.unit == "in" ? .25 : 0.5}
@@ -1030,74 +1479,108 @@ public class Main extends PIXI.Sprite
                   "tabs" );
                break;
             case 5:
+               //O var pd:ProgressDialog = startProgressDialog(250, 75, "processing", "Cancel", scene.cutCancel);
                let pd:ProgressDialog = startProgressDialog( 250, 75, "processing", "Cancel", scene.cutCancel);
+               //O scene.reprocessCuts(pd);
                scene.reprocessCuts( pd );
                break;
             case 6:
+               //O  var pd1:ProgressDialog = startProgressDialog(250, 75, "processing", "Cancel", scene.cutCancel);
                let pd1:ProgressDialog = startProgressDialog( 250, 75, "processing", "Cancel", scene.cutCancel);
+               //O scene.reprocessCuts(pd1,true);
                this.scene.reprocessCuts( pd1, true );
                break;
             case 7:
+               //O unit = Global.unit == "in" ? "in" : "mm";
                this.unit = Global.unit == "in" ? "in" : "mm";
 
                // get defaults based on selected
+               //O var activecuts:Array = scene.getActiveCuts();
                let activecuts:Array = this.scene.getActiveCuts( );
 
+               //O var center:Boolean = true;
                let this.center: boolean = true;
+               //O var spacing:Number = tooldiameter*2;
                let this.spacing: number = tooldiameter*2;
+               //O var outside:Boolean = true;
                let this.outside: boolean = true;
 
                //O for each( let cut:CutObject in activecuts)
                for ( let cut:CutObject in this.activecuts)
                {
+                  //O if(!isNaN(cut.tooldiameter))
                   if ( !isNaN( cut.tooldiameter))
                   {
+                     //O tooldiameter = cut.tooldiameter;
                      this.tooldiameter = cut.tooldiameter;
                   }
+                  //O if(!isNaN(cut.targetdepth))
                   if ( !isNaN( cut.targetdepth ) )
                   {
+                     //O targetdepth = cut.targetdepth;
                      this.targetdepth = cut.targetdepth;
                   }
+                  //O outside = cut.outside;
                   outside = cut.outside;
+                  //O  if(!isNaN(cut.safetyheight))
                   if ( !isNaN( cut.safetyheight ) )
                   {
+                     //O safetyheight = cut.safetyheight;
                      this.safetyheight = cut.safetyheight;
                   }
+                  //O if(!isNaN(cut.stocksurface))
                   if ( !isNaN( cut.stocksurface ) )
                   {
+                     //O stocksurface = String(cut.stocksurface);
                      this.stocksurface = String( cut.stocksurface );
                   }
+                  //O if(!isNaN(cut.stepover))
                   if ( !isNaN( cut.stepover ) )
                   {
-                    this. stepover = cut.stepover;
+                     //O stepover = cut.stepover;
+                     this.stepover = cut.stepover;
                   }
+                  //O if(!isNaN(cut.stepdown)
                   if ( !isNaN( cut.stepdown ) )
                   {
-                    this. stepdown = cut.stepdown;
+                     //O stepdown = cut.stepdown;
+                     this.stepdown = cut.stepdown;
                   }
+                  //O if(!isNaN(cut.roughingclearance))
                   if ( !isNaN( cut.roughingclearance ) )
                   {
+                     //O roughingclearance = String(cut.roughingclearance);
                      this.roughingclearance = String( cut.roughingclearance );
                   }
+                  //O if(!isNaN(cut.feedrate))
                   if ( !isNaN( cut.feedrate ) )
                   {
+                     //O feedrate = cut.feedrate;
                      this.feedrate = cut.feedrate;
                   }
+                  //O if(!isNaN(cut.plungerate))
                   if ( !isNaN( cut.plungerate ) )
                   {
+                     //Onplungerate = cut.plungerate;
                      this.plungerate = cut.plungerate;
                   }
+                  //O if(!isNaN(cut.dir))
                   if ( !isNaN( cut.dir ) )
                   {
+                     //O dir = cut.dir;
                      this.dir = cut.dir;
                   }
+                  //O center = cut.center;
                   center = cut.center;
+                  //O if(!isNaN(cut.spacing))
                   if ( !isNaN( cut.spacing ) )
                   {
+                     //O spacing = cut.spacing;
                      this.spacing = cut.spacing;
                   }
                }
 
+               //O startDialog(150,200, new Array(   {type:"number", label:"tool diameter ("+unit+")", value: tooldiameter},
                this.startDialog( 150,200, new Array(   {type:"number", label:"tool diameter ( "+unit+")", value: tooldiameter},
                   {type:"number", label:"target depth ( " + unit + ")", value: targetdepth},
                {
@@ -1145,14 +1628,18 @@ public class Main extends PIXI.Sprite
                   "batch" );
                break;
             case 8:
+               //O var processed:Array = scene.getProcessedCuts();
                let processed:Array = this.scene.getProcessedCuts( );
+               //O var fields:Array = new Array();
                let fields:Array = new Array( );
                //O for each( cut in processed )
                for ( cut in this.processed )
                {
+                  //O fields.push({label: cut.name + " ("+Global.toFixed(cut.tooldiameter, Global.precision)+")", data: cut, diameter: cut.tooldiameter, active: cut.active});
                   fields.push( {label: cut.name + " ( " + Global.toFixed( cut.tooldiameter, Global.precision ) + ")", data: cut, diameter: cut.tooldiameter, active: cut.active}
                   );
                }
+               //O startDialog(300,200, new Array({type:"cutlist", label:"calculated toolpaths", value: fields},
                this.startDialog( 300,200, new Array( {type:"cutlist", label:"calculated toolpaths", value: fields},
                {
                   type:"combobox", label:false, items:new Array( 
@@ -1165,16 +1652,22 @@ public class Main extends PIXI.Sprite
                break;
          }
       }
+      //O else if(e.target == tools.dToolpaths)
       else if ( e.target == tools.dToolpaths )
       {
 
+         //O var selectedindex:int = tools.dToolpaths.selectedIndex;
          let selectedindex:int = tools.dToolpaths.selectedIndex;
 
+         //O unit = Global.unit == "in" ? "in" : "mm";
          this.unit = Global.unit == "in" ? "in" : "mm";
 
+         //O if(e.target.selectedItem.data is ProfileCutObject)
          if ( e.target.selectedItem.data is ProfileCutObject )
          {
+            //O var profile:ProfileCutObject = e.target.selectedItem.data as ProfileCutObject;
             let profile:ProfileCutObject = e.target.selectedItem.data as ProfileCutObject;
+            //O startDialog(150,200, new Array({type:"string", label:"name", value: profile.name},
             this.startDialog( 150,200, new Array( {type:"string", label:"name", value: profile.name},
                {type:"number", label:"tool diameter ( " + unit + ")", value: unit == "mm" ? 10*profile.tooldiameter : profile.tooldiameter, highlight: true},
                {type:"number", label:"target depth ( " + unit + ")", value: profile.targetdepth == 0 ? String( profile.targetdepth ):  profile.targetdepth, highlight: true},
@@ -1208,9 +1701,12 @@ public class Main extends PIXI.Sprite
             ),
                "editprofile" );
          }
+         //O else if(e.target.selectedItem.data is PocketCutObject)
          else if ( e.target.selectedItem.data is PocketCutObject )
          {
+            //O var pocket:PocketCutObject = e.target.selectedItem.data as PocketCutObject;
             let pocket:PocketCutObject = e.target.selectedItem.data as PocketCutObject;
+            //O startDialog(150,200, new Array({type:"string", label:"name", value: pocket.name},
             this.startDialog( 150,200, new Array( {type:"string", label:"name", value: pocket.name},
                {type:"number", label:"tool diameter ( " + unit + ")", value: unit == "mm" ? 10*pocket.tooldiameter : pocket.tooldiameter, highlight: true},
                {type:"number", label:"target depth ( " + unit + ")", value: pocket.targetdepth == 0 ? String( pocket.targetdepth) : pocket.targetdepth, highlight: true},
@@ -1234,9 +1730,12 @@ public class Main extends PIXI.Sprite
             }),
                "editpocket" );
          }
+         //O else if(e.target.selectedItem.data is FollowPathCutObject)
          else if ( e.target.selectedItem.data is FollowPathCutObject )
          {
+            //O var follow:FollowPathCutObject = e.target.selectedItem.data as FollowPathCutObject;
             let follow:FollowPathCutObject = e.target.selectedItem.data as FollowPathCutObject;
+            //O startDialog(150,200, new Array({type:"string", label:"name", value: follow.name},
             this.startDialog( 150,200, new Array( {type:"string", label:"name", value: follow.name},
                {type:"number", label:"tool diameter ( " + unit + ")", value: unit == "mm" ? 10*follow.tooldiameter : follow.tooldiameter, highlight: true},
                {type:"number", label:"target depth ( " + unit + ")", value: follow.targetdepth == 0 ? String( follow.targetdepth) : follow.targetdepth, highlight: true},
@@ -1248,9 +1747,12 @@ public class Main extends PIXI.Sprite
             ),
                "editfollowpath" );
          }
+         //O else if(e.target.selectedItem.data is DrillCutObject
          else if ( e.target.selectedItem.data is DrillCutObject )
          {
+            //O var drill:DrillCutObject = e.target.selectedItem.data as DrillCutObject;
             let drill:DrillCutObject = e.target.selectedItem.data as DrillCutObject;
+            //O startDialog(150,200, new Array({type:"string", label:"name", value: drill.name},
             this.startDialog( 150,200, new Array( {type:"string", label:"name", value: drill.name},
                {type:"number", label:"tool diameter ( " + unit + ")", value: unit == "mm" ? 10*drill.tooldiameter : drill.tooldiameter, highlight: true},
                {type:"number", label:"target depth ( " + unit + ")", value: drill.targetdepth == 0 ? String( drill.targetdepth ) : drill.targetdepth, highlight: true},
@@ -1274,44 +1776,57 @@ public class Main extends PIXI.Sprite
                "editdrill" );
          }
       }
+      //O else if(e.target == tools.dNesting )
       else if ( e.target == this.tools.dNesting )
       {
+         //O switch(e.target.selectedIndex)
          switch( e.target.selectedIndex )
          {
             case 0:
+               //O var selectedpaths:Array = new Array();
                let selectedpaths:Array = new Array( );
                //O for each( let path:Path in this.scene.pathlist)
                for ( let path:Path in this.scene.pathlist )
                {
+                  //O if(path.active == true)
                   if ( path.active == true )
                   {
+                     //O selectedpaths.push(path);
                      this.selectedpaths.push( path );
                   }
                }
 
+               //O if(selectedpaths.length != 1
                if ( this.selectedpaths.length != 1 )
                {
+                  //O startDialog(375,50,new Array({type:"label", label:"Please specify exactly one closed path to act as the material boundary"}), "error");
                   this.startDialog( 375,50,new Array( {type:"label", label:"Please specify exactly one closed path to act as the material boundary"}
                   ), "error" );
                }
+               //O else if(!selectedpaths[0].isClosed())
                else if ( !this.selectedpaths[0].isClosed( ) )
                {
+                  //O startDialog(230,50,new Array({type:"label", label:"The selected path is not a closed path"}), "error");
                   this.startDialog( 230,50,new Array( {type:"label", label:"The selected path is not a closed path"}
                   ), "error" );
                }
                else
                {
+                  //O scene.nestpath = selectedpaths[0];
                   this.scene.nestpath = this.selectedpaths[ 0 ];
                }
                break;
             case 1:
+               //O if(scene.nestpath == null || !scene.contains(scene.nestpath))
                if ( scene.nestpath == null || !this.scene.contains( this.scene.nestpath ))
                {
+                  //O startDialog(330,50,new Array({type:"label", label:"Please specify a closed path to act as the material boundary"}), "error");
                   this.startDialog( 330,50,new Array( {type:"label", label:"Please specify a closed path to act as the material boundary"}
                   ), "error" );
                }
                else
                {
+                  //O startDialog(200, 100, new Array({type:"number", label:"angles", value: 4},
                   this.startDialog( 200, 100, new Array( {type:"number", label:"angles", value: 4},
                      {type:"number", label:"space between objects ( " + Global.unit + ")", value: '0'},
                      {type:"checkbox", label:"group overlapping toolpaths", value: true},
@@ -1322,150 +1837,216 @@ public class Main extends PIXI.Sprite
                break;
          }
       }
+      //O else if(e.target == tools.dPartkart
       else if ( e.target == tools.dPartkart )
       {
+         //O switch(e.target.selectedIndex)
          switch( e.target.selectedIndex )
          {
             case 0:
+               //O partkart.order(scene.getActiveCuts());
                this.partkart.order( this.scene.getActiveCuts( ) );
                break;
             case 1:
+               //O partkart.order(scene.cutlist.slice());
                this.partkart.order( this.scene.cutlist.slice( ) );
                break;
          }
 
+         //O scene.redraw();
          this.scene.redraw( );
       }
 
+      //O clearMenu();
       this.clearMenu( );
+      //O tools.active = false;
       this.tools.active = false;
 
       // select the item in the toolpath menu for further processing
+      //O if(e.target == tools.dToolpaths)
       if ( e.target == this.tools.dToolpaths )
       {
+         //O tools.dToolpaths.selectedIndex = selectedindex;
          this.tools.dToolpaths.selectedIndex = selectedindex;
       }
    }
 
+   //O public function setCursor():void
    public setCursor(  ): void
    {
+      //O if(Global.tool == 0 || Global.tool == 3 || Global.tool == 4){
       if ( Global.tool == 0 || Global.tool == 3 || Global.tool == 4 )
       {
+         //O Mouse.cursor = MouseCursor.AUTO;
          this.Mouse.cursor = MouseCursor.AUTO;
       }
+      //O else if(Global.tool == 1)
       else if ( Global.tool == 1 )
       {
+         //O Mouse.cursor = MouseCursor.BUTTON;
          this.Mouse.cursor = MouseCursor.BUTTON;
       }
+      //O else if(Global.tool == 1)
       else if ( Global.tool == 2 )
       {
+         //O Mouse.cursor = MouseCursor.HAND;
          this.Mouse.cursor = MouseCursor.HAND;
       }
    }
 
+   //O public function zoomIn(e:MouseEvent):void
    public zoomIn( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O if(Global.zoom < 200)
       if ( Global.zoom < 200)
       {
+         //O setZoom(Global.zoom*1.2);
          this.setZoom( Global.zoom*1.2);
       }
    }
 
+   //O public function zoomOut(e:MouseEvent):void
    public zoomOut( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O if(Global.zoom > 15)
       if ( Global.zoom > 15 )
       {
+         //O setZoom(Global.zoom*0.8);
          this.setZoom( Global.zoom * 0.8 );
       }
    }
 
+   //O public function zoomWheel(e:MouseEvent):void
    public zoomWheel( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O f(Global.dragging == false && Global.tool != 99)
       if ( Global.dragging == false && Global.tool != 99 )
       {
 
+         //O if(zooming == false)
          if ( this.zooming == false )
          {
+            //O zooming = true;
             this.zooming = true;
+            //O //stage.quality = StageQuality.LOW;
             //stage.quality = StageQuality.LOW;
+            //O //scene.cacheAsBitmap = false;
             //scene.cacheAsBitmap = false;
+            //O startzoom = Global.zoom;j
             this.startzoom = Global.zoom;
+            //O timer = new Timer(100,1);
             this.timer = new Timer( 100, 1 );
+            //O timer.addEventListener(TimerEvent.TIMER_COMPLETE, finishZoom);
             this.timer.addEventListener( TimerEvent.TIMER_COMPLETE, finishZoom );
+            //O timer.start();
             this.timer.start( );
          }
          else
          {
+            //O if(timer){
             if ( this.timer )
             {
+               //O timer.reset();
                this.timer.reset( );
+               //O timer.start();
                this.timer.start( );
             }
          }
 
+         //O var d:int = e.delta/Math.abs(e.delta);
          let d:int = e.delta/Math.abs( e.delta );
+         //O if(d < 0)
          if (  d < 0)
          {
+            //O if(Global.zoom < 2000)
             if ( Global.zoom < 2000)
             {
+               //O imposterZoom(Global.zoom*1.2, new Point(e.stageX, e.stageY));
                this.imposterZoom( Global.zoom*1.2, new Point( e.stageX, e.stageY ) );
+               //O //setZoom(Global.zoom*1.2, new Point(e.stageX, e.stageY));
                //setZoom( Global.zoom*1.2, new Point( e.stageX, e.stageY ) );
             }
          }
+         //O else if(d > 0)
          else if ( d > 0)
          {
+            //O imposterZoom(Global.zoom*0.8);
             this.imposterZoom( Global.zoom * 0.8 );
+            //O //zoomOut(e);
             //zoomOut( e); // zoom in on mouse but zoom out on center, this is also a method of navigation
          }
       }
    }
 
+   //O public function finishZoom(e:TimerEvent):voi
    public finishZoom( e:TimerEvent ): void
    {
+      //O zooming = false;
       this.zooming = false;
+      //O //stage.quality = StageQuality.HIGH;
       //stage.quality = StageQuality.HIGH;
+      //O //scene.cacheAsBitmap = true;
       //scene.cacheAsBitmap = true;
+      //O if(imposter != null && contains(imposter))
       if ( this.imposter != null && contains( this.imposter ) )
       {
+         //O removeChild(imposter);j
          this.removeChild( this.imposter );
       }
 
+      //O imposter = null;
       this.imposter = null;
 
+      //O scene.visible = true;
       this.scene.visible = true;
 
+      //O scene.x = Global.xorigin;
       this.scene.x = Global.xorigin;
+      //O scene.y = Global.yorigin;j
       this.scene.y = Global.yorigin;
 
+      //O scene.redraw();
       this.scene.redraw( );
    }
 
    // redrawing during a zoom event may be laggy, the idea behind imposter zoom is to replace the scene
    // with a bitmap "imposter", and zoom that instead ( much faster/more responsive)
+   //O public function imposterZoom(zoom:Number, mouse:Point = null):vo
    public imposterZoom( zoom: number, mouse: PIXI.Point = null ): void
    {
 
+      //O if(zoom != Global.zoom)
       if ( zoom != Global.zoom )
       {
 
+         //O if(imposter == null)
          if ( this.imposter == null )
          {
+            //O imposter = new Sprite();
             this.imposter = new PIXI.Sprite( );
 
+            //O var trans:Matrix = new Matrix(1,0,0,1, Global.xorigin+stage.stageWidth/2,Global.yorigin+stage.stageHeight/2);
             let trans:Matrix = new Matrix( 1,0,0,1, Global.xorigin + this.stage.stageWidth/2,Global.yorigin + this.stage.stageHeight/2);
 
+            //O if(scene.width > 0 && scene.height > 0)
             if ( this.scene.width > 0 && this.scene.height > 0 )
             {
                try
                {
                   // draw everything that's visible, and a little bit more
+                  //O  var b:BitmapData = new BitmapData(stage.stageWidth*2,stage.stageHeight*2, true, 0x000000);
                   let b:BitmapData = new BitmapData( this.stage.stageWidth*2, this.stage.stageHeight * 2, true, 0x000000 );
+                  //O b.draw(scene, trans);
                   b.draw( scene, trans );
 
+                  //O var bitmap:Bitmap =  new Bitmap(b,"auto",false);
                   let bitmap:Bitmap =  new Bitmap( b, "auto", false );
+                  //O bitmap.x = -Global.xorigin-stage.stageWidth/2;
                   bitmap.x = -Global.xorigin-stage.stageWidth/2;
+                  //O bitmap.y = -Global.yorigin-stage.stageHeight/2;
                   bitmap.y = -Global.yorigin-stage.stageHeight/2;
 
+                  //O imposter.addChild(bitmap);
                   this.imposter.addChild( bitmap );
 
                }
@@ -1473,228 +2054,341 @@ public class Main extends PIXI.Sprite
                {
                   // fallback to regular zoom when an error occurs
                   // this usually happens when the bitmap is too big
+                  //O setZoom(zoom, mouse);
                   this.setZoom( zoom, mouse );
                   return;
                }
             }
 
+            //O scene.visible = false;
             this.scene.visible = false;
          }
 
+         //O if(mouse == null){
          if ( mouse == null)
          {
+            //O Global.xorigin = Global.docwidth/2 - (Global.docwidth/2 - Global.xorigin)*(zoom/Global.zoom);
             Global.xorigin = Global.docwidth/2 - ( Global.docwidth/2 - Global.xorigin)*( zoom/Global.zoom);
+            //O Global.yorigin = Global.docheight/2 - (Global.docheight/2 - Global.yorigin)*(zoom/Global.zoom);j
             Global.yorigin = Global.docheight/2 - ( Global.docheight/2 - Global.yorigin)*( zoom/Global.zoom);
          }
          else
          {
+            //O Global.xorigin = mouse.x - (mouse.x - Global.xorigin)*(zoom/Global.zoom);
             Global.xorigin = mouse.x - ( mouse.x - Global.xorigin) * ( zoom/Global.zoom);
+            //O lobal.yorigin = mouse.y - (mouse.y - Global.yorigin)*(zoom/Global.zoom);
             Global.yorigin = mouse.y - ( mouse.y - Global.yorigin) * ( zoom/Global.zoom);
          }
 
+         //O addChild(imposter);
          this.addChild( this.imposter );
 
+         //O Global.zoom = zoom;
          Global.zoom = zoom;
+         //O grid.setOrigin();
          this.grid.setOrigin( );
+         //O grid.redrawGrid()
          this.grid.redrawGrid( );
+         //O redrawBackground();
          this.redrawBackground( );
 
+         //O imposter.x = Global.xorigin;j
          this.imposter.x = Global.xorigin;
+         //O imposter.y = Global.yorigin;
          this.imposter.y = Global.yorigin;
 
+         //O imposter.width = 2*stage.stageWidth * (Global.zoom/startzoom);
          this.imposter.width = 2 * this.stage.stageWidth * ( Global.zoom/startzoom );
+         //O mposter.height = 2*stage.stageHeight * (Global.zoom/startzoom);
          this.imposter.height = 2 * this.stage.stageHeight * ( Global.zoom/startzoom );
       }
    }
 
+   //O public function setZoom(zoom:Number, mouse:Point = null):voi
    public setZoom( zoom: number, mouse:Point = null ): void
    {
       // tools should be on top when zooming
+      //O addChild(tools);
       this.addChild( this.tools );
 
+      //O if(zoom != Global.zoom
       if ( zoom != Global.zoom )
       {
+         //O if(mouse == null){
          if ( mouse == null)
          {
+            //O Global.xorigin = Global.docwidth/2 - (Global.docwidth/2 - Global.xorigin)*(zoom/Global.zoom);
             Global.xorigin = Global.docwidth/2 - ( Global.docwidth/2 - Global.xorigin)*( zoom/Global.zoom);
+            //O Global.yorigin = Global.docheight/2 - (Global.docheight/2 - Global.yorigin)*(zoom/Global.zoom);
             Global.yorigin = Global.docheight/2 - ( Global.docheight/2 - Global.yorigin)*( zoom/Global.zoom );
          }
          else
          {
+            //O Global.xorigin = mouse.x - (mouse.x - Global.xorigin)*(zoom/Global.zoom);
             Global.xorigin = mouse.x - ( mouse.x - Global.xorigin) * ( zoom/Global.zoom );
+            //O Global.yorigin = mouse.y - (mouse.y - Global.yorigin)*(zoom/Global.zoom);
             Global.yorigin = mouse.y - ( mouse.y - Global.yorigin) * ( zoom/Global.zoom );
          }
 
+         //O Global.zoom = zoom;
          Global.zoom = zoom;
+         //O grid.setOrigin();
          this.grid.setOrigin( );
+         //O grid.redrawGrid();j
          this.grid.redrawGrid( );
+         //O redrawBackground();
          this.redrawBackground( );
 
+         //O scene.x = Global.xorigin;
          this.scene.x = Global.xorigin;
+         //O scene.y = Global.yorigin;
          this.scene.y = Global.yorigin;
 
+         //O scene.redraw();
          this.scene.redraw( );
       }
    }
 
+   //O public function redrawBackground():void
    public redrawBackground(  ): void
    {
+      //O if(background.alpha != 0)
       if ( this.background.alpha != 0)
       {
+         //O background.x = Global.xorigin;
          this.background.x = Global.xorigin;
+         //O background.y = Global.yorigin;
          this.background.y = Global.yorigin;
 
+         //O if(background.numChildren > 0)
          if ( this.background.numChildren > 0 )
          {
+            //O var loader:Loader = background.getChildAt(0) as Loader;
             let loader:Loader = this.background.getChildAt( 0 ) as Loader;
+            //O ar bit:Bitmap = loader.content as Bitmap;
             let bit:Bitmap = this.loader.content as Bitmap;
 
+            //O if(bit != null){
             if ( bit != null )
             {
+               //O  background.width = (bit.bitmapData.width/backgroundscale)*Global.zoom;
                this.background.width = ( bit.bitmapData.width/backgroundscale ) * Global.zoom;
+               //O background.height = (bit.bitmapData.height/backgroundscale)*Global.zoom;
                this.background.height = ( bit.bitmapData.height/backgroundscale ) * Global.zoom;
             }
          }
       }
    }
 
+   //O public function unitChange(e:Event):void{
    public unitChange( e:Event ): void
    {
+      //O var unitbox:ComboBox = e.target as ComboBox;
       let unitbox:ComboBox = e.target as ComboBox;
 
+      //O var unit = unitbox.value;
       let unit = unitbox.value;
+      //O var i:int = 0;
       let i:int = 0;
+      //O if(Global.unit != unit)
       if ( Global.unit != unit )
       {
+         //O if(unit == "in"){
          if ( unit == "in" )
          {
+            //O scene.cmToInch();
             this.scene.cmToInch( );
+            //O scene.cmToInch();
             Global.zoom = Global.zoom*2.54;
          }
+         //O else if(unit == "cm")
          else if (  unit == "cm" )
          {
+            //O scene.inchToCm();
             this.scene.inchToCm( );
+            //O Global.zoom = Global.zoom/2.54;
             Global.zoom = Global.zoom/2.54;
          }
+         //O grid.redrawGrid();
          this.grid.redrawGrid( );
+         //O scene.redraw();
          this.scene.redraw( );
+         //O Global.unit = unit;
          Global.unit = unit;
       }
    }
 
+   //O Global.unit = unit;
    public snapChange( e:Event ): void
    {
+      //O Global.snap = e.target.selected;
       Global.snap = e.target.selected;
    }
 
+   //O public function viewcutsChange(e:Event):void
    public viewcutsChange( e:Event ): void
    {
+      //O Global.viewcuts = e.target.selected;
       Global.viewcuts = e.target.selected;
+      //O cene.redraw();
       this.scene.redraw( );
    }
 
+   //O public function loadFile():void
    public loadFile(  ): void
    {
+      //O var sloader:SVGLoader = new SVGLoader(this);
       let sloader:SVGLoader = new SVGLoader( this);
+      //O sloader.load();
       this.sloader.load( );
    }
 
+   //O public function saveFile():void
    public saveFile(  ): void
    {
 
       // ensure there are paths to save
+      //O if(scene.pathlist.length == 0)
       if ( this.scene.pathlist.length == 0 )
       {
+         //O startDialog(140, 50, new Array({type:"label", label:"No paths to save"}), "error");
          this.startDialog( 140, 50, new Array( { type:"label", label:"No paths to save" }
          ), "error" );
          return;
       }
 
+      //O var writer:SVGWriter = new SVGWriter(scene.pathlist, scene.cutlist);
       let writer:SVGWriter = new SVGWriter( this.scene.pathlist, this.scene.cutlist );
+      //O var save:String = writer.parse();
       let save: string = writer.parse( );
 
+      //O file = new FileReference();
       this.file = new FileReference( );
+      //O file.save(save, "partkamdesign.svg");
       this.file.save( save, "partkamdesign.svg");
+      //O file.addEventListener(Event.CANCEL, saveCancel);
       this.file.addEventListener( Event.CANCEL, this.saveCancel);
+      //O file.addEventListener(Event.SELECT, saveBegin);
       this.file.addEventListener( Event.SELECT, this.saveBegin);
+      //O file.addEventListener(ProgressEvent.PROGRESS, saveProgress);
       this.file.addEventListener( ProgressEvent.PROGRESS, this.saveProgress);
+      //O file.addEventListener(Event.COMPLETE, saveComplete);
       this.file.addEventListener( Event.COMPLETE, this.saveComplete);
    }
 
+   //O public function exportGcode(cutlist:Array):void
    public exportGcode( cutlist:Array ): void
    {
 
+      //O var processor:PostProcessor = new PostProcessor(cutlist);
       let processor:PostProcessor = new PostProcessor( this.cutlist );
+      //O var gcode:String = processor.process();
       let gcode: string = processor.process( );
-      //			trace( gcode);
+      //O trace(gcode);
+      // trace( gcode);
+      //O if(gcode != null)
       if (  gcode != null)
       {
+         //O file = new FileReference();
          this.file = new FileReference( );
+         //O file.save(gcode, "part.nc");
          this.file.save( gcode, "part.nc");
+         //O file.addEventListener(Event.CANCEL, saveCancel);
          this.file.addEventListener( Event.CANCEL, this.saveCancel);
+         //O file.addEventListener(Event.COMPLETE, saveComplete);
          this.file.addEventListener( Event.COMPLETE, this.saveComplete);
       }
    }
 
+   //O public function saveBegin(e:Event):void
    public saveBegin( e:Event ): void
    {
+      //O progressdialog = startProgressDialog(250, 75, "Saving", "Cancel", this.saveProgressCancel);
       progressdialog = startProgressDialog( 250, 75, "Saving", "Cancel", this.saveProgressCancel);
+      //O progressdialog.init(1);
       progressdialog.init( 1);
    }
 
+   //O public function saveCancel(e:Event):void
    public saveCancel( e:Event ): void
    {
+      //O removeFile();
       this.removeFile( );
    }
 
+   //O public function saveProgressCancel():void
    public saveProgressCancel( ): void
    {
+      //O if(file != null)
       if ( this.file != null)
       {
+         //O file.cancel();
          this.file.cancel( );
       }
+      //O removeFile();
       this.removeFile( );
    }
 
+   //O public function saveProgress(e:ProgressEvent):voi
    public saveProgress( e:ProgressEvent ): void
    {
+      //O progressdialog.setProgress(e.bytesLoaded/e.bytesTotal)
       progressdialog.setProgress( e.bytesLoaded/e.bytesTotal);
    }
 
+   //O public function saveComplete(e:Event):void
    public saveComplete( e:Event ): void
    {
+      //O removeFile();
       this.removeFile( );
+      //O if(progressdialog != null)
       if ( this.progressdialog != null)
       {
+         //O progressdialog.stopDialog();
          this.progressdialog.stopDialog( );
       }
    }
 
+   //O public function removeFile():void
    public removeFile(  ): void
    {
+      //O if(file != null)
       if ( this.file != null)
       {
+         //O file.removeEventListener(Event.CANCEL, saveCancel);
          this.file.removeEventListener( Event.CANCEL, this.saveCancel );
+         //O file.removeEventListener(Event.SELECT, saveBegin);
          this.file.removeEventListener( Event.SELECT, this.saveBegin );
+         //O ile.removeEventListener(ProgressEvent.PROGRESS, saveProgress)
          this.file.removeEventListener( ProgressEvent.PROGRESS, this.saveProgress );
+         //O file.removeEventListener(Event.COMPLETE, saveComplete);
          this.file.removeEventListener( Event.COMPLETE, this.saveComplete );
       }
 
-      this.ile = null;
+      //O file = null;
+      this.file = null;
    }
 
+   //O public function processFile(svg:Object, svgxml:XML, clean:Boolean = true):void
    public processFile( svg:Object, svgxml:XML, clean:boolean = true ): void
    {
+      //O var parser:SVGToPath = new SVGToPath();
       let parser:SVGToPath = new SVGToPath( );
+      //O var list:Array = parser.parse(svg);
       let list:Array = parser.parse( svg);
 
+      //O  var miny:Number = 0;
       let miny: number = 0;
 
+      //O if(svg.height)
       if ( svg.height )
       {
+         //O var h:String = svg.height.toString();
          let h: string = svg.height.toString( );
+         //O if(h != "100%")
          if (  h != "100%")
          {
+            //O miny = parser.getUnit(h);
             miny = parser.getUnit( h );
          }
       }
@@ -1702,54 +2396,74 @@ public class Main extends PIXI.Sprite
       //O for each( let path:Path in list )
       for ( let path:Path in list )
       {
+         //O path.invertY();
          path.invertY( );
       }
 
       //O for each( path in list )
       for ( path in list )
       {
+         //O path.docy -= miny;
          path.docy -= miny;
       }
 
+      //O scene.setInactive();
       this.scene.setInactive( );
+      //O scene.addPaths(list);
       this.scene.addPaths( list );
 
       // post process step: separate and merge to ensure each loop is a separate path
       // and to join open segments often created by cad software
+      //O if(clean
       if ( clean )
       {
+         //O var pd:ProgressDialog = startProgressDialog(250, 75, "Performing File Cleanup", "Stop Cleanup");
          let pd:ProgressDialog = startProgressDialog( 250, 75, "Performing File Cleanup", "Stop Cleanup" );
+         //O scene.processFile(pd, svgxml);
          this.scene.processFile( pd, svgxml);
       }
       else
       {
+         //O scene.loadCuts(svgxml);
          this.scene.loadCuts( svgxml );
       }
    }
 
    // modal dialog stuff
 
+   //O public function addScreen():void
    public addScreen( ): void
    {
+      //O Mouse.cursor = MouseCursor.AUTO
       Mouse.cursor = MouseCursor.AUTO;
 
       // first add screen and blur the background
 
+      //O var s:Shape = new Shape();
       let s: PIXI.Shape = new PIXI.Shape( );
 
+      //O s.graphics.beginFill(0x000000);
       s.graphics.beginFill( 0x000000);
+      //O s.graphics.drawRect(0,0,Global.docwidth,Global.docheight);
       s.graphics.drawRect( 0,0,Global.docwidth,Global.docheight );
+      //O s.graphics.endFill();
       s.graphics.endFill( );
+      //O s.alpha = 0.1;
       s.alpha = 0.1;
 
+      //O var screen:Sprite = new Sprite();
       let screen: PIXI.Sprite = new PIXI.Sprite( );
 
+      //O screen.addChild(s);
       this.screen.addChild( s );
+      //O screen.name = "screen";
       this.screen.name = "screen";
+      //O addChild(screen);
       this.addChild( this.screen );
 
       // now blur everything
 
+      //O
       /*let blur:BlurFilter = new BlurFilter( 3, 3, 3 );
       //this.filters = [colorMat, blur];
       for( let i:int=0; i<numChildren; i++ ){
@@ -1759,654 +2473,986 @@ public class Main extends PIXI.Sprite
       }*/
    }
 
+   //O public function startDialog(dw:int, dh:int, fieldlist:Array, dialogname:String, submitlabel:String = "OK", closewindow:Boolean = true):Dialog
    public startDialog( dw:int, dh:int, fieldlist:Array, dialogname: string, submitlabel: string = "OK", closewindow: boolean = true ): Dialog
    {
 
+      //O addScreen();
       this.addScreen( );
 
+      //O var d:Dialog = new Dialog(dw, dh, fieldlist, submitlabel, closewindow);
       let d:Dialog = new Dialog( dw, dh, fieldlist, submitlabel, closewindow);
 
+      //O d.name = dialogname;
       d.name = dialogname;
 
+      //O d.x = Global.docwidth/2 - d.width/2;
       d.x = Global.docwidth/2 - d.width/2;
+      //O d.y = Global.docheight/2 - d.height/2;
       d.y = Global.docheight/2 - d.height/2;
 
+      //O temptool = Global.tool;
       temptool = Global.tool;
+      //O Global.tool = 99;
       Global.tool = 99; // no tool may be used during modal dialog display
+      //O addChild(d);
       this.addChild( d );
 
+      //O return d;
       return d;
    }
 
+   //O public function startProgressDialog(dw:int, dh:int, dmessage:String = "processing", dlabel:String = "Cancel", callback:Function = null):ProgressDialog
    public startProgressDialog( dw:int, dh:int, dmessage: string = "processing", dlabel: string = "Cancel", callback:Function = null ): ProgressDialog
    {
 
+      //O addScreen();
       this.addScreen( );
 
+      //O var d:ProgressDialog = new ProgressDialog(dw, dh, dmessage, dlabel, callback);
       let d:ProgressDialog = new ProgressDialog( dw, dh, dmessage, dlabel, callback);
 
+      //O d.x = Global.docwidth/2 - dw/2;
       d.x = Global.docwidth/2 - dw/2;
+      //O d.y = Global.docheight/2 - dh/2;
       d.y = Global.docheight/2 - dh/2;
 
+      //O temptool = Global.tool;
       temptool = Global.tool;
-      Global.tool = 99;                                  // no tool may be used during modal dialog display
+      // no tool may be used during modal dialog display
+      //O Global.tool = 99;
+      Global.tool = 99;
+      //O addChild(d);
       this.addChild( d );
 
+      //O return d;
       return d;
    }
 
+   //O public function endDialog():void
    public endDialog( ): void
    {
       // remove screen, blur, and restore everthing to original settings
+      //O for(var i:int=0; i<numChildren; i++)
       for( let i:int=0; i < numChildren; i++ )
       {
+         //O if(getChildAt(i) is Sprite)
          if ( getChildAt( i) is PIXI.Sprite )
          {
+            //O  getChildAt(i).filters = [];
             getChildAt( i ).filters = [];
+            //O if(getChildAt(i).name == "screen")
             if ( getChildAt( i ).name == "screen" )
             {
+               //O removeChildAt(i);
                this.removeChildAt( i );
             }
          }
       }
 
+      //O setCursor();
       this.setCursor( );
 
+      //O Global.tool = temptool;
       Global.tool = temptool;
    }
 
+   //O public function processDialog(flist:Array, dname:String):void{
    public processDialog( flist:Array, dname: string ): void
    {
       // do something with dialog output
 
+      //O stage.focus = this;
       this.stage.focus = this;
 
+      //O var i:int = 0;
       let i:int = 0;
+      //O switch(dname){
       switch( dname )
       {
          case "scale":
+            //O var sx:Number = Number(flist[0].input.text);
             let sx: number = Number( flist[0].input.text );
+            //O var sy:Number = Number(flist[1].input.text);
             let sy: number = Number( flist[1].input.text );
 
+            //O var avx:Number = 0;
             let avx: number = 0;
+            //O var avy:Number = 0;
             let avy: number = 0;
 
+            //O var m:Matrix = new Matrix(sx/100,0,0,sy/100,avx,avy);
             let m:Matrix = new Matrix( sx/100, 0, 0, sy/100, avx, avy );
 
+            //O if(sx != 0 && sy != 0)
             if (  sx != 0 && sy != 0 )
             {
+               //O scene.applyMatrixLocal(m);
                this.scene.applyMatrixLocal( m );
             }
             break;
          case "rotate":
+            //O var ang:Number = Number(flist[0].input.text);
             let ang: number = Number( flist[0].input.text );
+            //O var r:Matrix = new Matrix();
             let r:Matrix = new Matrix( );
+            //O r.rotate(ang*Math.PI/180);
             r.rotate( ang*Math.PI/180 );
-            if ( ang != 0 && ang != 360n)
+            //O if(ang != 0 && ang != 360)
+            if ( ang != 0 && ang != 360)
             {
+               //O scene.applyMatrixLocal(r);
                this.scene.applyMatrixLocal( rn);
             }
             break;
          case "skew":
+            //O var skx:Number = Number(flist[0].input.text);
             let skx: number = Number( flist[ 0 ].input.text );
+            //O var sky:Number = Number(flist[1].input.text);
             let sky: number = Number( flist[ 1 ].input.text );
 
+            //O var s:Matrix = new Matrix();
             let s:Matrix = new Matrix( );
+            //O s.c = Math.tan((-1*skx/100));
             s.c = Math.tan( ( -1*skx/100 ) );
+            //O s.b = Math.tan((-1*sky/100));
             s.b = Math.tan( ( -1*sky/100 ) );
 
-            scene.applyMatrixLocal( sn);
+            //O scene.applyMatrixLocal(s);
+            this.scene.applyMatrixLocal( sn);
             break;
          case "background":
-            if (  flist[0].input != null && flist[0].input is Loader)
+            //O if(flist[0].input != null && flist[0].input is Loader
+            if ( flist[0].input != null && flist[0].input is Loader)
             {
+               //O while(background.numChildren > 0
                while( this.background.numChildren > 0 )
                {
+                  //O background.removeChildAt(0);
                   this.background.removeChildAt( 0 );
                }
+               //O background.addChild(flist[0].input);
                this.background.addChild( flist[0].input );
             }
 
+            //O var scale:Number = Number(flist[1].input.text);
             let scale: number = Number( flist[ 1 ].input.text );
 
+            //O if(!isNaN(scale) && scale != 0)
             if ( !isNaN( scale) && scale != 0 )
             {
+               //O if(scale < 0)
                if ( scale < 0)
                {
+                  //O scale = Math.abs(scale);
                   scale = Math.abs( scale );
                }
 
+               //O backgroundscale = scale;
                this.backgroundscale = scale;
 
+               //O redrawBackground();
                this.redrawBackground( );
             }
 
+            //O var al:Number = Number(flist[2].input.text);
             let al: number = Number( flist[2].input.text );
 
+            //O if(!isNaN(al))
             if ( !isNaN( al ) )
             {
-               if ( al>100)
+               //O if(al>100)
+               if ( al > 100)
                {
+                  //O al = 100;
                   al = 100;
                }
+               //O else if(al < 0)
                else if ( al < 0 )
                {
+                  //O al = Math.abs(al);
                   al = Math.abs( al );
                }
+               //O background.alpha = al/100;
                this.background.alpha = al/100;
+               //O backgroundvisibility = al;
                this.backgroundvisibility = al;
             }
             break;
          case "preferences":
+            //O var res:Number = Number(flist[0].input.text);
             let res: number = Number( flist[ 0 ].input.text );
+            //O if(!isNaN(res) && res != 0){
             if ( !isNaN( res) && res != 0 )
             {
+               //O if(res < 0)
                if ( res < 0 )
                {
+                  //O res = -res;
                   res = -res;
                }
+               //O Global.importres = res;
                Global.importres = res;
             }
 
+            //O var snap:Boolean = flist[4].input.selected;
             let snap: boolean = flist[ 4 ].input.selected;
+            //O Global.localsnap = snap;
             Global.localsnap = snap;
 
+            //O var tolerance:Number = Number(flist[7].input.text);
             let tolerance: number = Number( flist[7].input.text );
 
+            //O if(!isNaN(tolerance) && tolerance != 0)
             if ( !isNaN( tolerance) && tolerance != 0 )
             {
+               //O if(tolerance < 0)
                if ( tolerance < 0 )
                {
+                  //O tolerance = -tolerance;
                   tolerance = -tolerance;
                }
+               //O Global.tolerance = tolerance;
                Global.tolerance = tolerance;
             }
 
+            //O var bitmaptolerance:Number = Number(flist[8].input.text)
             let bitmaptolerance: number = Number( flist[ 8 ].input.text )
 
-               if ( !isNaN( bitmaptolerance ) && bitmaptolerance != 0 )
+            //O f(!isNaN(bitmaptolerance) && bitmaptolerance != 0
+            if ( !isNaN( bitmaptolerance ) && bitmaptolerance != 0 )
             {
+               //O if(bitmaptolerance < 0)
                if ( bitmaptolerance < 0)
                {
+                  //O bitmaptolerance = -bitmaptolerance;
                   bitmaptolerance = -bitmaptolerance;
                }
+               //O Global.bitmaptolerance = bitmaptolerance;
                Global.bitmaptolerance = bitmaptolerance;
             }
 
+            //O var nestbitmapsize:Number = Number(flist[9].input.text)
             let nestbitmapsize: number = Number( flist[ 9 ].input.text )
 
+            //O if(!isNaN(nestbitmapsize))
             if ( !isNaN( nestbitmapsize ) )
             {
+               //O if(nestbitmapsize < 400)
                if ( nestbitmapsize < 400 )
                {
+                  //Onnestbitmapsize = 400;
                   nestbitmapsize = 400;
                }
+               //O if(nestbitmapsize > 4000)
                if ( nestbitmapsize > 4000 )
                {
+                  //O nestbitmapsize = 4000;
                   nestbitmapsize = 4000;
                }
+               //O Global.nestbitmapsize = Math.floor(nestbitmapsize);
                Global.nestbitmapsize = Math.floor( nestbitmapsize );
             }
+            //O Global.precision = int(flist[6].input.text);
             Global.precision = int( flist[6].input.text );
 
+            //O Global.separatetoolpaths = flist[10].input.selected;
             Global.separatetoolpaths = flist[10].input.selected;
 
             break;
          case "addcircle":
+            //O var dia:Number = Number(flist[0].input.text);
             let dia: number = Number( flist[0].input.text );
+            //O if(!isNaN(dia) && dia != 0)
             if ( !isNaN( dia) && dia != 0 )
             {
+               //O if(dia < 0){
                if ( dia < 0)
                {
+                  //O dia = Math.abs(dia);
                   dia = Math.abs( dia );
                }
 
+               //O addEllipse(dia,dia);
                this.addEllipse( dia,dia);
             }
             break;
          case "addellipse":
+            //O var ew:Number = Number(flist[0].input.text);
             let ew: number = Number( flist[0].input.text );
+            //O var eh:Number = Number(flist[1].input.text);
             let eh: number = Number( flist[1].input.text );
+            //O if(!isNaN(ew) && ew != 0 && !isNaN(eh) && eh != 0)
             if ( !isNaN( ew ) && ew != 0 && !isNaN( eh ) && eh != 0 )
             {
+               //O if(ew < 0)
                if ( ew < 0 )
                {
+                  //O ew = Math.abs(ew);
                   ew = Math.abs( ew );
                }
+               //O if(eh < 0)
                if ( eh < 0)
                {
+                  //O eh = Math.abs(eh);
                   eh = Math.abs( eh );
                }
 
+               //O addEllipse(ew,eh);
                this.addEllipse( ew,eh);
             }
             break;
          case "addrectangle":
+            //O var rw:Number = Number(flist[0].input.text);
             let rw: number = Number( flist[0].input.text );
+            //O var rh:Number = Number(flist[1].input.text);
             let rh: number = Number( flist[1].input.text );
+            //O if(!isNaN(rw) && rw != 0 && !isNaN(rh) && rh != 0)
             if ( !isNaN( rw ) && rw != 0 && !isNaN( rh ) && rh != 0 )
             {
+               //O if(rw < 0)
                if ( rw < 0)
                {
+                  // rw = Math.abs(rw);
                   rw = Math.abs( rw );
                }
+               //O if(rh < 0)
                if ( rh < 0)
                {
+                  //O rh = Math.abs(rh);
                   rh = Math.abs( rh );
                }
 
+               //O addRect(rw,rh,0, false);
                this.addRect( rw,rh,0, false);
             }
             break;
          case "addroundedrectangle":
+            //O var rw1:Number = Number(flist[0].input.text);
             let rw1: number = Number( flist[ 0 ].input.text );
+            //O var rh1:Number = Number(flist[1].input.text);
             let rh1: number = Number( flist[ 1 ].input.text );
+            //O ar rad:Number = Number(flist[2].input.text);
             let rad: number = Number( flist[ 2 ].input.text );
+            //O if(!isNaN(rw1) && rw1 != 0 && !isNaN(rh1) && rh1 != 0
             if ( !isNaN( rw1 ) && rw1 != 0 && !isNaN( rh1 ) && rh1 != 0 )
             {
+               //O if(rw1 < 0)
                if ( rw1 < 0 )
                {
+                  //O rw1 = Math.abs(rw1);
                   rw1 = Math.abs( rw1 );
                }
+               //O if(rh < 0)
                if ( rh < 0)
                {
+                  //O rh1 = Math.abs(rh1);
                   rh1 = Math.abs( rh1 );
                }
+               //O if(rad < 0)
                if ( rad < 0)
                {
+                  //O rad = Math.abs(rad);
                   rad = Math.abs( rad );
                }
 
+               //O addRect(rw1,rh1,rad, true);
                this.addRect( rw1,rh1,rad, true );
             }
             break;
          case "addpolygon":
+            //O var sides:int = Math.floor(Number(flist[0].input.text));
             let sides:int = Math.floor( Number( flist[0].input.text ) );
+            //O var rad1:Number = Number(flist[1].input.text);
             let rad1: number = Number( flist[1].input.text);
+            //O if(!isNaN(sides) && sides !=0 && !isNaN(rad1) && rad1!=0){
             if ( !isNaN( sides ) && sides !=0 && !isNaN( rad1 ) && rad1 != 0 )
             {
+               //O if(sides<0)
                if ( sides < 0 )
                {
+                  //O sides = Math.abs(sides);
                   sides = Math.abs( sides );
                }
+               //O if(rad1 < 0)
                if ( rad1 < 0 )
                {
+                  //Onrad1 = Math.abs(rad1);
                   rad1 = Math.abs( rad1 );
                }
+               //O if(sides >= 3)
                if ( sides >= 3)
                {
+                  //OnddPolygon(sides, rad1);
                   addPolygon( sides, rad1 );
                }
             }
             break;
          case "addstar":
+            //O var points:int = Math.floor(Number(flist[0].input.text));
             let points:int = Math.floor( Number( flist[0].input.text ) );
+            //O var rad2:Number = Number(flist[1].input.text);
             let rad2: number = Number( flist[1].input.text);
+            //O var pointiness:Number = Number(flist[2].input.text)
             let pointiness: number = Number( flist[2].input.text );
+            //O if(!isNaN(points) && points !=0 && !isNaN(rad2) && rad2!=0 && !isNaN(pointiness))
             if ( !isNaN( points) && points !=0 && !isNaN( rad2 ) && rad2 != 0 && !isNaN( pointiness ) )
             {
+               //O if(points<0)
                if ( points < 0 )
                {
+                  //O points = Math.abs(points);
                   points = Math.abs( points );
                }
+               //O if(rad2 < 0)
                if ( rad2 < 0 )
                {
+                  //O rad2 = Math.abs(rad1);
                   rad2 = Math.abs( rad1 );
                }
+               //O if(pointiness < 0){
                if ( pointiness < 0)
                {
+                  //O pointiness = Math.abs(pointiness);
                   pointiness = Math.abs( pointiness );
                }
+               //O if(pointiness > 99){
                if ( pointiness > 99 )
                {
+                  //O pointiness = 99;
                   pointiness = 99;
                }
+               //O if(points >= 3)
                if ( points >= 3 )
                {
+                  //O addStar(points, rad2, pointiness);
                   this.addStar( points, rad2, pointiness );
                }
             }
             break;
          case "profile":
+            //O scene.zeroSelected();
             this.scene.zeroSelected( );
+            //O scene.profile(flist);
             this.scene.profile( flist );
+            //O scene.pathsOnTop();
             this.scene.pathsOnTop( );
             break;
          case "editprofile":
+            //O scene.zeroSelected();
             this.scene.zeroSelected( );
+            //O scene.editprofile(flist);
             this.scene.editprofile( flist );
+            //O scene.pathsOnTop();
             this.scene.pathsOnTop( );
             break;
          case "pocket":
+            //O scene.zeroSelected();
             this.scene.zeroSelected( );
+            //O scene.pocket(flist);
             this.scene.pocket( flist );
+            //O scene.pathsOnTop();
             this.scene.pathsOnTop( );
             break;
          case "editpocket":
+            //O scene.zeroSelected();
             this.scene.zeroSelected( );
+            //O scene.editpocket(flist)
             this.scene.editpocket( flist );
+            //O scene.pathsOnTop();
             this.scene.pathsOnTop( );
             break;
          case "followpath":
+            //O scene.zeroSelected();
             this.scene.zeroSelected( );
+            //O scene.followpath(flist);
             this.scene.followpath( flist );
+            //O scene.pathsOnTop();
             this.scene.pathsOnTop( );
             break;
          case "editfollowpath":
+            //O scene.zeroSelected();
             this.scene.zeroSelected( );
+            //O scene.editfollowpath(flist);
             this.scene.editfollowpath( flist );
+            //O scene.pathsOnTop();
             this.scene.pathsOnTop( );
             break;
          case "drill":
+            //O scene.zeroSelected();
             this.scene.zeroSelected( );
+            //O scene.drill(flist);
             this.scene.drill( flist );
+            //O scene.pathsOnTop();
             this.scene.pathsOnTop( );
             break;
          case "editdrill":
+            //O scene.zeroSelected();
             this.scene.zeroSelected( );
+            //O scene.editdrill(flist);
             this.scene.editdrill( flist );
+            //O scene.pathsOnTop();
             this.scene.pathsOnTop( );
             break;
          case "batch":
+            //O  scene.zeroSelected();
             this.scene.zeroSelected( );
+            //O scene.batch(flist);
             this.scene.batch( flist );
+            //O scene.pathsOnTop();
             this.scene.pathsOnTop( );
             break;
          case "startnest":
+            //O var pd:ProgressDialog = startProgressDialog(250, 75, "Optimizing Nesting Solution", "Stop", scene.finishNest);
             let pd:ProgressDialog = startProgressDialog( 250, 75, "Optimizing Nesting Solution", "Stop", this.scene.finishNest );
 
+            //O var divs:int = Number(flist[0].input.text);
             let divs:int = Number( flist[ 0 ].input.text );
+            //O var gap:Number = Number(flist[1].input.text);
             let gap: number = Number( flist[ 1 ].input.text );
+            //O var group:Boolean = flist[2].input.selected;
             let group: boolean = flist[ 2 ].input.selected;
+            //O var groupprofile:Boolean = flist[3].input.selected;
             let groupprofile: boolean = flist[ 3 ].input.selected;
 
+            //O if(!scene.startNest(pd, divs, gap, group, groupprofile))
             if ( !this.scene.startNest( pd, divs, gap, group, groupprofile))
             {
+               //O pd.stopDialog();
                pd.stopDialog( );
+               //O scene.redraw();
                this.scene.redraw( );
+               //O startDialog(270, 50, new Array({type:"label", label:"At least 2 objects are required for nesting"}), "error");
                startDialog( 270, 50, new Array( {type:"label", label:"At least 2 objects are required for nesting"}
                ), "error");
             }
             break;
          case "tabs":
+            //O var tabspacing:Number = Number(flist[0].input.text);
             let tabspacing: number = Number( flist[0].input.text);
+            //O var tabwidth:Number = Number(flist[1].input.text);
             let tabwidth: number = Number( flist[1].input.text);
+            //O var tabheight:Number = Number(flist[2].input.text);
             let tabheight: number = Number( flist[2].input.text);
 
+            //O if(isNaN(tabspacing) || tabspacing <= 0 || isNaN(tabwidth) || tabwidth <= 0 || isNaN(tabheight) || tabheight <= 0 || tabspacing <= tabwidth)
             if (  isNaN( tabspacing ) || tabspacing <= 0 || isNaN( tabwidth ) || tabwidth <= 0 || isNaN( tabheight ) || tabheight <= 0 || tabspacing <= tabwidth )
             {
+               //O tartDialog(100, 50, new Array({type:"label", label:"Invalid input"}), "error");
                startDialog( 100, 50, new Array( {type:"label", label:"Invalid input" }
                ), "error");
+               //O return;
                return;
             }
+            //O scene.addTabsSelected(tabspacing, tabwidth, tabheight);
             this.scene.addTabsSelected( tabspacing, tabwidth, tabheight );
             break;
          case "exportgcode":
+            //O var cutlist:Array = new Array();
             let cutlist:Array = new Array( );
+            //O var listitems:Array = flist[0].input.selectedItems;
             let listitems:Array = flist[ 0 ].input.selectedItems;
+            //O  for(i=0; i<listitems.length; i++)
             for( i=0; i < listitems.length; i++ )
             {
+               //O var obj:Object = listitems[i]
                let obj:Object = listitems[ i ];
+               //O cutlist.push(obj.data)
                cutlist.push( obj.data );
             }
+            //O if(cutlist.length > 0)
             if ( cutlist.length > 0 )
             {
+               //O exportGcode(cutlist);
                this.exportGcode( cutlist );
             }
             break;
       }
    }
 
+   //O public function addEllipse(ew:Number, eh:Number):void
    public addEllipse( ew: number, eh: number ): void
    {
+      //O var middle:Point = new Point(((Global.docwidth/2)-Global.xorigin)/Global.zoom, (-(Global.docheight/2)+Global.yorigin)/Global.zoom);
       let middle:PIXI.Point = new PIXI.Point( ( ( Global.docwidth/2) - Global.xorigin)/Global.zoom, ( - ( Global.docheight/2) + Global.yorigin)/Global.zoom );
 
+      //O var cx:Number = middle.x;
       let cx: number = middle.x;
+      //O var cy:Number = middle.y;
       let cy: number = middle.y;
+      //O var rx:Number = ew/2;
       let rx: number = ew/2;
+      //O var ry:Number = eh/2;
       let ry: number = eh/2;
 
+      //O var ob:Object = {cx:cx+Global.unit, cy:cy+Global.unit, rx:rx+Global.unit, ry:ry+Global.unit};
       let ob:Object = { cx:cx+Global.unit, cy:cy + Global.unit, rx:rx + Global.unit, ry:ry + Global.unit };
 
+      //O var svgtemp:SVGToPath = new SVGToPath();
       let svgtemp:SVGToPath = new SVGToPath( );
 
+      //O var p:Path = svgtemp.parseEllipse(ob);
       let p:Path = svgtemp.parseEllipse( ob );
 
+      //O if(p != null)
       if ( p != null)
       {
+         //O scene.addPath(p);
          this.scene.addPath( p );
+         //O scene.redraw();
          this.scene.redraw( );
       }
 
+      //O svgtemp = null;
       svgtemp = null;
    }
 
+   //O public function addRect(rw:Number, rh:Number, radius:Number, round:Boolean):void
    public addRect( rw: number, rh: number, radius: number, round: boolean ): void
    {
+      //O var middle:Point = new Point(((Global.docwidth/2)-Gl
       let middle:Point = new Point( ( ( Global.docwidth/2)-Global.xorigin)/Global.zoom, ( -( Global.docheight/2)+Global.yorigin)/Global.zoom);
 
+      //O var ob:Object = {isRound: round, rx: radius + Global.unit, ry: radius + Global.unit, x: middle.x-rw/2 + Global.unit, y:middle.y-rh/2 + Global.unit, width:rw + Global.unit, height:rh + Global.unit};
       let ob:Object = {isRound: round, rx: radius + Global.unit, ry: radius + Global.unit, x: middle.x-rw/2 + Global.unit, y:middle.y - rh/2 + Global.unit, width:rw + Global.unit, height:rh + Global.unit};
 
+      //O var svgtemp:SVGToPath = new SVGToPath();
       let svgtemp:SVGToPath = new SVGToPath( );
 
+      //O var p:Path = svgtemp.parseRect(ob);
       let p:Path = svgtemp.parseRect( ob );
 
+      //O if(p != null){
       if ( p != null)
       {
+         //O scene.addPath(p);
          this.scene.addPath( p );
+         //Onscene.redraw();
          this.scene.redraw( );
       }
 
+      //O svgtemp = null;
       svgtemp = null;
    }
 
+   //O public function addPolygon(sides:int, radius:Number):void
    public addPolygon( sides: number, radius: number ): void
    {
+      //O if(sides<3){
       if (  sides < 3 )
       {
+         //O sides = 3;
          sides = 3;
       }
 
+      //O var p:Path = new Path();
       let p:Path = new Path( );
 
+      //O  //var radius:Number = Global.docheight/(Global.zoom*3);
       //let radius: number = Global.docheight/( Global.zoom * 3 );
 
       // current point
+      //O var cpoint:Point;
       let cpoint: PIXI.Point;
 
       // point belonging to the previous segment
+      //O var lpoint:Point = new Point(0, radius);
       let lpoint: PIXI.Point = new PIXI.Point( 0, radius );
+      //O var origin:Point = lpoint;
       let origin: PIXI.Point = lpoint;
       //O for( let i:int=360/sides; i<360; i += 360/sides )
       for( let i = 360/sides; i < 360; i += 360/sides )
       {
+         //O  cpoint = new Point(radius*Math.sin(i*Math.PI/180), radius*Math.cos(i*Math.PI/180));
          cpoint = new PIXI.Point( radius*Math.sin( i * Math.PI/180), radius * Math.cos( i * Math.PI/180));
+         //O var seg:Segment = new Segment(lpoint, cpoint);
          let seg:Segment = new Segment( lpoint, cpoint );
+         //O lpoint = cpoint;
          lpoint = cpoint;
+         //O p.addSegment(seg);
          p.addSegment( seg);
       }
 
       // close polygon
+      //O seg = new Segment(cpoint, origin);
       seg = new Segment( cpoint, origin );
+      //O p.addSegment(seg);
       p.addSegment( seg);
 
+      //O var middle:Point = new Point(((Global.docwidth/2)-Global.xorigin)/Global.zoom, (-(Global.docheight/2)+Global.yorigin)/Global.zoom);
       let middle: PIXI.Point = new PIXI.Point( ( ( Global.docwidth/2) - Global.xorigin)/Global.zoom, ( - ( Global.docheight/2) + Global.yorigin)/Global.zoom );
+      //O p.docx = middle.x;
       p.docx = middle.x;
+      //O p.docy = -middle.y;
       p.docy = -middle.y;
 
+      //O scene.addPath(p);
       this.scene.addPath( p);
+      //O scene.redraw();
       this.scene.redraw( );
    }
 
+   //O public function addStar(points:int, radius:Number, pointiness:Number):voi
    public addStar( points: number, radius: number, pointiness: number ): void
    {
+      //O if(points<3){
       if ( points < 3 )
       {
+         //Onpoints = 3;
          points = 3;
       }
 
+      //O var p:Path = new Path;
       let p:Path = new Path;
 
+      //O var cpoint:Point;
       let cpoint: PIXI.Point;                           // current point
       // point belonging to the previous segment
+      //O var lpoint:Point = new Point(0, radius); 
       let lpoint: PIXI.Point = new PIXI.Point( 0, radius );
 
+      //O var origin:Point = lpoint;
       let origin:Point = lpoint;
+      //O for(var i:int=360/points; i<360; i += 360/points)
       for( let i = 360/points; i < 360; i += 360/points )
       {
+         //O cpoint = new Point(radius*Math.sin(i*Math.PI/180), radius*Math.cos(i*Math.PI/180));
          cpoint = new PIXI.Point( radius * Math.sin( i * Math.PI/180 ), radius * Math.cos( i * Math.PI/180 ) );
+         //O var ipoint:Point = new Point(radius*((100-pointiness)/100)*Math.sin((i-180/points)*Math.PI/180), radius*((100-pointiness)/100)*Math.cos((i-180/points)*Math.PI/180));
          let ipoint:PIXI.Point = new PIXI.Point( radius * ( ( 100-pointiness)/100) * Math.sin( ( i-180/points) * Math.PI/180), radius * ( ( 100-pointiness)/100)*Math.cos( ( i-180/points) * Math.PI/180));
 
+         //O var seg:Segment = new Segment(lpoint, ipoint);
          let seg:Segment = new Segment( lpoint, ipoint );
+         //O p.addSegment(seg);
          p.addSegment( seg);
 
+         //O seg = new Segment(ipoint, cpoint);
          seg = new Segment( ipoint, cpoint );
+         //O p.addSegment(seg);
          p.addSegment( seg );
 
+         //O lpoint = cpoint;
          lpoint = cpoint;
       }
 
       // close star
+      //O point = new Point(radius*((100-pointiness)/100)*Math.sin((i-180/points)*Math.PI/180), radius*((100-pointiness)/100)*Math.cos((i-180/points)*Math.PI/180));
       ipoint = new Point( radius*( ( 100-pointiness)/100) * Math.sin( ( i-180/points)*Math.PI/180), radius * ( ( 100-pointiness)/100)*Math.cos( ( i-180/points)*Math.PI/180));
+      //O seg = new Segment(cpoint, ipoint);
       seg = new Segment( cpoint, ipoint);
+      //O p.addSegment(seg);
       p.addSegment( seg );
 
+      //O seg = new Segment(ipoint, origin);
       seg = new Segment( ipoint, origin);
+      //O p.addSegment(seg);
       p.addSegment( seg );
 
+      //O var middle:Point = new Point(((Global.docwidth/2)-Global.xorigin)/Global.zoom, (-(Global.docheight/2)+Global.yorigin)/Global.zoom);
       let middle: PIXI.Point = new PIXI.Point( ( ( Global.docwidth/2) - Global.xorigin)/Global.zoom, ( -( Global.docheight/2) + Global.yorigin)/Global.zoom );
+      //O p.docx = middle.x;
       p.docx = middle.x;
+      //O p.docy = -middle.y;
       p.docy = -middle.y;
 
+      //O scene.addPath(p);
       this.scene.addPath( p );
+      //O scene.redraw();
       this.scene.redraw( );
    }
 
    // pen tools
+   //O public function startPen(e:MouseEvent):void
    public startPen( e:  PIXI.interaction.InteractionEvent ): void
    {
+      //O  //Global.dragging = true;
       //Global.dragging = true;
+      //O if(pen == null)
       if ( this.pen == null )
       {
+         //O pen = new Pen(new Point(scene.mouseX/Global.zoom, -scene.mouseY/Global.zoom));
          this.pen = new Pen( new Point( scene.mouseX/Global.zoom, - this.scene.mouseY/Global.zoom ) );
+         //O pen.mousedown = true;
          this.pen.mousedown = true;
+         //O scene.addPath(pen);
          this.scene.addPath( this.pen );
+         //O  addEventListener(MouseEvent.MOUSE_MOVE, movePen);
          addEventListener( 'mousemove', this.movePen );
+         //O addEventListener(MouseEvent.MOUSE_UP, upPen);
          addEventListener( 'mouseup', this.upPen );
       }
       else
       {
-         pen.startPoint( new PIXI.Point( scene.mouseX/Global.zoom, -scene.mouseY/Global.zoom));
-         pen.mousedown = true;
+         //O pen.startPoint(new Point(scene.mouseX/Global.zoom, -scene.mouseY/Global.zoom));
+         this.pen.startPoint( new PIXI.Point( scene.mouseX/Global.zoom, -scene.mouseY/Global.zoom));
+         //O pen.mousedown = true;
+         this.pen.mousedown = true;
       }
    }
 
+   //O public function movePen(e:MouseEvent):void
    public movePen( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O pen.setPosition();
       this.pen.setPosition( );
    }
 
+   //O public function upPen(e:MouseEvent):void
    public upPen( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O pen.mousedown = false;
       this.pen.mousedown = false;
+      //O pen.finishPoint();
       this.pen.finishPoint( );
    }
 
+   //O public function finishPen():voi
    public finishPen(  ): void
    {
+      //O if(pen != null
       if ( this.pen != null)
       {
+         //O removeEventListener(MouseEvent.MOUSE_MOVE, movePen);
          removeEventListener( 'mousemove', this.movePen );
+         //O removeEventListener(MouseEvent.MOUSE_UP, upPen);
          removeEventListener( 'mouseup', this.upPen );
+         //O pen.redraw();
          this.pen.redraw( );
+         //O pen = null;
          this.pen = null;
       }
    }
 
    // sketch tools
+   //O public function startSketch(e:MouseEvent):void{
    public startSketch( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O if(e.target is Dot)
       if ( e.target is Dot)
       {
+         //O sketchdot = e.target as Dot;
          this.sketchdot = e.target as Dot;
       }
 
+      //O Global.dragging = true;
       Global.dragging = true;
 
+      //O sketch = new Sketch(new Point(e.stageX,e.stageY));
       this.sketch = new Sketch( new PIXI.Point( e.stageX,e.stageY));
 
+      //O addChild(sketch);
       this.addChild( sketch );
+      //O addEventListener(MouseEvent.MOUSE_MOVE, moveSketch);
       addEventListener( 'mousemove', this.moveSketch );
+      //O addEventListener(MouseEvent.MOUSE_UP, upSketch);
       addEventListener( 'mouseup', this.upSketch );
+      //O stage.addEventListener(Event.MOUSE_LEAVE, upSketch);
       this.stage.addEventListener( Event.MOUSE_LEAVE, this.upSketch );
 
+      //O timer = new Timer(0,0);
       timer = new Timer( 0,0 );
+      //O timer.addEventListener(TimerEvent.TIMER, timeIncrement);
       timer.addEventListener( TimerEvent.TIMER, this.timeIncrement );
+      //O timer.start();
       timer.start( );
    }
 
+   //O public function moveSketch(e:MouseEvent):void
    public moveSketch( e: PIXI.interaction.InteractionEvent ): void
    {
+      //O var p:Point = new Point(e.stageX, e.stageY);
       let p: PIXI.Point = new PIXI.Point( e.stageX, e.stageY );
+      //O sketch.lineTo(p);
       this.sketch.lineTo( p );
+      //O sketch.addPoint(p);
       this.sketch.addPoint( p );
+      //O sketch.addTime(now);
       this.sketch.addTime( this.now );
    }
 
+   //O public function upSketch(e:Event):void
    public upSketch( e:Event ): void
    {
+      //O removeEventListener(MouseEvent.MOUSE_MOVE, moveSketch)
       removeEventListener( 'mousemove', this.moveSketch );
+      //O removeEventListener(MouseEvent.MOUSE_UP, upSketch);
       removeEventListener( 'mouseup', this.upSketch );
+      //O stage.removeEventListener(Event.MOUSE_LEAVE, upSketch);
       this.stage.removeEventListener( Event.MOUSE_LEAVE, this.upSketch );
 
+      //O timer.removeEventListener(TimerEvent.TIMER, timeIncrement);
       this.timer.removeEventListener( TimerEvent.TIMER, this.timeIncrement );
+      //O now = 0
       this.now = 0;
 
+      //O var path:Path = sketch.getPath();
       let path:Path = this.sketch.getPath( );
 
+      //O if(path != null)
       if ( path != null)
       {
+         //O path.docx = -Global.xorigin/Global.zoom;
          path.docx = -Global.xorigin/Global.zoom;
+         //O path.docy = -Global.yorigin/Global.zoom;
          path.docy = -Global.yorigin/Global.zoom;
 
+         //O path.x = -Global.xorigin;
          path.x = -Global.xorigin;
+         //O ath.y = -Global.yorigin
          path.y = -Global.yorigin;
 
+         //O if(sketchdot != null)
          if (  sketchdot != null)
          {
+            //O sketchdot.looppath.mergePath(path, sketchdot.point);
             this.sketchdot.looppath.mergePath( path, sketchdot.point);
+            //O ketchdot.looppath.setInactive();
             this.sketchdot.looppath.setInactive( );
 
+            //O sketchdot = null;
             this.sketchdot = null;
          }
          else
          {
             // if it is not a continuation, check if the path should be closed
+            //O if(path.seglist.length > 2){
             if ( path.seglist.length > 2 )
             {
+               //O var seglist:Array = path.seglist;
                let seglist:Array = path.seglist;
+               //O  var intersect:Point = Global.lineIntersect(seglist[0].p1, seglist[0].p2, seglist[seglist.length-1].p1, seglist[seglist.length-1].p2, true);
                let intersect: PIXI.Point = Global.lineIntersect( seglist[ 0 ].p1, seglist[0].p2, seglist[seglist.length-1].p1, seglist[seglist.length-1].p2, true );
+               //O if(intersect != null && !isNaN(intersect.x) && !isNaN(intersect.y))
                if ( intersect != null && !isNaN( intersect.x ) && !isNaN( intersect.y ))
                {
+                  //O seglist[0].p1 = intersect;
                   seglist[ 0 ].p1 = intersect;
+                  //O eglist[seglist.length-1].p2 = intersect;
                   seglist[ seglist.length-1 ].p2 = intersect;
                }
             }
 
+            //O
             /*path.docx = -Global.xorigin/Global.zoom;
             path.docy = -Global.yorigin/Global.zoom;*/
+            //O path.redrawDots();
             path.redrawDots( );
+            //O  scene.addPath(path);
             this.scene.addPath( path );
          }
       }
 
+      //O Global.dragging = false;
       Global.dragging = false;
+      //O removeChild(sketch);
       this.removeChild( this.sketch );
 
    }
 
+   //O public function timeIncrement(e:TimerEvent):void
    public timeIncrement( e:TimerEvent ): void
    {
+      //O now++;
       this.now++;
    }
 }
